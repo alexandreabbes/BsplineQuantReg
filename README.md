@@ -1,2 +1,0 @@
-# BsplineQuantReg
-# BsplineQuantReg
