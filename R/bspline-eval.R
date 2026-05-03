@@ -73,7 +73,6 @@ bs_direct<-function(Basis,xvalues)
 }
 
 
-
 #' Evaluate a piecewise polynomial (PP) form
 #'
 #' Evaluates a piecewise polynomial function at given points.
@@ -82,6 +81,7 @@ bs_direct<-function(Basis,xvalues)
 #' @param xvalues Vector of evaluation points
 #' @return Function values at the requested points
 #' @keywords internal
+
 evalpp<-function(p,xvalues){
   #this evaluates a polynomial p under the pp form,
   #p if given with its knots and the local coefficients
@@ -137,14 +137,17 @@ makpp<-function(coef,tn){
 #' Plots all basis functions of a B-spline.
 #'
 #' @param Bspline Object returned by \code{Bspline_base}
-#' @param xvalues Vector of evaluation points for plotting
+#' @param xvalues Vector of evaluation points for plotting (by default 100 points are computed in the knot range)
 #' @export
 #'
-view_basis<-function(Bspline,xvalues)
-{#permet de tracer la spline Bspline
-  #Bspline est un type ad-hoc avec les
-  #coefficients, les noeuds, le degré.
+view_basis<-function(Bspline,xvalues=0)
+{
+  if (xvalues==0){
+    k=range(Bspline$knots)
+    xvalues=(k[1]:(k[2]*100))/100}
+
   yvalues=bs_direct(Bspline,xvalues)
+
   matplot(xvalues, t(yvalues))
 }
 

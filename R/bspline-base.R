@@ -30,36 +30,38 @@ Omega<-function(s,j,o)#t: knots in the base t-t[j]
 
 
 #' Build B-spline basis in piecewise polynomial form
-#'
 #' Computes local polynomial coefficients for each B-spline basis function
 #' on each interval. Polynomials are expressed in the canonical basis
-#' (1, t, t^2, t^3) centered at the interval origin.
-#'
-#' @param sn Extended knot vector (including endpoint repetitions)
+#' Uses De Boor's recursion formula.
+#' @param sn Extended knot vector (including endpoint repetitions ; This means if t0..t_{kn} it the set of knots
+#' then sn should be given as a vector with  "degree" times t_0 and t_{kn} at the begining
+#'  and the ends.  its length is number of intervals+1+2*degree)
 #' @param degree B-spline degree (default = 3 for cubic)
 #' @param der Derivative order (0 = original basis)
 #' @return A list containing:
-#'   \item{base}{Coefficients in local basis (Taylor centered at interval origin)}
-#'   \item{base0}{Coefficients in canonical basis}
+#'   \item{base}{Coefficients in the local bases, in the form of an 3-d array [j,nu,coeff], j : the number of the spline in the basis,
+#'   nu: the number of the interval in the extended notation, coeff : the coefficients in decreasing order
+#'   convention on the local bases (t-s_nu)^l, l=3..1
+#'   base[j,,] is a matrix of piecewise polynomial function compatible with the pp-form.}
+#'   \item{base0}{Coefficients in canonical basis (centered at 0) (1, t, t^2, t^3) centered at the interval origin.}
 #'   \item{knots}{Extended knot vector}
-#'   \item{int_knots}{Internal knots (effective partition)}
+#'   \item{int_knots}{Internal knots (effective partition including ends)}
 #'   \item{degree}{Spline degree}
 #'   \item{n_splines}{Number of basis functions}
 #'   \item{deriv_order}{Applied derivative order}
 #' @examples
 #' sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
 #' basis <- Bspline_base(sn, degree=3)
-  #' @export
+#' x=(0:(5*100))/100
+#' y=bs_direct(basis,x)
+#' matplot(x,y)
+#' #or simple:
+#' #view_basis(basis)
+#'
+#' @export
 
 Bspline_base<-function(sn,degree=3,der=0)
 {
-  #' this computes a Bspline basis coefficients, on the local power bases.
-  #'sn is the extended knot vector
-  #' including the ends of th interval. This means if t0..t_{kn} it the set of knots
-  #' then sn should be given as a vector with  "degree" times t_0 and t_{kn} at the begining and the ends.
-  #'  its length is number of intervals+1+2*degree
-  #'This
-
   tn=sn[(degree+1):(length(sn)-degree)] #effective knots partition
   kn=length(tn)-1 # tn is the interior knots without the extended partition.
 

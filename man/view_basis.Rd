@@ -4,12 +4,12 @@
 \alias{view_basis}
 \title{Visualize a B-spline functions basis}
 \usage{
-view_basis(Bspline, xvalues)
+view_basis(Bspline, xvalues = 0)
 }
 \arguments{
 \item{Bspline}{Object returned by \code{Bspline_base}}
 
-\item{xvalues}{Vector of evaluation points for plotting}
+\item{xvalues}{Vector of evaluation points for plotting (by default 100 points are computed in the knot range)}
 }
 \description{
 Plots all basis functions of a B-spline.

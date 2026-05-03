@@ -1,4 +1,4 @@
-# rhotau, SplineCubicQuantBspkn3, apply_karlin_constraints
+# rhotau, SplineConstQuantRegBs3, apply_karlin_constraints
 
 
 
@@ -168,14 +168,13 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
   boundary_knots <- range(knots)
   degree=3
   N=length(knots)+3-1
-  #B <- bs(xtab, knots = knots, degree = degree)
+  #B <- bs(xtab, knots = knots, degree = degree,
+  #Boundary.knots = boundary_knots, intercept = TRUE) #this line allows to use the library spline (faster)
   #B=B[,1:N]
-
-  #        Boundary.knots = boundary_knots, intercept = TRUE)
   #kn=length(knots)-1
   #N <- kn+degree
+
   int_knots=knots[2:kn]
-  #cat("Nombre de fonctions de base:", N, "\n")
 
   # Calcul des coefficients normalisés des dérivées
   deriv_spline <- bspline_to_deriv_coeffs_pp(knots, degree = 3,xvalues=xtab)
