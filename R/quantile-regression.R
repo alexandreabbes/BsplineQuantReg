@@ -24,7 +24,6 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0) {
   # Nombre correct de fonctions de base: kn + degree+1
   nbasis <- kn + degree
 
-  # Créer la base B-spline avec fda
   norder <- degree + 1  # 4 pour cubique
 
   # Créer la base avec create.bspline.basis
@@ -34,7 +33,7 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0) {
 
   N <-BB$n_splines
 
-  cat("Nombre de fonctions de base (fda):", N, "\n")
+  cat("Nombre de fonctions de base", N, "\n")
 
   # Matrice des coefficients pour la dérivée première normalisée
 
@@ -135,7 +134,7 @@ apply_karlin_constraints <- function(p2, p1, p0, z0) {
 #' @export
 
 
-SplineCubicQuantBspkn3 <- function(xtab, ytab, knots, tau,
+SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
                                    monot = 0,
                                    convcons=0,
                                    solver = "CLARABEL", weight = NULL)
@@ -178,7 +177,7 @@ SplineCubicQuantBspkn3 <- function(xtab, ytab, knots, tau,
   int_knots=knots[2:kn]
   #cat("Nombre de fonctions de base:", N, "\n")
 
-  # Calcul des coefficients normalisés des dérivées avec fda
+  # Calcul des coefficients normalisés des dérivées
   deriv_spline <- bspline_to_deriv_coeffs_pp(knots, degree = 3,xvalues=xtab)
   deriv_coeffs <-deriv_spline$d1
   deriv_coeffs2<-deriv_spline$d2
@@ -267,7 +266,6 @@ SplineCubicQuantBspkn3 <- function(xtab, ytab, knots, tau,
     int_knots = knots
   ))
 }
-
 
 
 

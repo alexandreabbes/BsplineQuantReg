@@ -27,20 +27,20 @@ test_karlin_simple <- function() {
   n=7
   monot=c(rep(1,n),rep(0,(12-n)))
   knots <- quantile(xtab, probs = seq(0, 1, length.out = kn + 1))
-  res<-SplineCubicQuantBspkn3(xtab, ytab, knots, tau = 0.9,
+  res<-SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.9,
                               monot = 0, solver = "OSQP")
   cat("\n=== TEST CROISSANT PARTIEL ===\n")
 
   #  monot=0
-  res_croissant <- SplineCubicQuantBspkn3(xtab, ytab, knots, tau = 0.5,
+  res_croissant <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
                                           monot = monot, convcons=0,solver = "OSQP")
 
   cat("\n=== TEST DÉCROISSANT ===\n")
-  res_decroissant <- SplineCubicQuantBspkn3(xtab, ytab, knots, tau = 0.5,
+  res_decroissant <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
                                             monot = -1, solver = "OSQP")
   cat("\n=== TEST CONVEXE ===\n")
-  res_convexe <- SplineCubicQuantBspkn3(xtab, ytab, knots,monot=0,convcons=1, tau = 0.5)
-  res_convexe <- SplineCubicQuantBspkn3(xtab, ytab, knots,monot=0,convcons=1, tau = 0.5)
+  res_convexe <- SplineConstQuantRegBs3(xtab, ytab, knots,monot=0,convcons=1, tau = 0.5)
+  res_convexe <- SplineConstQuantRegBs3(xtab, ytab, knots,monot=0,convcons=1, tau = 0.5)
   #                                                   monot = -1, solver = "OSQP")
   # Visualisation
   par(mfrow = c(2, 2))
