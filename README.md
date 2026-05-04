@@ -59,6 +59,10 @@ The `cobs` package (Constrained B-Splines) is the closest to this package, but w
 Due to the current implementation (pure R with CVXR), the package is **significantly slower** than its Python counterpart. Cubic B-spline quantile regression with constraints involves solving SOCP problems, and the R implementation does not yet leverage optimized linear algebra libraries.
 [Python version](https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines) 
 
+Current benchmarking (median regression, n=1000, kn=20, cubic splines):
+
+⚠️ The R version is currently **50-100x slower** than Python (estimation) 
+
 ### Future Improvements
 
 We plan to improve performance in future releases by:
