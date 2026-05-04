@@ -12,8 +12,11 @@ Description: Quantile regression with cubic B-splines under monotonicity
     consistency and correctness.
 Depends: R (>= 3.5.0)
 Imports: CVXR
-Suggests: splines, splines2, fda, testthat, Pracma
+Suggests: splines, splines2, fda, testthat, Pracma, knitr, rmarkdown
+VignetteBuilder: knitr
 License: GPL-3
 Encoding: UTF-8
 LazyData: false
 RoxygenNote: 7.3.3
+
+

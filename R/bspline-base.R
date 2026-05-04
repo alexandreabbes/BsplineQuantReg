@@ -54,7 +54,7 @@ Omega<-function(s,j,o)#t: knots in the base t-t[j]
 #' basis <- Bspline_base(sn, degree=3)
 #' x=(0:(5*100))/100
 #' y=bs_direct(basis,x)
-#' matplot(x,y)
+#' matplot(x,t(y))
 #' #or simple:
 #' #view_basis(basis)
 #'
@@ -161,7 +161,7 @@ Bspline_deriv<-function(bspline,der=2){
       p=polyderiv(Bn[j,nu,],der)
       q=polyderiv(B0[j,nu,],der)
       if (!is.null(p)){
-        print(c(j,nu))
+
         Bn_der[j,nu,]=p
         B0_der[j,nu,]=q
       }

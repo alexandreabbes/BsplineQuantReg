@@ -1,7 +1,18 @@
 # rhotau, SplineConstQuantRegBs3, apply_karlin_constraints
 
 
-
+#' @references
+#' \itemize{
+#'   \item Abbes, A. (2025). \emph{Quantile regression with cubic polynomial splines under shape constraints with applications}
+#'         . Zenodo.
+#'         \doi{10.5281/zenodo.16999784}
+#'   \item de Boor, C. (1978). \emph{A Practical Guide to Splines}. Springer-Verlag.
+#'         \doi{10.1007/978-1-4612-6333-3}
+#'   \item Karlin, S., & Studden, W. J. (1966). \emph{Tchebycheff Systems: With
+#'         Applications in Analysis and Statistics}. Interscience Publishers.
+#'   \item Koenker, R., & Bassett, G. (1978). Regression Quantiles.
+#'         \emph{Econometrica}, 46(1), 33-50. \doi{10.2307/1913643}
+#' }
 
 #' Convert B-spline to derivative coefficients
 #'
@@ -50,14 +61,14 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0) {
       a1<-basis[j,nu,3]
       c1<-2*basis[j,nu,2]
 
-      # coeffs_poly est [a0, a1, a2, a3] a0+a1*x+a_2*x^2...
-      deriv_coeffs[nu-degree,j,]=c(a1,a2,a3)
+      # coeffs_poly est [a3, a2, a1, a0] a0+a1*x+a_2*x^2+a3*x^3
+      deriv_coeffs[nu-degree,j,]=c(a3,a2,a1)
       deriv2_val[nu-degree,j]=c1
     }
 
     # for the last knot the second deriv is an affine function
     # c1+c2(t-t_{kn-1}) h is the last intervall space
-    c2=6*basis[j,nu,4]
+    c2=6*basis[j,nu,1]
     deriv2_val[nu-degree+1,j]=c1+c2*h
   }
   if (length(xvalues)!=1){yvalues=bs_direct(BB,xvalues)}
@@ -91,12 +102,6 @@ apply_karlin_constraints <- function(p2, p1, p0, z0) {
   return(constraints)
 }
 
-#' Régression quantile avec splines cubiques - Version avec contraintes de Karlin
-#' pour la monotonie
-#' et contraintes de convexite aux noeuds.
-#'
-
-
 #' Constrained quantile regression with cubic splines
 #'
 #' Performs quantile regression using cubic B-splines, with optional
@@ -124,13 +129,22 @@ apply_karlin_constraints <- function(p2, p1, p0, z0) {
 #' knots <- quantile(x, probs=seq(0,1,length.out=10))
 #'
 #' # Median quantile regression without constraints
-#' fit <- SplineCubicQuantBspkn3(x, y, knots, tau=0.5)
+#' fit <- SplineConstQuantRegBs3(x, y, knots, tau=0.5)
 #'
 #' # With increasing monotonicity constraint
-#' fit_monot <- SplineCubicQuantBspkn3(x, y, knots, tau=0.5, monot=1)
+#' fit_monot <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, monot=1)
 #'
 #' # With convexity constraint
-#' fit_convex <- SplineCubicQuantBspkn3(x, y, knots, tau=0.5, convcons=1)
+#' fit_convex <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, convcons=1)
+#' #\dontshow{
+#' # Simple self-contained example for R CMD check
+#' set.seed(42)
+#' x <- seq(0, 1, length=50)
+#' y <- 2*x + 0.5*sin(6*pi*x) + 0.05*rnorm(50)
+#' knots <- quantile(x, probs=seq(0,1,length.out=8))
+#' fit <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, monot=0)
+#' print(range(fit$coefficients))
+#' }
 #' @export
 
 
@@ -206,7 +220,7 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
         a_coef=sum(deriv_coeffs[i,,1]*alpha) *monot[i]
         b_coef=sum(deriv_coeffs[i,,2]*alpha) *monot[i]
         c_coef=sum(deriv_coeffs[i,,3]*alpha) *monot[i]
-
+        #a*x^2+b*x+c
         CK<-apply_karlin_constraints(a_coef,b_coef,c_coef,z_vars[[i]])
         constraints<-c(constraints,CK)
       }

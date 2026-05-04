@@ -9,11 +9,11 @@
 #' @param xvalues Vector of evaluation points
 #' @return Spline values at the requested points
 #' @examples
-#' # Create and evaluate a spline
+#'{ # Create and evaluate a spline
 #' sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
 #' basis <- Bspline_base(sn, degree=3)
 #' basis$coefficients <- runif(basis$n_splines)
-#' y <- spline_eval(basis, seq(0,5,length=100))
+#' y <- spline_eval(basis, seq(0,5,length=100))}
 #' @export
 
 spline_eval<-function(Bspline,xvalues)

@@ -2,9 +2,7 @@
 % Please edit documentation in R/quantile-regression.R
 \name{SplineConstQuantRegBs3}
 \alias{SplineConstQuantRegBs3}
-\title{Régression quantile avec splines cubiques - Version avec contraintes de Karlin
-pour la monotonie
-et contraintes de convexite aux noeuds.}
+\title{Constrained quantile regression with cubic splines}
 \usage{
 SplineConstQuantRegBs3(
   xtab,
@@ -44,9 +42,6 @@ A list containing:
   \item{int_knots}{Same as knots (compatibility)}
 }
 \description{
-Constrained quantile regression with cubic splines
-}
-\details{
 Performs quantile regression using cubic B-splines, with optional
 monotonicity constraints (via Karlin-Studden) and convexity constraints.
 }
@@ -57,11 +52,20 @@ y <- 2*x + sin(6*pi*x)/2 + rnorm(100, 0, 0.05)
 knots <- quantile(x, probs=seq(0,1,length.out=10))
 
 # Median quantile regression without constraints
-fit <- SplineCubicQuantBspkn3(x, y, knots, tau=0.5)
+fit <- SplineConstQuantRegBs3(x, y, knots, tau=0.5)
 
 # With increasing monotonicity constraint
-fit_monot <- SplineCubicQuantBspkn3(x, y, knots, tau=0.5, monot=1)
+fit_monot <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, monot=1)
 
 # With convexity constraint
-fit_convex <- SplineCubicQuantBspkn3(x, y, knots, tau=0.5, convcons=1)
+fit_convex <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, convcons=1)
+#\dontshow{
+# Simple self-contained example for R CMD check
+set.seed(42)
+x <- seq(0, 1, length=50)
+y <- 2*x + 0.5*sin(6*pi*x) + 0.05*rnorm(50)
+knots <- quantile(x, probs=seq(0,1,length.out=8))
+fit <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, monot=0)
+print(range(fit$coefficients))
+}
 }

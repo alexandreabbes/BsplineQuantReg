@@ -42,7 +42,7 @@ sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
 basis <- Bspline_base(sn, degree=3)
 x=(0:(5*100))/100
 y=bs_direct(basis,x)
-matplot(x,y)
+matplot(x,t(y))
 #or simple:
 #view_basis(basis)
 
