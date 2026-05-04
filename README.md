@@ -76,4 +76,4 @@ We plan to improve performance in future releases by:
 
 ```r
 # Install from GitHub
-devtools::install_github("alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines", ref = "R")
+devtools::install_github("alexandreabbes/BsplineQuantReg", ref = "main")
