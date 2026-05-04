@@ -50,7 +50,23 @@ The `cobs` package (Constrained B-Splines) is the closest to this package, but w
 ### When to use this package vs cobs
 
 - **Use `cobs`** : For linear or quadratic splines, simpler constraints
-- **Use this package** : For cubic splines, Karlin-Studden exact constraints, polynomial coefficient extraction
+- **Use this package** : For cubic splines testing , Karlin-Studden exact constraints, polynomial coefficient extraction
+
+## ⚠️ Performance Notice
+
+**This R package is currently intended for demonstration, prototyping,  and educational purposes only.**
+
+Due to the current implementation (pure R with CVXR), the package is **significantly slower** than its Python counterpart. Cubic B-spline quantile regression with constraints involves solving SOCP problems, and the R implementation does not yet leverage optimized linear algebra libraries.
+[Python version](https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines) 
+
+### Future Improvements
+
+We plan to improve performance in future releases by:
+- Linking with faster optimization libraries (OSQP, Gurobi)
+- Implementing more efficient SOCP solvers
+- Optimizing the B-spline basis computation
+
+**The Python version remains the recommended choice for production use.**
 
 ### Installation for beta testing:
 
