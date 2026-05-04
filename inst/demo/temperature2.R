@@ -69,7 +69,7 @@ y_uncon <- spline_eval(fit_uncon, x_eval)
 # ============================================================
 cat("\n=== 2. Full increasing monotonicity (everywhere) ===\n")
 fit_full_inc <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
-                                       monot = 1, convcons = 0, solver="OSQP")
+                                       monot = 0, convcons = -1, solver="OSQP")
 y_full_inc <- spline_eval(fit_full_inc, x_eval)
 
 # ============================================================
