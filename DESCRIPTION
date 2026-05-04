@@ -1,7 +1,7 @@
 Package: ConstrainedQuantileSplines
 Type: Package
 Title: Constrained Quantile Regression with Cubic B-Splines
-Version: 0.1.0-beta
+Version: 0.1.0
 Date: 2026-05-04
 Authors@R: person("Alexandre", "Abbes", 
                   email = "alexandre.abbes@proton.me",
@@ -17,28 +17,4 @@ Imports: CVXR, pracma
 Suggests: splines, splines2, fda, testthat, knitr, rmarkdown
 VignetteBuilder: knitr
 Encoding: UTF-8
-RoxygenNote: 7.2.0
-
-
-Package: ConstrainedQuantileSplines
-Type: Package
-Title: Constrained Quantile Regression with Cubic B-Splines
-Version: 0.1.0
-Date: 2026-04-26
-Authors@R: person("Alexandre", "Abbes", 
-                  email = "alexandre.abbes@proton.me",
-                  role = c("aut", "cre"))
-Description: Quantile regression with cubic B-splines under monotonicity 
-    and convexity constraints using the Karlin-Studden SOCP formulation.
-    All polynomial and spline functions are reimplemented to ensure 
-    consistency and correctness.
-Depends: R (>= 3.5.0)
-Imports: CVXR
-Suggests: splines, splines2, fda, testthat, Pracma, knitr, rmarkdown
-VignetteBuilder: knitr
-License: GPL-3
-Encoding: UTF-8
-LazyData: false
 RoxygenNote: 7.3.3
-
-

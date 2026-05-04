@@ -8,3 +8,13 @@
     "Use test_karlin_simple() for a demo."
   )
 }
+#' Package load message
+#'
+#' @keywords internal
+.onAttach <- function(libname, pkgname) {
+  packageStartupMessage(
+    "ConstrainedQuantileSplines (version 0.1.0-beta)\n",
+    "This is a BETA version. The API may change in future releases.\n",
+    "Use demo() to see examples: demo(package = 'ConstrainedQuantileSplines')"
+  )
+}

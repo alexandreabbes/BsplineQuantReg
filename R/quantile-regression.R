@@ -1,30 +1,19 @@
 # rhotau, SplineConstQuantRegBs3, apply_karlin_constraints
 
 
-#' @references
-#' \itemize{
-#'   \item Abbes, A. (2025). \emph{Quantile regression with cubic polynomial splines under shape constraints with applications}
-#'         . Zenodo.
-#'         \doi{10.5281/zenodo.16999784}
-#'   \item de Boor, C. (1978). \emph{A Practical Guide to Splines}. Springer-Verlag.
-#'         \doi{10.1007/978-1-4612-6333-3}
-#'   \item Karlin, S., & Studden, W. J. (1966). \emph{Tchebycheff Systems: With
-#'         Applications in Analysis and Statistics}. Interscience Publishers.
-#'   \item Koenker, R., & Bassett, G. (1978). Regression Quantiles.
-#'         \emph{Econometrica}, 46(1), 33-50. \doi{10.2307/1913643}
-#' }
+
 
 #' Convert B-spline to derivative coefficients
 #'
 #' Converts a B-spline basis to normalized first and second derivative
 #' coefficients on each interval.
 #'
-#' @param tn Knot vector (effective partition)
+#' @param tn Knot vector (effective partition, not extended)
 #' @param degree Spline degree (default = 3)
 #' @param xvalues Evaluation points for design matrix (0 = no evaluation)
 #' @return A list containing:
 #'   \item{d0}{Design matrix (if xvalues provided)}
-#'   \item{d1}{First derivative coefficients [a1, a2, a3] for each interval}
+#'   \item{d1}{First derivative coefficients [a3, a2, a1] for each interval}
 #'   \item{d2}{Second derivative values at knots}
 #' @export
 bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0) {
@@ -144,6 +133,34 @@ apply_karlin_constraints <- function(p2, p1, p0, z0) {
 #' knots <- quantile(x, probs=seq(0,1,length.out=8))
 #' fit <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, monot=0)
 #' print(range(fit$coefficients))
+#' }
+#'
+#' @seealso
+#' Related R packages:
+#' \itemize{
+#'   \item \code{\link[quantreg]{quantreg}} - Quantile regression with linear programming
+#'   \item \code{\link[cobs]{cobs}} - Constrained B-sines (linear and quadratic only)
+#' }
+#'
+#' Other implementations:
+#' \itemize{
+#'   \item MATLAB/Python versions: \url{https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines}
+#' }
+#' @references
+#' \itemize{
+#'   \item Abbes, A. (2025). \emph{Quantile regression with cubic polynomial splines under shape constraints with applications}
+#'         . Zenodo.
+#'         \doi{10.5281/zenodo.16999784}
+#'   \item de Boor, C. (1978). \emph{A Practical Guide to Splines}. Springer-Verlag.
+#'         \doi{10.1007/978-1-4612-6333-3}
+#'   \item Karlin, S., & Studden, W. J. (1966). \emph{Tchebycheff Systems: With
+#'         Applications in Analysis and Statistics}. Interscience.
+#'   \item Koenker, R., & Bassett, G. (1978). Regression Quantiles.
+#'         \emph{Econometrica}, 46(1), 33-50. \doi{10.2307/1913643}
+#'   \item Koenker, R. (2025). quantreg: Quantile Regression. R package version 5.99.
+#'         \url{https://CRAN.R-project.org/package=quantreg}
+#'   \item Ng, P., & Maechler, M. (2024). cobs: Constrained B-Splines.
+#'         R package version 1.3-8. \url{https://CRAN.R-project.org/package=cobs}
 #' }
 #' @export
 

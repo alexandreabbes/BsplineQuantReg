@@ -68,4 +68,34 @@ knots <- quantile(x, probs=seq(0,1,length.out=8))
 fit <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, monot=0)
 print(range(fit$coefficients))
 }
+
+}
+\references{
+\itemize{
+  \item Abbes, A. (2025). \emph{Quantile regression with cubic polynomial splines under shape constraints with applications}
+        . Zenodo.
+        \doi{10.5281/zenodo.16999784}
+  \item de Boor, C. (1978). \emph{A Practical Guide to Splines}. Springer-Verlag.
+        \doi{10.1007/978-1-4612-6333-3}
+  \item Karlin, S., & Studden, W. J. (1966). \emph{Tchebycheff Systems: With
+        Applications in Analysis and Statistics}. Interscience.
+  \item Koenker, R., & Bassett, G. (1978). Regression Quantiles.
+        \emph{Econometrica}, 46(1), 33-50. \doi{10.2307/1913643}
+  \item Koenker, R. (2025). quantreg: Quantile Regression. R package version 5.99.
+        \url{https://CRAN.R-project.org/package=quantreg}
+  \item Ng, P., & Maechler, M. (2024). cobs: Constrained B-Splines.
+        R package version 1.3-8. \url{https://CRAN.R-project.org/package=cobs}
+}
+}
+\seealso{
+Related R packages:
+\itemize{
+  \item \code{\link[quantreg]{quantreg}} - Quantile regression with linear programming
+  \item \code{\link[cobs]{cobs}} - Constrained B-sines (linear and quadratic only)
+}
+
+Other implementations:
+\itemize{
+  \item MATLAB/Python versions: \url{https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines}
+}
 }

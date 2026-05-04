@@ -5,8 +5,12 @@
 \title{Package load message}
 \usage{
 .onAttach(libname, pkgname)
+
+.onAttach(libname, pkgname)
 }
 \description{
+Package load message
+
 Package load message
 }
 \keyword{internal}
