@@ -101,7 +101,7 @@ evalpp<-function(p,xvalues){
     h=xval-tn[i]
     pval<-c(pval,poly_eval(poly_loc,h))
   }
-  xval=xvalues[xvalues=tn[kn]]
+  xval=xvalues[xvalues==tn[kn]]
   #pval=c(pval,polyval(p=rev(poly_loc),xval)) #if use of R convention
   h=tn[kn]-tn[kn-1]
   pval=c(pval,poly_eval(poly_loc,h)) #use our convention for polynomial

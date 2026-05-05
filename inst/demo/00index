@@ -1,3 +1,4 @@
 monotonicity   Monotonicity constraints demo
 convexity      Convexity and concavity constraints demo
 comparison     Comparison of unconstrained vs constrained fits
+temperature     Temperature anomaly analysis: uniform increasing vs mixed constraints (decreasing 1956-1973 only)

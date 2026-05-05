@@ -69,7 +69,7 @@ y_uncon <- spline_eval(fit_uncon, x_eval)
 # ============================================================
 cat("\n=== 2. Full increasing monotonicity (everywhere) ===\n")
 fit_full_inc <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
-                                       monot = 0, convcons = -1, solver="OSQP")
+                                       monot = 1, convcons = 0)
 y_full_inc <- spline_eval(fit_full_inc, x_eval)
 
 # ============================================================
@@ -233,3 +233,4 @@ cat("  - Quantile regression reveals changing distribution over time\n")
 cat("\nThis demonstrates that flexible constraint patterns\n")
 cat("are more realistic than global monotonicity.\n")
 cat("\nDemo completed.\n")
+
