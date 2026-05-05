@@ -83,8 +83,8 @@ apply_karlin_constraints <- function(p2, p1, p0, z0) {
   constraints <- list()
   constraints <- c(constraints, list(z0 >= 0))
 
-  K1_vec <- vstack(p0 + p2 - z0,p1-z0)
-  K2_vec <- (p0 +p2+ z0)
+  K1_vec <- vstack(p0 - p2 - z0,p1-z0)
+  K2_vec <- (p0+p2- z0)
 
   constraints <- c(constraints, list(K2_vec >= p_norm(K1_vec, 2)))
 
