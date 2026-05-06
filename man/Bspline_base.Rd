@@ -10,9 +10,9 @@ Uses De Boor's recursion formula.}
 Bspline_base(sn, degree = 3, der = 0)
 }
 \arguments{
-\item{sn}{Extended knot vector (including endpoint repetitions ; This means if t0..t_{kn} it the set of knots
-then sn should be given as a vector with  "degree" times t_0 and t_{kn} at the begining
- and the ends.  its length is number of intervals+1+2*degree)}
+\item{sn}{Extended knot vector (including endpoint repetitions) ; This means if t0..t_{kn} it the set of knots
+then sn should be given as a vector with  "degree" times t_0 and t_kn at the begining
+ and the ends.  its length is number of intervals+1+2*degree.}
 
 \item{degree}{B-spline degree (default = 3 for cubic)}
 

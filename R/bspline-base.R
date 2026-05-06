@@ -20,22 +20,17 @@ Omega<-function(s,j,o)#t: knots in the base t-t[j]
   else
   {alpha=1/(s[j+o-1]-s[j])
   beta=(-s[j]*alpha)
-  #w<-c(beta,alpha) } # This is the affine element wjl of deBoor
   w<-c(alpha,beta)#MatNot
-  #wik=(t-s_i)/(s_{i+k-1}-s_{i})=alpha*t+beta
-  print(w)
   return(w)
   }
 }
-
-
 #' Build B-spline basis in piecewise polynomial form
 #' Computes local polynomial coefficients for each B-spline basis function
 #' on each interval. Polynomials are expressed in the canonical basis
 #' Uses De Boor's recursion formula.
-#' @param sn Extended knot vector (including endpoint repetitions ; This means if t0..t_{kn} it the set of knots
-#' then sn should be given as a vector with  "degree" times t_0 and t_{kn} at the begining
-#'  and the ends.  its length is number of intervals+1+2*degree)
+#' @param sn Extended knot vector (including endpoint repetitions) ; This means if t0..t_{kn} it the set of knots
+#' then sn should be given as a vector with  "degree" times t_0 and t_kn at the begining
+#'  and the ends.  its length is number of intervals+1+2*degree.
 #' @param degree B-spline degree (default = 3 for cubic)
 #' @param der Derivative order (0 = original basis)
 #' @return A list containing:
@@ -68,9 +63,6 @@ Bspline_base<-function(sn,degree=3,der=0)
   n_intervals<-kn+2*degree #Nb extended intervals
   n_splines<-kn+degree
   B<-array(0,dim=c((degree+1),n_splines,n_intervals,(degree+1))) # B is the initial B-spline basis : piecewise constant
-  #for (i in (degree+1):(kn+degree)){B[1,i,i,1]<-1} # initialisation of the splines in increasing convention
-  #with degree 0 wich has dimension kn
-  # 1: degree 0, kn = Nb interval; kn= Nb elements in the basis of degree 0
 
   for (i in (degree+1):(kn+degree)){B[1,i,i,degree+1]<-1}#in decreasing convention
   if (degree>0){

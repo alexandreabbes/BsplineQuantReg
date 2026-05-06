@@ -59,15 +59,6 @@ fit_monot <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, monot=1)
 
 # With convexity constraint
 fit_convex <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, convcons=1)
-#\dontshow{
-# Simple self-contained example for R CMD check
-set.seed(42)
-x <- seq(0, 1, length=50)
-y <- 2*x + 0.5*sin(6*pi*x) + 0.05*rnorm(50)
-knots <- quantile(x, probs=seq(0,1,length.out=8))
-fit <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, monot=0)
-print(range(fit$coefficients))
-}
 
 }
 \references{

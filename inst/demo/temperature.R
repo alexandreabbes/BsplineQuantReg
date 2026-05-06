@@ -6,7 +6,7 @@
 # 2. Uniform increasing constraint (everywhere)
 # 3. Mixed: Decreasing only between 1956-1973, unconstrained elsewhere
 
-library(BsplineQuantReg)
+library(ConstrainedQuantileSplines)
 
 cat("========================================\n")
 cat("Demo: Temperature Anomaly Trend Analysis\n")
