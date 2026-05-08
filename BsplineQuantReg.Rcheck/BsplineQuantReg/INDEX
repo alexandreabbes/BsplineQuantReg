@@ -1,0 +1,27 @@
+Bspline_base            Build B-spline basis in piecewise polynomial
+                        form Computes local polynomial coefficients for
+                        each B-spline basis function on each interval.
+                        Polynomials are expressed in the canonical
+                        basis Uses De Boor's recursion formula.
+Bspline_deriv           Differentiate a B-spline basis
+SplineConstQuantRegBs3
+                        Constrained quantile regression with cubic
+                        splines
+Spline_der_knots        Derivatives at knots of a B-spline
+apply_karlin_constraints
+                        Karlin-Studden constraints for monotonicity
+bs_direct               Direct evaluation of a B-spline basis
+bspline_to_deriv_coeffs_pp
+                        Convert B-spline to derivative coefficients
+change_polynomial_base_taylor
+                        Change polynomial basis (Taylor expansion)
+is_beta                 Check if package is beta version
+package_version         Get package version
+poly_eval               Evaluate polynomial
+polyadd                 Polynomial addition
+polyderiv               Polynomial derivative
+polymul                 Polynomial multiplication
+reduce_pol              Reduce polynomial
+spline_eval             Evaluate a B-spline
+test_karlin_simple      Comprehensive test function
+view_basis              Visualize a B-spline functions basis

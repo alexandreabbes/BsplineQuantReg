@@ -1,0 +1,8 @@
+Hmm ... looks like a package
+Converting parsed Rd's to LaTeX ..
+Creating pdf output from LaTeX ...
+Warning in system(paste(shQuote(texi2dvi), if (quiet) "--quiet" else "",  :
+  running command '"C:\PROGRA~1\MiKTeX\miktex\bin\x64\texify.exe"  --pdf "Rd2.tex" ' had status 1
+Saving output to 'BsplineQuantReg-manual.pdf' ...
+Done
+You may want to clean up by 'rm -Rf C:/Users/ALEXAN~1/AppData/Local/Temp/RtmpYH17hD/Rd2pdf2a3c7104646a'
