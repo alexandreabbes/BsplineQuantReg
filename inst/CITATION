@@ -2,10 +2,9 @@ citHeader("To cite the ConstrainedQuantileSplines package in publications, pleas
 
 citEntry(
   entry = "Article",
+  journal="zenodo",
   title = "Constrained Quantile Regression with Cubic B-Splines using Karlin-Studden Constraints",
-  author = personList(
-    as.person("Alexandre Abbes")
-  ),
+  author = personList(as.person("Alexandre Abbes")),
   year = "2025",
   doi = "10.5281/zenodo.16999784",
   url = "https://doi.org/10.5281/zenodo.16999784",
@@ -34,8 +33,6 @@ citEntry(
 
 
 ## 5. Ajouter une version dans `inst/CITATION`
-
-```r
 citEntry(
   entry = "Manual",
   title = "ConstrainedQuantileSplines: Quantile Regression with Shape Constraints",

@@ -1,7 +1,4 @@
-# rhotau, SplineConstQuantRegBs3, apply_karlin_constraints
-
-
-
+# SplineConstQuantRegBs3, apply_karlin_constraints
 
 #' Convert B-spline to derivative coefficients
 #'
@@ -129,8 +126,8 @@ apply_karlin_constraints <- function(p2, p1, p0, z0) {
 #' @seealso
 #' Related R packages:
 #' \itemize{
-#'   \item \code{\link[quantreg]{quantreg}} - Quantile regression with linear programming
-#'   \item \code{\link[cobs]{cobs}} - Constrained B-sines (linear and quadratic only)
+#'   \item \code{quantreg} - Quantile regression with linear programming
+#'   \item \code{cobs} - Constrained B-sines (linear and quadratic only)
 #' }
 #'
 #' Other implementations:
@@ -190,11 +187,6 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
   boundary_knots <- range(knots)
   degree=3
   N=length(knots)+3-1
-  #B <- bs(xtab, knots = knots, degree = degree,
-  #Boundary.knots = boundary_knots, intercept = TRUE) #this line allows to use the library spline (faster)
-  #B=B[,1:N]
-  #kn=length(knots)-1
-  #N <- kn+degree
 
   int_knots=knots[2:kn]
 
@@ -253,25 +245,21 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
 
   for (s in unique(solvers_to_try)) {
     cat("Tentative avec solveur:", s, "\n")
-    result <- tryCatch({
-      solve(problem, solver = toupper(s), verbose = FALSE)
-    }, error = function(e) {
-      cat("Échec:", e$message, "\n")
-      NULL
-    })
-
-    if (!is.null(result) && !is.null(result$getValue(alpha))) {
+    result <- tryCatch(
+      psolve(problem, solver = toupper(s), verbose = FALSE),
+    error = function(e) {cat("Échec:", e$message, "\n")
+      NULL} )
+    if (!is.null(result) && !is.null(value(alpha))) {
       cat("Solveur réussi:", s, "\n")
-      break
-    }
+      break}
   }
 
-  if (is.null(result) || is.null(result$getValue(alpha))) {
+  if (is.null(result) || is.null(value(alpha))) {
     warning("L'optimisation n'a pas convergé avec aucun solveur")
     return(NULL)
   }
 
-  alpha_val <- result$getValue(alpha)+y_mean
+  alpha_val <- value(alpha)+y_mean
 
   #  cat("Statut:", result$status, "\n")
   #  cat("Valeur objectif:", result$value, "\n")

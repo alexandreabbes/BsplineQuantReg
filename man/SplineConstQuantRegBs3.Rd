@@ -81,8 +81,8 @@ fit_convex <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, convcons=1)
 \seealso{
 Related R packages:
 \itemize{
-  \item \code{\link[quantreg]{quantreg}} - Quantile regression with linear programming
-  \item \code{\link[cobs]{cobs}} - Constrained B-sines (linear and quadratic only)
+  \item \code{quantreg} - Quantile regression with linear programming
+  \item \code{cobs} - Constrained B-sines (linear and quadratic only)
 }
 
 Other implementations:

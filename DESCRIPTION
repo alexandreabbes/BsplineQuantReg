@@ -1,4 +1,4 @@
-Package: ConstrainedQuantileSplines
+Package: BsplineQuantReg
 Type: Package
 Title: Constrained Quantile Regression with Cubic B-Splines
 Version: 0.1.0

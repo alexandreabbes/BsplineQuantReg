@@ -75,11 +75,11 @@ y_full_inc <- spline_eval(fit_full_inc, x_eval)
 # ============================================================
 # Model 3: Partial monotonicity (only after 1970)
 # ============================================================
-break_year_1970 <- 1970
+br_year_1970 <- 1970
 monot_partial <- rep(0, length(knots) - 1)
 for (i in 1:length(monot_partial)) {
   interval_end <- knots_years[i + 1]
-  if (interval_end > break_year_1970) {
+  if (interval_end > br_year_1970) {
     monot_partial[i] <- 1
   }
 }
@@ -93,23 +93,23 @@ y_partial <- spline_eval(fit_partial, x_eval)
 # Model 4: Mixed constraints
 # Decreasing between 1945 and 1970, increasing elsewhere
 # ============================================================
-break_year_start <- 1945
-break_year_end <- 1970
+br_year_start <- 1945
+br_year_end <- 1970
 
 monot_mixed <- rep(0, length(knots) - 1)
 for (i in 1:length(monot_mixed)) {
   interval_start <- knots_years[i]
   interval_end <- knots_years[i + 1]
 
-  if (interval_start >= break_year_end) {
+  if (interval_start >= br_year_end) {
     monot_mixed[i] <- 1      # increasing after 1970
-  } else if (interval_end <= break_year_start) {
+  } else if (interval_end <= br_year_start) {
     monot_mixed[i] <- 1      # increasing before 1945
-  } else if (interval_start >= break_year_start && interval_end <= break_year_end) {
+  } else if (interval_start >= br_year_start && interval_end <= br_year_end) {
     monot_mixed[i] <- -1     # decreasing between 1945 and 1970
-  } else if (interval_start < break_year_start && interval_end > break_year_start) {
+  } else if (interval_start < br_year_start && interval_end > br_year_start) {
     monot_mixed[i] <- 1      # increasing (partial interval before 1945)
-  } else if (interval_start < break_year_end && interval_end > break_year_end) {
+  } else if (interval_start < br_year_end && interval_end > br_year_end) {
     monot_mixed[i] <- 1      # increasing (partial interval after 1970)
   }
 }
