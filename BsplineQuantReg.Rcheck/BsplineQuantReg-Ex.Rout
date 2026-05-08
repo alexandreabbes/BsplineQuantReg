@@ -293,7 +293,7 @@ Solveur succeeded: CLARABEL
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  19.78 0.96 29.86 NA NA 
+Time elapsed:  17.45 0.78 24.05 NA NA 
 > grDevices::dev.off()
 null device 
           1 

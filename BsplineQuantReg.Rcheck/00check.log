@@ -1,0 +1,83 @@
+* using log directory 'C:/Users/Alexandre/Documents/BsplineQuantReg/BsplineQuantReg.Rcheck'
+* using R version 4.5.2 (2025-10-31 ucrt)
+* using platform: x86_64-w64-mingw32
+* R was compiled by
+    gcc.exe (GCC) 14.3.0
+    GNU Fortran (GCC) 14.3.0
+* running under: Windows 10 x64 (build 18362)
+* using session charset: UTF-8
+* using option '--as-cran'
+* checking for file 'BsplineQuantReg/DESCRIPTION' ... OK
+* checking extension type ... Package
+* this is package 'BsplineQuantReg' version '0.1.0'
+* package encoding: UTF-8
+* checking CRAN incoming feasibility ... [38s] NOTE
+Maintainer: 'Alexandre Abbes <alexandre.abbes@proton.me>'
+
+New submission
+
+Package CITATION file contains call(s) to old-style personList() or
+as.personList().  Please use c() on person objects instead.
+Package CITATION file contains call(s) to old-style citEntry().  Please
+use bibentry() instead.
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking whether package 'BsplineQuantReg' can be installed ... [38s] OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking for future file timestamps ... OK
+* checking 'build' directory ... OK
+* checking DESCRIPTION meta-information ... OK
+* checking top-level files ... NOTE
+Files 'README.md' or 'NEWS.md' cannot be checked without 'pandoc' being installed.
+* checking for left-over files ... OK
+* checking index information ... OK
+* checking package subdirectories ... OK
+* checking code files for non-ASCII characters ... OK
+* checking R files for syntax errors ... OK
+* checking whether the package can be loaded ... OK
+* checking whether the package can be loaded with stated dependencies ... OK
+* checking whether the package can be unloaded cleanly ... OK
+* checking whether the namespace can be loaded with stated dependencies ... OK
+* checking whether the namespace can be unloaded cleanly ... OK
+* checking loading without being on the library search path ... OK
+* checking whether startup messages can be suppressed ... OK
+* checking use of S3 registration ... OK
+* checking dependencies in R code ... OK
+* checking S3 generic/method consistency ... OK
+* checking replacement functions ... OK
+* checking foreign function calls ... OK
+* checking R code for possible problems ... [16s] OK
+* checking Rd files ... OK
+* checking Rd metadata ... OK
+* checking Rd line widths ... OK
+* checking Rd cross-references ... OK
+* checking for missing documentation entries ... OK
+* checking for code/documentation mismatches ... OK
+* checking Rd \usage sections ... OK
+* checking Rd contents ... OK
+* checking for unstated dependencies in examples ... OK
+* checking installed files from 'inst/doc' ... OK
+* checking files in 'vignettes' ... OK
+* checking examples ... [25s] NOTE
+Examples with CPU (user + system) or elapsed time > 5s
+                       user system elapsed
+SplineConstQuantRegBs3 5.60   0.31    7.53
+test_karlin_simple     5.35   0.11    6.52
+* checking for unstated dependencies in 'demo' ... OK
+* checking for unstated dependencies in vignettes ... OK
+* checking package vignettes ... OK
+* checking re-building of vignette outputs ... [32s] OK
+* checking PDF version of manual ... OK
+* checking HTML version of manual ... OK
+* checking for non-standard things in the check directory ... OK
+* checking for detritus in the temp directory ... NOTE
+Found the following files/directories:
+  'lastMiKTeXException'
+* DONE
+Status: 4 NOTEs
