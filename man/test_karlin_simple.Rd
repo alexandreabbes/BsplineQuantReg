@@ -2,8 +2,7 @@
 % Please edit documentation in R/test_bsqr.R
 \name{test_karlin_simple}
 \alias{test_karlin_simple}
-\title{Fonction de test simplifiée
-Comprehensive test function}
+\title{Comprehensive test function}
 \usage{
 test_karlin_simple()
 }

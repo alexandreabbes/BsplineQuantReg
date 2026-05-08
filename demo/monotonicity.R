@@ -3,7 +3,7 @@
 # This demo shows quantile regression with increasing/decreasing constraints
 
 # Load the package
-library(ConstrainedQuantileSplines)
+library(BsplineQuantReg)
 
 # Generate data
 set.seed(42)

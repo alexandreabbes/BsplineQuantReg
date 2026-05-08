@@ -1,5 +1,4 @@
 
-#' Fonction de test simplifiée
 
 #' Comprehensive test function
 #'
@@ -16,7 +15,7 @@ test_karlin_simple <- function() {
   n_points <- 50
   xtab <- (0:n_points)/n_points
 
-  # Données simples et clairement croissantes
+  # simple pscillating data
   #ytab <- -3 * xtab +sin(3*2*xtab*3.14)+ 0.2 * rnorm(n_points)
   ytab <- 2* xtab + 0.5 * sin(6 * pi * xtab) + 0.05 * rnorm(n_points+1)
   #ytab<-xtab*(1-xtab)
@@ -35,7 +34,7 @@ test_karlin_simple <- function() {
   res_croissant <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
                                           monot = monot, convcons=0,solver = "OSQP")
 
-  cat("\n=== TEST DÉCROISSANT ===\n")
+  cat("\n=== TEST DECROISSANT ===\n")
   res_decroissant <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
                                             monot = -1, solver = "OSQP")
   cat("\n=== TEST CONVEXE ===\n")
@@ -60,9 +59,9 @@ test_karlin_simple <- function() {
 
   abline(v = knots, col = "blue", lty = 2)
 
-  # Décroissant
+  # Decroissant
   plot(xtab, ytab, pch = 16, cex = 0.5, col = "black",
-       main = "Contrainte décroissante")
+       main = "Contrainte decroissante")
 
   lines(x_eval, y_decroiss, col = "red", lwd = 2)
 

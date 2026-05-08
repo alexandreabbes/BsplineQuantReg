@@ -8,7 +8,7 @@
 # 3. Partial increasing only after 1970
 # 4. Mixed constraints: decreasing (1945-1970) + increasing elsewhere
 
-library(ConstrainedQuantileSplines)
+library(BsplineQuantReg)
 
 cat("========================================\n")
 cat("Demo: Temperature Anomaly Trend Analysis\n")
@@ -33,7 +33,7 @@ temperature <- c(
 
 cat(sprintf("Years: %d to %d (%d observations)\n",
             min(years), max(years), length(years)))
-cat(sprintf("Temperature range: [%.2f, %.2f] °C\n\n",
+cat(sprintf("Temperature range: [%.2f, %.2f] C\n\n",
             min(temperature), max(temperature)))
 
 # Normalize years to [0,1] for numerical stability
@@ -164,7 +164,7 @@ par(mfrow = c(2, 2), mar = c(4, 4, 4, 3))
 
 # Plot 1: Unconstrained fit
 plot(years, temperature, pch = 16, cex = 0.6, col = "gray",
-     xlab = "Year", ylab = "Temperature Anomaly (°C)",
+     xlab = "Year", ylab = "Temperature Anomaly (C)",
      main = "1. Unconstrained Median (tau = 0.5)")
 lines(years_eval, y_uncon, col = "red", lwd = 2)
 abline(v = knots_years, col = "blue", lty = 2, lwd = 0.5)
@@ -174,7 +174,7 @@ grid()
 
 # Plot 2: Full monotonicity (too restrictive)
 plot(years, temperature, pch = 16, cex = 0.6, col = "gray",
-     xlab = "Year", ylab = "Temperature Anomaly (°C)",
+     xlab = "Year", ylab = "Temperature Anomaly (C)",
      main = "2. Full Increasing Constraint (too restrictive)")
 lines(years_eval, y_full_inc, col = "blue", lwd = 2)
 abline(v = knots_years, col = "blue", lty = 2, lwd = 0.5)
@@ -185,7 +185,7 @@ grid()
 
 # Plot 3: Mixed constraints (decreasing 1945-1970, increasing elsewhere)
 plot(years, temperature, pch = 16, cex = 0.6, col = "gray",
-     xlab = "Year", ylab = "Temperature Anomaly (°C)",
+     xlab = "Year", ylab = "Temperature Anomaly (C)",
      main = "3. Mixed Constraints")
 lines(years_eval, y_mixed, col = "darkgreen", lwd = 2)
 abline(v = knots_years, col = "blue", lty = 2, lwd = 0.5)
@@ -202,7 +202,7 @@ grid()
 # Plot 4: Multiple quantiles with mixed constraints
 colors <- c("orange", "red", "darkred")
 plot(years, temperature, pch = 16, cex = 0.6, col = "gray",
-     xlab = "Year", ylab = "Temperature Anomaly (°C)",
+     xlab = "Year", ylab = "Temperature Anomaly (C)",
      main = "4. Quantile Regression with Mixed Constraints")
 for (i in seq_along(tau_multi)) {
   y_fit <- spline_eval(fits_multi[[i]], x_eval)

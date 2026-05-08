@@ -18,7 +18,7 @@
 
 spline_eval<-function(Bspline,xvalues)
   #Bspline has a new type R container,
-  #désign by its coefficients, the degree
+  #designed by its coefficients, the degree
   #and the knots
   #It is independent from the polynomial notation order
 {
@@ -53,7 +53,7 @@ bs_direct<-function(Basis,xvalues)
 {
   #Calcule les valeurs d'une base Bspline.
   #comme la fonction bs de R, mais en utilisant la
-  # base calculée sous PP-forme : coeff des polynômes sur la base locale.
+  # base calculee sous PP-forme : coeff des polynomes sur la base locale.
   #indep. du choix de la notation croissant/decroissant
   n=length(xvalues)
   int_knots=Basis$int_knots#interior knots
@@ -124,8 +124,8 @@ makpp<-function(coef,tn){
   kn=dim(coef)[1]
   o=dim(coef)[2]
   if (length(tn) != (kn+1)){
-    return("length of coef and number of knots do not match")
-    break
+    stop("length of coef and number of knots do not match")
+
   }
   else{
     return(list(coefficients=(coef),knots=tn))

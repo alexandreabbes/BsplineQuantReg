@@ -13,8 +13,8 @@ License: GPL-3
 URL: https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines/tree/R, https://doi.org/10.5281/zenodo.16999784
 BugReports: https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines/issues
 Depends: R (>= 3.5.0)
-Imports: CVXR, pracma
-Suggests: splines, splines2, fda, testthat, knitr, rmarkdown
+Imports: CVXR
+Suggests: splines, splines2, fda, testthat, knitr, rmarkdown, pracma
 VignetteBuilder: knitr
 Encoding: UTF-8
 RoxygenNote: 7.3.3

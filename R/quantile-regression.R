@@ -15,7 +15,7 @@
 #' @export
 bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0) {
 
-  # Créer la base avec create.bspline.basis
+  # create  basis with create.bspline.basis
   kn <- length(tn) - 1
 
   # Nombre correct de fonctions de base: kn + degree+1
@@ -23,7 +23,6 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0) {
 
   norder <- degree + 1  # 4 pour cubique
 
-  # Créer la base avec create.bspline.basis
   sn=c(tn[1]*rep(1,degree),tn,tn[kn+1]*rep(1,degree)) # this is the extended knots sequence
   BB <- Bspline_base(sn,degree)
   basis<-BB$base
@@ -32,8 +31,7 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0) {
 
   cat("Nombre de fonctions de base", N, "\n")
 
-  # Matrice des coefficients pour la dérivée première normalisée
-
+  # Matrix of normalised coef derivativs
   deriv_coeffs <- array(0, dim = c(kn, N, 3))
   deriv2_val<-array(0, dim = c(kn+1, N))
 
@@ -74,7 +72,7 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0) {
 #' @return List of CVXR constraints
 #' @export
 apply_karlin_constraints <- function(p2, p1, p0, z0) {
-  # P2, p1, p0 sont les coefficients du polynôme quadratique: p2*u^2 + p1*u + p0
+  # P2, p1, p0 sont les coefficients du polynome quadratique: p2*u^2 + p1*u + p0
   # Dans la notation de l'article
 
   constraints <- list()
@@ -190,7 +188,7 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
 
   int_knots=knots[2:kn]
 
-  # Calcul des coefficients normalisés des dérivées
+  # Calcul des coefficients normalises des derivees
   deriv_spline <- bspline_to_deriv_coeffs_pp(knots, degree = 3,xvalues=xtab)
   deriv_coeffs <-deriv_spline$d1
   deriv_coeffs2<-deriv_spline$d2
@@ -244,18 +242,18 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
   solvers_to_try <- c(solver, "CLARABEL", "OSQP", "ECOS", "SCS")
 
   for (s in unique(solvers_to_try)) {
-    cat("Tentative avec solveur:", s, "\n")
+    cat("attempt with  solver:", s, "\n")
     result <- tryCatch(
       psolve(problem, solver = toupper(s), verbose = FALSE),
-    error = function(e) {cat("Échec:", e$message, "\n")
+    error = function(e) {cat("Missed:", e$message, "\n")
       NULL} )
     if (!is.null(result) && !is.null(value(alpha))) {
-      cat("Solveur réussi:", s, "\n")
+      cat("Solveur succeeded:", s, "\n")
       break}
   }
 
   if (is.null(result) || is.null(value(alpha))) {
-    warning("L'optimisation n'a pas convergé avec aucun solveur")
+    warning("Optimisation did not converge with any available solver")
     return(NULL)
   }
 

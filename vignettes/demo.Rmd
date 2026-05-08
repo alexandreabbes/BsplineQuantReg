@@ -16,4 +16,4 @@ vignette: >
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(ConstrainedQuantileSplines)
+library(BsplineQuantReg)

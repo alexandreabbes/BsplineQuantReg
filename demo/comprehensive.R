@@ -9,7 +9,7 @@
 #
 # The results are displayed in a 2x2 panel for comparison.
 
-library(ConstrainedQuantileSplines)
+library(BsplineQuantReg)
 
 cat("==============================================\n")
 cat("Demo: Comprehensive Quantile Regression Tests\n")
@@ -21,7 +21,7 @@ n_points <- 50
 xtab <- seq(0, 1, length.out = n_points + 1)  # 51 points from 0 to 1
 
 # Data: increasing trend with oscillation + noise
-# y = 2x + 0.5*sin(6πx) + noise
+# y = 2x + 0.5*sin(6 pi x) + noise
 ytab <- 2 * xtab + 0.5 * sin(6 * pi * xtab) + 0.05 * rnorm(n_points + 1)
 
 # Number of intervals

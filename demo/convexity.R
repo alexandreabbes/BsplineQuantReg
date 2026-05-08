@@ -6,7 +6,7 @@
 # 2. Concavity constraint (second derivative <= 0)
 # 3. Partial convexity (only on the right half)
 
-library(ConstrainedQuantileSplines)
+library(BsplineQuantReg)
 
 cat("========================================\n")
 cat("Demo: Convexity & Concavity Constraints\n")

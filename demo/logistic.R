@@ -2,7 +2,7 @@
 # This demo shows quantile regression on a logistic/sigmoid function
 # Author: Alexandre Abbes
 
-library(ConstrainedQuantileSplines)
+library(BsplineQuantReg)
 
 cat("========================================\n")
 cat("Demo: Logistic Curve Quantile Regression\n")
@@ -78,9 +78,9 @@ lines(x_eval, y_monot, col = "blue", lwd = 2)
 dy <- diff(y_monot) / diff(x_eval)
 cat(sprintf("Minimum derivative (should be >= 0): %.6f\n", min(dy)))
 if(min(dy) >= -1e-6) {
-  cat("✓ Monotonicity constraint satisfied!\n")
+  cat(" Monotonicity constraint satisfied!\n")
 } else {
-  cat("✗ Monotonicity constraint violated\n")
+  cat(" Monotonicity constraint violated\n")
 }
 
 legend("topleft", legend = c("True", "Monotonic fit (tau=0.5)"),

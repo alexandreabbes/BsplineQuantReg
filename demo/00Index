@@ -1,4 +1,6 @@
 monotonicity   Monotonicity constraints demo
 convexity      Convexity and concavity constraints demo
-comparison     Comparison of unconstrained vs constrained fits
 temperature     Temperature anomaly analysis: uniform increasing vs mixed constraints (decreasing 1956-1973 only)
+temperature2  The same as Temerature, but with other contraints
+logistic      test of regression related to the logistic function
+comprehensive  A simple test for different constraints on an ocsillating function

@@ -28,7 +28,8 @@ Omega<-function(s,j,o)#t: knots in the base t-t[j]
 #' Computes local polynomial coefficients for each B-spline basis function
 #' on each interval. Polynomials are expressed in the canonical basis
 #' Uses De Boor's recursion formula.
-#' @param sn Extended knot vector (including endpoint repetitions) ; This means if t0..t_{kn} it the set of knots
+#' @param sn Extended knot vector (including endpoint repetitions)
+#' This means if t0..tkn it the set of knots
 #' then sn should be given as a vector with  "degree" times t_0 and t_kn at the begining
 #'  and the ends.  its length is number of intervals+1+2*degree.
 #' @param degree B-spline degree (default = 3 for cubic)

@@ -83,7 +83,7 @@ change_polynomial_base_taylor <- function(coeffs_a, a, b)
   #in std notation
   coeffs_a=rev(coeffs_a)
   n <- length(coeffs_a) - 1
-  # Calculer les valeurs du polynôme et ses dérivées au point b
+  # Calculer les valeurs du polynome et ses derivees au point b
   # P(t) = sum c_k (t-a)^k
   # On utilise la formule de Taylor : c'_j = P^{(j)}(b)/j!
 
