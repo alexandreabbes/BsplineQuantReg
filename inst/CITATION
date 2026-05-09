@@ -23,7 +23,7 @@ citEntry(
   ),
   year = "2026",
   note = "R package version 0.1.0",
-  url = "https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines/tree/R",
+  url = "github.com/alexandreabbes/BsplineQuantReg",
   textVersion = paste(
     "Abbes, A. (2026).",
     "ConstrainedQuantileSplines: Quantile Regression with Shape Constraints (R package version 0.1.0).",
