@@ -1,5 +1,20 @@
 citHeader("To cite the ConstrainedQuantileSplines package in publications, please use:")
 
+
+bibentry(
+  bibtype = "Manual",
+  title = "R code for Quantile Regression with Bspline under Shape Constraints",
+  author = c(person("Alexandre"," Abbes")),
+  year = "2026",
+  note = "R package version 0.1.0",
+  url = "https://github.com/alexandreabbes/BsplineQuantReg",
+  textVersion = paste(
+    "Abbes, A. (2026).",
+    "BsplineQuantReg: Quantile Regression with Shape Constraints (R package version 0.1.0).",
+    "https://github.com/alexandreabbes/BsplineQuantReg")
+  )
+
+
 bibentry(
   bibtype = "Article",
   journal="zenodo",
@@ -8,7 +23,6 @@ bibentry(
   year = "2025",
   doi = "10.5281/zenodo.16999784",
   url = "https://doi.org/10.5281/zenodo.16999784",
-  note = "Pre-release version",
   textVersion = paste(
     "Abbes, A. (2025).",
     "Quantile regression with cubic polynomial splines under shape constraints with applications",
@@ -16,31 +30,18 @@ bibentry(
   )
 )
 
+
 bibentry(
   bibtype = "Manual",
-  title = "Quantile regression with cubic polynomial splines under shape constraints with applications",
+  title = "Python code for quantile regression with polynomial splines under shape constraints.",
   author = c(person("Alexandre"," Abbes")),
   year = "2026",
-  note = "R package version 0.1.0",
-  url = "github.com/alexandreabbes/BsplineQuantReg",
+  note = "Python version code of the R package BsplineQuantReg, with nice tk interface, and multiple constraints",
+  url = "https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines",
   textVersion = paste(
     "Abbes, A. (2026).",
-    "BsplineQuantReg: Constrained Quantile Regression with Cubic B-Splines",
-    "(R package version 0.1.0-beta).",
-    "https://github.com/alexandreabbes/BsplineQuantReg"
-  )
-)
-bibentry(
-  bibtype = "Manual",
-  title = "Quantile regression with polynomial splines, of degree 1 to 4, under shape constraints.",
-  author = c(person("Alexandre"," Abbes")),
-  year = "2026",
-  note = "Python version code with tk interface.Karlin-studden constraint formulation",
-  url = "github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines",
-  textVersion = paste(
-    "Abbes, A. (2026).",
-    "Constrained Quantile Regression with linear, quadratic, Cubic and quartic B-Splines",
-    "(Python code version beta).",
+    "Python code for quantile regression with polynomial splines under shape constraints, with degree 1 to 4",
+    "(Python code draft version).",
     "https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines"
   )
 )

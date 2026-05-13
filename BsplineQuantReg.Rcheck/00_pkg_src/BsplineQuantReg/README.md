@@ -74,6 +74,5 @@ We plan to improve performance in future releases by:
 
 ### Installation for beta testing:
 
-```r
 # Install from GitHub
-devtools::install_github("alexandreabbes/BsplineQuantReg", ref = "main")
+pak::pak("alexandreabbes/BsplineQuantReg")

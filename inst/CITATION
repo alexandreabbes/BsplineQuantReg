@@ -1,8 +1,8 @@
 citHeader("To cite the ConstrainedQuantileSplines package in publications, please use:")
 
 
-citEntry(
-  entry = "Manual",
+bibentry(
+  bibtype = "Manual",
   title = "R code for Quantile Regression with Bspline under Shape Constraints",
   author = c(person("Alexandre"," Abbes")),
   year = "2026",
@@ -13,10 +13,6 @@ citEntry(
     "BsplineQuantReg: Quantile Regression with Shape Constraints (R package version 0.1.0).",
     "https://github.com/alexandreabbes/BsplineQuantReg")
   )
-
-
-
-
 
 
 bibentry(

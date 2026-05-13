@@ -3,7 +3,7 @@ Type: Package
 Title: Constrained Quantile Regression with Cubic B-Splines
 Version: 0.1.0
 Date: 2026-05-04
-Authors@R: person("Alexandre", "Abbes",, "alexandre.abbes@proton.me", role =c("aut","cre") )
+Authors@R: person("Alexandre", "Abbes", email = "alexandre.abbes@proton.me", role = c("aut", "cre"))
 Description: Quantile regression with cubic B-splines under monotonicity
     and convexity constraints using the Karlin-Studden SOCP formulation.
     The method is described in Abbes (2026) <doi:10.5281/zenodo.16999784>.
@@ -16,7 +16,7 @@ URL: https://github.com/alexandreabbes/BsplineQuantReg, https://doi.org/10.5281/
 BugReports: https://github.com/alexandreabbes/BsplineQuantReg/issues
 Depends: R (>= 3.5.0)
 Imports: CVXR
-Suggests: cobs, quantreg, splines, splines2, fda
-VignetteBuilder: knitr
+Suggests: cobs, quantreg, knitr, pracma
 Encoding: UTF-8
+VignetteBuilder: knitr
 RoxygenNote: 7.3.3
