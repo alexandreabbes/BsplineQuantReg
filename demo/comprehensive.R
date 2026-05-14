@@ -17,12 +17,12 @@ cat("==============================================\n\n")
 
 # Generate synthetic data
 set.seed(42)
-n_points <- 50
+n_points <- 100
 xtab <- seq(0, 1, length.out = n_points + 1)  # 51 points from 0 to 1
 
 # Data: increasing trend with oscillation + noise
 # y = 2x + 0.5*sin(6 pi x) + noise
-ytab <- 2 * xtab + 0.5 * sin(6 * pi * xtab) + 0.05 * rnorm(n_points + 1)
+ytab <- 2 * xtab + 0.5 * sin(6 * pi * xtab) + 0.2 * rnorm(n_points + 1)
 
 # Number of intervals
 kn <- 12
@@ -46,17 +46,25 @@ cat("4. Convexity:            second derivative >= 0 everywhere\n\n")
 
 cat("Fitting models...\n")
 
-# Fit 1: Unconstrained (tau = 0.9)
-cat("  - Unconstrained (tau = 0.9)...")
-res_uncon <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.9,
+# Fit 1: Unconstrained (tau = 0.9, 0.5, 0.1)
+cat("  - Unconstrained (tau = 0.9, 0.5, 0.1)")
+res_uncon1 <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.9,
                                     monot = 0, convcons = 0, solver = "OSQP")
+res_uncon2 <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.1,
+                                    monot = 0, convcons = 0, solver = "OSQP")
+res_uncon3 <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+                                    monot = 0, convcons = 0, solver = "OSQP")
+
 cat(" done\n")
 
 # Fit 2: Partial increasing (tau = 0.5)
-cat("  - Partial increasing (tau = 0.5, intervals 1-7)...")
-res_croissant <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+cat("  - Partial increasing (tau = 0.5, 0.1, intervals 1-7)...")
+res_croissant1 <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
                                         monot = monot_partial, convcons = 0,
                                         solver = "OSQP")
+res_croissant2 <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.1,
+                                         monot = monot_partial, convcons = 0,
+                                         solver = "OSQP")
 cat(" done\n")
 
 # Fit 3: Full decreasing (tau = 0.5)
@@ -75,8 +83,11 @@ cat(" done\n\n")
 
 # Evaluate all fits on a fine grid
 x_eval <- seq(0, 1, length.out = 200)
-y_uncon <- spline_eval(res_uncon, x_eval)
-y_croiss <- spline_eval(res_croissant, x_eval)
+y_uncon1 <- spline_eval(res_uncon1, x_eval)
+y_uncon2 <- spline_eval(res_uncon2, x_eval)
+y_uncon3 <- spline_eval(res_uncon3, x_eval)
+y_croiss1 <- spline_eval(res_croissant1, x_eval)
+y_croiss2 <- spline_eval(res_croissant2, x_eval)
 y_decroiss <- spline_eval(res_decroissant, x_eval)
 y_convexe <- spline_eval(res_convexe, x_eval)
 
@@ -100,10 +111,11 @@ cat("\n")
 par(mfrow = c(2, 2), mar = c(4, 4, 4, 2))
 
 # Plot 1: Partial increasing constraint
-plot(xtab, ytab, pch = 16, cex = 0.5, col = "gray",
+plot(xtab, ytab, pch = 16, cex = 0.5, col = "black",
      xlab = "x", ylab = "y",
-     main = "Partial Increasing Constraint\n(first 7 intervals only)")
-lines(x_eval, y_croiss, col = "blue", lwd = 2)
+     main = "Partial Increasing Constraint\n(first 7 intervals only)\n tau=0.5, 0.1")
+lines(x_eval, y_croiss1, col = "blue", lwd = 2)
+lines(x_eval, y_croiss2, col = "blue", lwd = 2)
 abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
 # Highlight the constrained region
 abline(v = knots[n_constrained + 1], col = "red", lty = 2, lwd = 2)
@@ -112,7 +124,7 @@ text(knots[n_constrained + 1] + 0.02, max(ytab) - 0.2,
 grid()
 
 # Plot 2: Full decreasing constraint
-plot(xtab, ytab, pch = 16, cex = 0.5, col = "gray",
+plot(xtab, ytab, pch = 16, cex = 0.5, col = "black",
      xlab = "x", ylab = "y",
      main = "Full Decreasing Constraint\n(everywhere)")
 lines(x_eval, y_decroiss, col = "darkgreen", lwd = 2)
@@ -120,7 +132,7 @@ abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
 grid()
 
 # Plot 3: Convexity constraint
-plot(xtab, ytab, pch = 16, cex = 0.5, col = "gray",
+plot(xtab, ytab, pch = 16, cex = 0.5, col = "black",
      xlab = "x", ylab = "y",
      main = "Convexity Constraint\n(second derivative >= 0)")
 lines(x_eval, y_convexe, col = "purple", lwd = 2)
@@ -128,10 +140,12 @@ abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
 grid()
 
 # Plot 4: Unconstrained (tau = 0.9)
-plot(xtab, ytab, pch = 16, cex = 0.5, col = "gray",
+plot(xtab, ytab, pch = 16, cex = 0.5, col = "black",
      xlab = "x", ylab = "y",
-     main = "Unconstrained\n(tau = 0.9)")
-lines(x_eval, y_uncon, col = "red", lwd = 2)
+     main = "Unconstrained\n(tau = 0.9, , 0.5, 0.1)")
+lines(x_eval, y_uncon1, col = "red", lwd = 2)
+lines(x_eval, y_uncon2, col = "red", lwd = 2)
+lines(x_eval, y_uncon3, col = "red", lwd = 2)
 abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
 grid()
 
