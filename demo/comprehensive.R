@@ -9,6 +9,9 @@
 #
 # The results are displayed in a 2x2 panel for comparison.
 
+
+oldpar <- par(mfrow = c(2,2))
+
 library(BsplineQuantReg)
 
 cat("==============================================\n")
@@ -16,7 +19,7 @@ cat("Demo: Comprehensive Quantile Regression Tests\n")
 cat("==============================================\n\n")
 
 # Generate synthetic data
-set.seed(42)
+#set.seed(42)
 n_points <- 100
 xtab <- seq(0, 1, length.out = n_points + 1)  # 51 points from 0 to 1
 
@@ -152,3 +155,5 @@ grid()
 cat("==============================================\n")
 cat("Demo completed. Check the plots for comparison.\n")
 cat("==============================================\n")
+
+par(oldpar)

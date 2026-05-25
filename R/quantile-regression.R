@@ -8,6 +8,7 @@
 #' @param tn Knot vector (effective partition, not extended)
 #' @param degree Spline degree (default = 3)
 #' @param xvalues Evaluation points for design matrix (0 = no evaluation)
+#' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list containing:
 #'   \item{d0}{Design matrix (if xvalues provided)}
 #'   \item{d1}{First derivative coefficients [a3, a2, a1] for each interval}
@@ -69,9 +70,10 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0, verbose=FALSE) {
 #' @param p1 Coefficient of u
 #' @param p0 Constant term
 #' @param z0 Auxiliary SOCP variable
+#' @param verbose boolean FALSE (default) or TRUE.
 #' @return List of CVXR constraints
 #' @export
-apply_karlin_constraints <- function(p2, p1, p0, z0) {
+apply_karlin_constraints <- function(p2, p1, p0, z0,verbose=FALSE) {
   # P2, p1, p0 sont les coefficients du polynome quadratique: p2*u^2 + p1*u + p0
   # Dans la notation de l'article
 
@@ -82,7 +84,7 @@ apply_karlin_constraints <- function(p2, p1, p0, z0) {
   K2_vec <- (p0+p2+ z0)
 
   constraints <- c(constraints, list(K2_vec >= p_norm(K1_vec, 2)))
-
+  if (verbose){message("constraints;\n",constraints)}
   return(constraints)
 }
 
@@ -101,6 +103,7 @@ apply_karlin_constraints <- function(p2, p1, p0, z0) {
 #'        1 = convex, -1 = concave, 0 = unconstrained. If scalar, repeated.
 #' @param solver CVXR solver to use (default = "CLARABEL")
 #' @param weight Observation weights (default = 1 for all)
+#' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list containing:
 #'   \item{coefficients}{B-spline coefficients (including y mean)}
 #'   \item{degree}{Spline degree (always 3)}
@@ -193,7 +196,7 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
   int_knots=knots[2:kn]
 
   # Calcul des coefficients normalises des derivees
-  deriv_spline <- bspline_to_deriv_coeffs_pp(knots, degree = 3,xvalues=xtab)
+  deriv_spline <- bspline_to_deriv_coeffs_pp(knots, degree = 3,xvalues=xtab,verbose=verbose)
   deriv_coeffs <-deriv_spline$d1
   deriv_coeffs2<-deriv_spline$d2
   B<-deriv_spline$d0
@@ -223,7 +226,7 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
         b_coef=sum(deriv_coeffs[i,,2]*alpha) *monot[i]
         c_coef=sum(deriv_coeffs[i,,3]*alpha) *monot[i]
         #a*x^2+b*x+c
-        CK<-apply_karlin_constraints(a_coef,b_coef,c_coef,z_vars[[i]])
+        CK<-apply_karlin_constraints(a_coef,b_coef,c_coef,z_vars[[i]],verbose=verbose)
         constraints<-c(constraints,CK)
       }
     }

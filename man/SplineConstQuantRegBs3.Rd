@@ -12,7 +12,8 @@ SplineConstQuantRegBs3(
   monot = 0,
   convcons = 0,
   solver = "CLARABEL",
-  weight = NULL
+  weight = NULL,
+  verbose = FALSE
 )
 }
 \arguments{

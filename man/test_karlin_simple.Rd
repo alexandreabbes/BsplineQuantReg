@@ -4,7 +4,7 @@
 \alias{test_karlin_simple}
 \title{Comprehensive test function}
 \usage{
-test_karlin_simple()
+test_karlin_simple(verbose = FALSE)
 }
 \value{
 No return value, produces plots.

@@ -4,7 +4,7 @@
 \alias{bspline_to_deriv_coeffs_pp}
 \title{Convert B-spline to derivative coefficients}
 \usage{
-bspline_to_deriv_coeffs_pp(tn, degree = 3, xvalues = 0)
+bspline_to_deriv_coeffs_pp(tn, degree = 3, xvalues = 0, verbose = FALSE)
 }
 \arguments{
 \item{tn}{Knot vector (effective partition, not extended)}

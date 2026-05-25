@@ -4,7 +4,7 @@
 \alias{apply_karlin_constraints}
 \title{Karlin-Studden constraints for positivity}
 \usage{
-apply_karlin_constraints(p2, p1, p0, z0)
+apply_karlin_constraints(p2, p1, p0, z0, verbose = FALSE)
 }
 \arguments{
 \item{p2}{Coefficient of u^2}
@@ -14,6 +14,8 @@ apply_karlin_constraints(p2, p1, p0, z0)
 \item{p0}{Constant term}
 
 \item{z0}{Auxiliary SOCP variable}
+
+\item{verbose}{boolean FALSE (default) or TRUE.}
 }
 \value{
 List of CVXR constraints
