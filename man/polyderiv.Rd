@@ -2,7 +2,8 @@
 % Please edit documentation in R/polynomial-utils.R
 \name{polyderiv}
 \alias{polyderiv}
-\title{Polynomial derivative}
+\title{Polynomial derivative
+Computes the derivative of order \code{der} of a polynomial.}
 \usage{
 polyderiv(p, der = 1)
 }
@@ -15,6 +16,7 @@ polyderiv(p, der = 1)
 Coefficients of the derivative polynomial
 }
 \description{
+Polynomial derivative
 Computes the derivative of order \code{der} of a polynomial.
 }
 \examples{

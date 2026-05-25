@@ -5,8 +5,8 @@
 #' Omega function for De Boor recursion
 #'
 #' Computes the affine element used in the recursive De Boor algorithm
-#' for B-spline construction. for a given extended knots partition
-#' Omega_jl(x)=(s_j-x)/(s_{j+l-1}-s_j), with l: order of the spline
+#' for B-spline construction. for a given extended knots partition s(1),..
+#' Omega(j,l)(x)=(s(j-x))/(s(j+l-1)-s(j)\), with l: order of the spline
 #'
 #' @param s Extended knot vector
 #' @param j Knot index
@@ -25,6 +25,7 @@ Omega<-function(s,j,o)#t: knots in the base t-t[j]
   return(w)
   }
 }
+
 #' Build B-spline basis in piecewise polynomial form
 #' Computes local polynomial coefficients for each B-spline basis function
 #' on each interval. Polynomials are expressed in the canonical basis
@@ -35,6 +36,7 @@ Omega<-function(s,j,o)#t: knots in the base t-t[j]
 #'  and the ends.  its length is number of intervals+1+2*degree.
 #' @param degree B-spline degree (default = 3 for cubic)
 #' @param der Derivative order (0 = original basis)
+#' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list containing:
 #'   \item{base}{Coefficients in the local bases, in the form of an 3-d array [j,nu,coeff], j : the number of the spline in the basis,
 #'   nu: the number of the interval in the extended notation, coeff : the coefficients in decreasing order
@@ -132,6 +134,7 @@ Bspline_base<-function(sn,degree=3,der=0,verbose=FALSE)
 #'
 #' @param bspline Object returned by \code{Bspline_base}
 #' @param der Derivative order
+#' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list similar to \code{Bspline_base} for the derivative basis
 #' @export
 

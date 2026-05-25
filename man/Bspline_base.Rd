@@ -18,6 +18,8 @@ then sn should be given as a vector with  "degree" times t_0 and t_kn at the beg
 \item{degree}{B-spline degree (default = 3 for cubic)}
 
 \item{der}{Derivative order (0 = original basis)}
+
+\item{verbose}{boolean FALSE (default) or TRUE.}
 }
 \value{
 A list containing:

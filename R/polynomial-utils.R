@@ -153,9 +153,7 @@ poly_eval<-function(p,xvalues){
 }
 
 #' Polynomial derivative
-#'
 #' Computes the derivative of order \code{der} of a polynomial.
-#'
 #' @param p Coefficient vector (decreasing powers)
 #' @param der Derivative order (default = 1)
 #' @return Coefficients of the derivative polynomial
@@ -164,9 +162,7 @@ poly_eval<-function(p,xvalues){
 #' polyderiv(c(1, 0, 0), 1) # returns c(2, 0)
 #' @export
 
-polyderiv<-function(p,der=1) # this is a working equivalent to polyder function,
-  #because the order higher than 1 do not work  in the R function polyder
-{#It is here in Std Not
+polyderiv<-function(p,der=1){
   if (der==0)   {return(p)}
   else {
     l=length(p)
@@ -177,7 +173,7 @@ polyderiv<-function(p,der=1) # this is a working equivalent to polyder function,
     if (der>1){for (i in 2:der){D=A%*%D}} #compute the d-th power of A
     q=D%*%p
     q=q[(1+der):(l)]
-    #return(rev(q)) # reverse back to match  stnd convention
+
     return(q)
   }
 }
