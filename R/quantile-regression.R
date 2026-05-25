@@ -13,7 +13,7 @@
 #'   \item{d1}{First derivative coefficients [a3, a2, a1] for each interval}
 #'   \item{d2}{Second derivative values at knots}
 #' @export
-bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0) {
+bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0, verbose=FALSE) {
 
   # create  basis with create.bspline.basis
   kn <- length(tn) - 1
@@ -28,9 +28,9 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0) {
   basis<-BB$base
 
   N <-BB$n_splines
-
-  cat("Nombre de fonctions de base", N, "\n")
-
+  if (verbose) {
+    message("Number of  basis functions", N, "\n")
+  }
   # Matrix of normalised coef derivativs
   deriv_coeffs <- array(0, dim = c(kn, N, 3))
   deriv2_val<-array(0, dim = c(kn+1, N))
@@ -154,7 +154,8 @@ apply_karlin_constraints <- function(p2, p1, p0, z0) {
 SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
                                    monot = 0,
                                    convcons=0,
-                                   solver = "CLARABEL", weight = NULL)
+                                   solver = "CLARABEL", weight = NULL,
+                                   verbose=FALSE)
 {
 
   if (is.null(weight)) {
@@ -175,13 +176,16 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
   }
 
   kn <- length(knots) - 1
-
-  cat("knots:", knots, "\n")
+  if (verbose) {
+    message("knots:", knots, "\n")
+  }
 
   if (length(monot) == 1) {
     monot <- rep(monot, kn)
   }
-  cat("Monotonicity constraints (Karlin):", monot, "\n")
+  if (verbose) {
+  message("Monotonicity constraints (Karlin):", monot, "\n")
+  }
   boundary_knots <- range(knots)
   degree=3
   N=length(knots)+3-1
@@ -242,13 +246,17 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
   solvers_to_try <- c(solver, "CLARABEL", "OSQP", "ECOS", "SCS")
 
   for (s in unique(solvers_to_try)) {
-    cat("attempt with  solver:", s, "\n")
+    if (verbose) {
+      message("attempt with  solver:", s, "\n")
+      }
     result <- tryCatch(
-      psolve(problem, solver = toupper(s), verbose = FALSE),
-    error = function(e) {cat("Missed:", e$message, "\n")
+      psolve(problem, solver = toupper(s), verbose=verbose),
+    error = function(e) {warning("Missed:", e$message, "\n")
       NULL} )
     if (!is.null(result) && !is.null(value(alpha))) {
-      cat("Solveur succeeded:", s, "\n")
+      if (verbose) {
+        message("Solveur succeeded:", s, "\n")
+      }
       break}
   }
 
@@ -258,11 +266,11 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
   }
 
   alpha_val <- value(alpha)+y_mean
-
-  #  cat("Statut:", result$status, "\n")
-  #  cat("Valeur objectif:", result$value, "\n")
-  #  cat("Coefficients alpha (range):", range(alpha_val), "\n")
-
+  if (verbose) {
+    message(" Statut:", result$status, "\n",
+            "Valeur objectif:", result$value, "\n",
+             "Coefficients alpha (range):", range(alpha_val), "\n")
+}
 
   return(list(
     #spline = spline_result,

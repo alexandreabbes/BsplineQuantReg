@@ -169,8 +169,6 @@ polyderiv<-function(p,der=1) # this is a working equivalent to polyder function,
     #p=rev(p)#reverse
     A=array(data=0,c(l,l))
     for (i in 1:(l-1)){A[i+1,(i)]=(l-i)}
-    print(l)
-    print(A)
     D=A
     if (der>1){for (i in 2:der){D=A%*%D}} #compute the d-th power of A
     q=D%*%p
