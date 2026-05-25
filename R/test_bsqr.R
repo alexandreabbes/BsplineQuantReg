@@ -11,7 +11,7 @@
 #' @export
 
 test_karlin_simple <- function() {
-  set.seed(42)
+#optional set.seed(42)
   n_points <- 50
   xtab <- (0:n_points)/n_points
 

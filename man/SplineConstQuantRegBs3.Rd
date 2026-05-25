@@ -46,7 +46,7 @@ Performs quantile regression using cubic B-splines, with optional
 monotonicity constraints (via Karlin-Studden) and convexity constraints.
 }
 \examples{
-set.seed(42)
+#optional set.seed(42)
 x <- seq(0, 1, length=100)
 y <- 2*x + sin(6*pi*x)/2 + rnorm(100, 0, 0.05)
 knots <- quantile(x, probs=seq(0,1,length.out=10))

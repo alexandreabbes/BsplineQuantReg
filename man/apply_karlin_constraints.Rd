@@ -2,7 +2,7 @@
 % Please edit documentation in R/quantile-regression.R
 \name{apply_karlin_constraints}
 \alias{apply_karlin_constraints}
-\title{Karlin-Studden constraints for monotonicity}
+\title{Karlin-Studden constraints for positivity}
 \usage{
 apply_karlin_constraints(p2, p1, p0, z0)
 }
@@ -19,6 +19,6 @@ apply_karlin_constraints(p2, p1, p0, z0)
 List of CVXR constraints
 }
 \description{
-Applies Karlin-Studden SOCP constraints to ensure monotonicity of a
+Applies Karlin-Studden SOCP constraints to ensure positivity of a
 quadratic polynomial on the interval [0,1].
 }

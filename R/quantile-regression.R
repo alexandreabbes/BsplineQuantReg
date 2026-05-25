@@ -60,9 +60,9 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0) {
   return(list(d0=yvalues,d1=deriv_coeffs, d2=deriv2_val))
 }
 
-#' Karlin-Studden constraints for monotonicity
+#' Karlin-Studden constraints for positivity
 #'
-#' Applies Karlin-Studden SOCP constraints to ensure monotonicity of a
+#' Applies Karlin-Studden SOCP constraints to ensure positivity of a
 #' quadratic polynomial on the interval [0,1].
 #'
 #' @param p2 Coefficient of u^2
@@ -107,7 +107,7 @@ apply_karlin_constraints <- function(p2, p1, p0, z0) {
 #'   \item{knots}{Knot vector used}
 #'   \item{int_knots}{Same as knots (compatibility)}
 #' @examples
-#' set.seed(42)
+#' #optional set.seed(42)
 #' x <- seq(0, 1, length=100)
 #' y <- 2*x + sin(6*pi*x)/2 + rnorm(100, 0, 0.05)
 #' knots <- quantile(x, probs=seq(0,1,length.out=10))

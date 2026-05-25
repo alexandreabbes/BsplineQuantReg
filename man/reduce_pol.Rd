@@ -7,11 +7,14 @@
 reduce_pol(p)
 }
 \arguments{
-\item{p}{Polynomial coefficient vector}
+\item{p}{Polynomial coefficient vector(coef in decreasing order)}
 }
 \value{
 Reduced vector (without leading zeros)
 }
 \description{
 Removes leading zeros from a polynomial coefficient vector.
+}
+\examples{
+reduce_pol((c(0, 1, 1)) # returns c(1, 1) #since 0x^2+x+1=x+1
 }

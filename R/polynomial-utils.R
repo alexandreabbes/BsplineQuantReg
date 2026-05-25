@@ -109,8 +109,10 @@ change_polynomial_base_taylor <- function(coeffs_a, a, b)
 #'
 #' Removes leading zeros from a polynomial coefficient vector.
 #'
-#' @param p Polynomial coefficient vector
+#' @param p Polynomial coefficient vector(coef in decreasing order)
 #' @return Reduced vector (without leading zeros)
+#' @examples
+#' reduce_pol((c(0, 1, 1)) # returns c(1, 1) #since 0x^2+x+1=x+1
 #' @export
 reduce_pol<-function(p){
   l=length(p)
@@ -123,8 +125,8 @@ reduce_pol<-function(p){
 #' Evaluates a polynomial at one or more points.
 #'
 #' @param p Coefficient vector (decreasing powers)
-#' @param xvalues x values at which to evaluate the polynomial
-#' @return Polynomial values at the given points
+#' @param xvalues vector at which to evaluate the polynomial
+#' @return Vector of same length as xvalues : polynomial values at the points xvalues
 #' @examples
 #' # P(x) = 1 + x + x^2
 #' poly_eval(c(1, 1, 1), c(0, 1, 2)) # returns c(1, 3, 7)

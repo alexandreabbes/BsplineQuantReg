@@ -9,10 +9,10 @@ poly_eval(p, xvalues)
 \arguments{
 \item{p}{Coefficient vector (decreasing powers)}
 
-\item{xvalues}{x values at which to evaluate the polynomial}
+\item{xvalues}{vector at which to evaluate the polynomial}
 }
 \value{
-Polynomial values at the given points
+Vector of same length as xvalues : polynomial values at the points xvalues
 }
 \description{
 Evaluates a polynomial at one or more points.
