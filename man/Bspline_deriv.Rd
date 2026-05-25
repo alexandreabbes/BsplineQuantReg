@@ -4,7 +4,7 @@
 \alias{Bspline_deriv}
 \title{Differentiate a B-spline basis}
 \usage{
-Bspline_deriv(bspline, der = 2)
+Bspline_deriv(bspline, der = 2, verbose = FALSE)
 }
 \arguments{
 \item{bspline}{Object returned by \code{Bspline_base}}

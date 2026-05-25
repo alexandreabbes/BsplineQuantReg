@@ -19,6 +19,6 @@ Omega(s, j, o)
 \description{
 Computes the affine element used in the recursive De Boor algorithm
 for B-spline construction. for a given extended knots partition
-Omega_{j,l}(x)=(s_j-x)/(s_{j+l-1}-s_j), with l: order of the spline
+Omega_jl(x)=(s_j-x)/(s_{j+l-1}-s_j), with l: order of the spline
 }
 \keyword{internal}

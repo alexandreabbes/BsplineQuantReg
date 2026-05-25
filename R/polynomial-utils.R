@@ -121,7 +121,7 @@ reduce_pol<-function(p,verbose=FALSE){
   l=length(p)
   k=1
   while (p[k]==0 & k<l){k=k+1}
-  if (vebose){message("removed ",k," useless zeroes")}
+  if (verbose){message("removed ",k," useless zeroes")}
   return(p[k:l])
 }
 #' Evaluate polynomial

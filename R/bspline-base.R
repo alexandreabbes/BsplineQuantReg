@@ -6,7 +6,7 @@
 #'
 #' Computes the affine element used in the recursive De Boor algorithm
 #' for B-spline construction. for a given extended knots partition
-#' Omega_{j,l}(x)=(s_j-x)/(s_{j+l-1}-s_j), with l: order of the spline
+#' Omega_jl(x)=(s_j-x)/(s_{j+l-1}-s_j), with l: order of the spline
 #'
 #' @param s Extended knot vector
 #' @param j Knot index
@@ -57,7 +57,7 @@ Omega<-function(s,j,o)#t: knots in the base t-t[j]
 #'
 #' @export
 
-Bspline_base<-function(sn,degree=3,der=0)
+Bspline_base<-function(sn,degree=3,der=0,verbose=FALSE)
 {
   tn=sn[(degree+1):(length(sn)-degree)] #effective knots partition
   kn=length(tn)-1 # tn is the interior knots without the extended partition.
@@ -136,7 +136,7 @@ Bspline_base<-function(sn,degree=3,der=0)
 #' @export
 
 
-Bspline_deriv<-function(bspline,der=2){
+Bspline_deriv<-function(bspline,der=2,verbose=FALSE){
   #computes the derivative fo a Bspline basis
   Bn=bspline$base
   B0=bspline$base0
