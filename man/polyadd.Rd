@@ -4,7 +4,7 @@
 \alias{polyadd}
 \title{Polynomial addition}
 \usage{
-polyadd(p1, p2, verbose)
+polyadd(p1, p2, verbose = FALSE)
 }
 \arguments{
 \item{p1}{First polynomial (coefficient vector)}

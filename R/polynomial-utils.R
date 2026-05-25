@@ -51,7 +51,7 @@ polymul <- function(p1, p2,ord=0,verbose=FALSE)
 #' polyadd(c(1, 1), c(1, -1)) # returns c(2, 0)
 #' @export
 
-polyadd<- function(p1, p2,verbose) {#in stnd notation
+polyadd<- function(p1, p2,verbose=FALSE) {
   p1=rev(p1)
   p2=rev(p2)
   l1 <- length(p1)
@@ -115,13 +115,14 @@ change_polynomial_base_taylor <- function(coeffs_a, a, b)
 #' @param verbose boolean FALSE (default) or TRUE.
 #' @return Reduced vector (without leading zeros)
 #' @examples
-#' reduce_pol((c(0, 1, 1)) # returns c(1, 1) #since 0x^2+x+1=x+1
+#' reduce_pol((c(0, 1, 1))  #returns c(1, 1) since 0x^2+x+1=x+1
 #' @export
 reduce_pol<-function(p,verbose=FALSE){
   l=length(p)
   k=1
   while (p[k]==0 & k<l){k=k+1}
-  if (verbose){message("removed ",k," useless zeroes")}
+  if (verbose)
+    {message("removed ",k," useless zeroes to ",p)}
   return(p[k:l])
 }
 #' Evaluate polynomial
