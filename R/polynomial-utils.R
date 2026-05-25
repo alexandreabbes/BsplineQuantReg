@@ -1,8 +1,6 @@
 # polymul, polyadd, polyderiv, poly_eval, reduce_pol
 # change_polynomial_base_taylor
 
-
-
 #' Polynomial multiplication
 #'
 #' Multiplies two polynomials represented by coefficients in decreasing power order.
@@ -10,13 +8,14 @@
 #' @param p1 First polynomial (coefficient vector, decreasing powers)
 #' @param p2 Second polynomial (coefficient vector, decreasing powers)
 #' @param ord Unused (compatibility parameter)
+#' @param verbose boolean FALSE (default) or TRUE.
 #' @return Coefficient vector of the product polynomial (decreasing powers)
 #' @examples
 #' # (1 + x) * (1 + x) = 1 + 2x + x^2
 #' polymul(c(1, 1), c(1, 1)) # returns c(1, 2, 1)
 #' @export
 
-polymul <- function(p1, p2,ord=0)
+polymul <- function(p1, p2,ord=0,verbose=FALSE)
 {
   if ((sum(abs(p1))==0) || (sum(abs(p2))==0)){ return(0)}
   else
@@ -34,7 +33,7 @@ polymul <- function(p1, p2,ord=0)
     }
     #reduce pol
     res=rev(res)#in standard notation
-    res=reduce_pol(res)
+    res=reduce_pol(res,verbose)
     return(res)
   }
 }
@@ -46,12 +45,13 @@ polymul <- function(p1, p2,ord=0)
 #'
 #' @param p1 First polynomial (coefficient vector)
 #' @param p2 Second polynomial (coefficient vector)
+#' @param verbose boolean FALSE (default) or TRUE.
 #' @return Coefficient vector of the sum
 #' @examples
 #' polyadd(c(1, 1), c(1, -1)) # returns c(2, 0)
 #' @export
 
-polyadd<- function(p1, p2) {#in stnd notation
+polyadd<- function(p1, p2,verbose) {#in stnd notation
   p1=rev(p1)
   p2=rev(p2)
   l1 <- length(p1)
@@ -64,7 +64,9 @@ polyadd<- function(p1, p2) {#in stnd notation
   l1=l}
   p1=c(p1,rep(0,(l2-l1)))
   sp1p2=p1+p2
-  return(rev(p1+p2))
+  res=rev(p1+p2)
+  res=reduce_pol(res,verbose)
+  return(res)
 }
 
 
@@ -72,7 +74,9 @@ polyadd<- function(p1, p2) {#in stnd notation
 #'
 #' Converts a polynomial expressed in the basis (t-a)^k to its representation
 #' in the basis (t-b)^k using Taylor's formula.
-#'
+#' P(t) = sum c_k (t-a)^k
+#' P(t) = sum c"_k (t-b)^k
+#" c'_j = P^{(j)}(b)/j!
 #' @param coeffs_a Coefficients in basis centered at a (decreasing powers)
 #' @param a Original expansion point
 #' @param b New expansion point
@@ -80,12 +84,10 @@ polyadd<- function(p1, p2) {#in stnd notation
 #' @export
 change_polynomial_base_taylor <- function(coeffs_a, a, b)
 {
-  #in std notation
+  #pol is in std decreasing notation
   coeffs_a=rev(coeffs_a)
   n <- length(coeffs_a) - 1
-  # Calculer les valeurs du polynome et ses derivees au point b
-  # P(t) = sum c_k (t-a)^k
-  # On utilise la formule de Taylor : c'_j = P^{(j)}(b)/j!
+
 
   coeffs_b <- numeric(n + 1)
 
@@ -110,14 +112,16 @@ change_polynomial_base_taylor <- function(coeffs_a, a, b)
 #' Removes leading zeros from a polynomial coefficient vector.
 #'
 #' @param p Polynomial coefficient vector(coef in decreasing order)
+#' @param verbose boolean FALSE (default) or TRUE.
 #' @return Reduced vector (without leading zeros)
 #' @examples
 #' reduce_pol((c(0, 1, 1)) # returns c(1, 1) #since 0x^2+x+1=x+1
 #' @export
-reduce_pol<-function(p){
+reduce_pol<-function(p,verbose=FALSE){
   l=length(p)
   k=1
   while (p[k]==0 & k<l){k=k+1}
+  if (vebose){message("removed ",k," useless zeroes")}
   return(p[k:l])
 }
 #' Evaluate polynomial

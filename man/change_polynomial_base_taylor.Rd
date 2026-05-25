@@ -19,4 +19,6 @@ Coefficients in basis centered at b
 \description{
 Converts a polynomial expressed in the basis (t-a)^k to its representation
 in the basis (t-b)^k using Taylor's formula.
+P(t) = sum c_k (t-a)^k
+P(t) = sum c"_k (t-b)^k
 }

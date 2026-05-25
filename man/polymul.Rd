@@ -4,7 +4,7 @@
 \alias{polymul}
 \title{Polynomial multiplication}
 \usage{
-polymul(p1, p2, ord = 0)
+polymul(p1, p2, ord = 0, verbose = FALSE)
 }
 \arguments{
 \item{p1}{First polynomial (coefficient vector, decreasing powers)}
@@ -12,6 +12,8 @@ polymul(p1, p2, ord = 0)
 \item{p2}{Second polynomial (coefficient vector, decreasing powers)}
 
 \item{ord}{Unused (compatibility parameter)}
+
+\item{verbose}{boolean FALSE (default) or TRUE.}
 }
 \value{
 Coefficient vector of the product polynomial (decreasing powers)
