@@ -5,9 +5,9 @@
 #'
 #' Evaluates a spline (linear combination of B-splines) at given points.
 #'
-#' @param Bspline Spline object (list with coefficients, degree, knots)
+#' @param Bspline Spline object (list with coefficients on the Bspline basis, degree, extended knots)
 #' @param xvalues Vector of evaluation points
-#' @return Spline values at the requested points
+#' @return vector of same length as xvalues, with Spline values at the requested points
 #' @examples
 #'{ # Create and evaluate a spline
 #' sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
@@ -134,15 +134,16 @@ makpp<-function(coef,tn){
 
 #' Visualize a B-spline functions basis
 #'
-#' Plots all basis functions of a B-spline.
+#' Plots all  functions of a B-spline basis.
 #'
 #' @param Bspline Object returned by \code{Bspline_base}
 #' @param xvalues Vector of evaluation points for plotting (by default 100 points are computed in the knot range)
+#' @return No return value, called for side effects (generates a plot)
 #' @export
 #'
 view_basis<-function(Bspline,xvalues=0)
 {
-  if (xvalues==0){
+  if (length(xvalues)==1){
     k=range(Bspline$knots)
     xvalues=(k[1]:(k[2]*100))/100}
 

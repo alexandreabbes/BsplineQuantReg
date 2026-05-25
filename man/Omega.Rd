@@ -14,10 +14,11 @@ Omega(s, j, o)
 \item{o}{Spline order (degree + 1)}
 }
 \value{
-Vector of coefficients [alpha, beta] representing (alpha*t + beta)
+(Side function) A Vector of coefficients [alpha, beta] representing (alpha*t + beta)
 }
 \description{
 Computes the affine element used in the recursive De Boor algorithm
-for B-spline construction.
+for B-spline construction. for a given extended knots partition
+Omega_{j,l}(x)=(s_j-x)/(s_{j+l-1}-s_j), with l: order of the spline
 }
 \keyword{internal}

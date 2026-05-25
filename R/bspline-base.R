@@ -5,12 +5,13 @@
 #' Omega function for De Boor recursion
 #'
 #' Computes the affine element used in the recursive De Boor algorithm
-#' for B-spline construction.
+#' for B-spline construction. for a given extended knots partition
+#' Omega_{j,l}(x)=(s_j-x)/(s_{j+l-1}-s_j), with l: order of the spline
 #'
 #' @param s Extended knot vector
 #' @param j Knot index
 #' @param o Spline order (degree + 1)
-#' @return Vector of coefficients [alpha, beta] representing (alpha*t + beta)
+#' @return (Side function) A Vector of coefficients [alpha, beta] representing (alpha*t + beta)
 #' @keywords internal
 
 Omega<-function(s,j,o)#t: knots in the base t-t[j]
