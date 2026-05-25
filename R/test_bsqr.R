@@ -1,17 +1,21 @@
-
-
 #' Comprehensive test function
 #'
 #' Runs quantile regression tests with and without constraints,
 #' and displays results. Demo function.
-#'
+#' @param verbose boolean FALSE (default) or TRUE.
+#' @param seed (default=NULL) value for the random generator.
 #' @return No return value, produces plots.
 #' @examples
 #' test_karlin_simple()
 #' @export
+test_karlin_simple <- function(verbose=FALSE,seed=NULL) {
+  # Store par
+  old <- par(mfrow = c(2,2))
+  # Restore par
+  on.exit(par(old))
 
-test_karlin_simple <- function(verbose=FALSE) {
-#optional set.seed(42)
+  if(!is.null(seed))
+    {    set.seed(seed)}
   n_points <- 50
   xtab <- (0:n_points)/n_points
 

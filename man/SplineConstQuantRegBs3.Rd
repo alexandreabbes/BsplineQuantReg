@@ -34,6 +34,8 @@ SplineConstQuantRegBs3(
 \item{solver}{CVXR solver to use (default = "CLARABEL")}
 
 \item{weight}{Observation weights (default = 1 for all)}
+
+\item{verbose}{boolean FALSE (default) or TRUE.}
 }
 \value{
 A list containing:
