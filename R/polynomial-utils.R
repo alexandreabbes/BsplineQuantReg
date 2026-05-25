@@ -115,7 +115,7 @@ change_polynomial_base_taylor <- function(coeffs_a, a, b)
 #' @param verbose boolean FALSE (default) or TRUE.
 #' @return Reduced vector (without leading zeros)
 #' @examples
-#' reduce_pol((c(0, 1, 1))  #returns c(1, 1) since 0x^2+x+1=x+1
+#' reduce_pol(c(0,0, 1, 1))
 #' @export
 reduce_pol<-function(p,verbose=FALSE){
   l=length(p)

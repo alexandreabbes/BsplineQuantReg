@@ -18,5 +18,5 @@ Reduced vector (without leading zeros)
 Removes leading zeros from a polynomial coefficient vector.
 }
 \examples{
-reduce_pol((c(0, 1, 1))  #returns c(1, 1) since 0x^2+x+1=x+1
+reduce_pol(c(0,0, 1, 1))
 }
