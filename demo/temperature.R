@@ -136,7 +136,7 @@ for (i in seq_along(tau_multi)) {
 par(mfrow = c(2, 2), mar = c(4, 4, 4, 3))
 
 # Plot 1: Unconstrained fit
-plot(years, temperature, pch = 16, cex = 0.6, col = "gray",
+plot(years, temperature, pch = 16, cex = 0.6, col = "black",
      xlab = "Year", ylab = "Temperature Anomaly (C)",
      main = "1. Unconstrained Median (tau = 0.5)")
 lines(years_eval, y_uncon, col = "red", lwd = 2)
@@ -146,7 +146,7 @@ abline(h = 0, col = "black", lty = 3, lwd = 0.5)
 grid()
 
 # Plot 2: Uniform increasing constraint
-plot(years, temperature, pch = 16, cex = 0.6, col = "gray",
+plot(years, temperature, pch = 16, cex = 0.6, col = "black",
      xlab = "Year", ylab = "Temperature Anomaly (C)",
      main = "2. Uniform Increasing Constraint (everywhere)")
 lines(years_eval, y_uniform_inc, col = "blue", lwd = 2)
@@ -156,7 +156,7 @@ abline(h = 0, col = "black", lty = 3, lwd = 0.5)
 grid()
 
 # Plot 3: Mixed constraints (decreasing only 1956-1973)
-plot(years, temperature, pch = 16, cex = 0.6, col = "gray",
+plot(years, temperature, pch = 16, cex = 0.6, col = "black",
      xlab = "Year", ylab = "Temperature Anomaly (C)",
      main = "3. Mixed Constraints (decreasing 1956-1973 only)")
 lines(years_eval, y_mixed, col = "darkgreen", lwd = 2)
@@ -171,7 +171,7 @@ grid()
 
 # Plot 4: Multiple quantiles with mixed constraints
 colors <- c("orange", "red", "darkred")
-plot(years, temperature, pch = 16, cex = 0.6, col = "gray",
+plot(years, temperature, pch = 16, cex = 0.6, col = "black",
      xlab = "Year", ylab = "Temperature Anomaly (C)",
      main = "4. Quantile Regression with Mixed Constraints")
 for (i in seq_along(tau_multi)) {

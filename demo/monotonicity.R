@@ -8,7 +8,7 @@ library(BsplineQuantReg)
 oldpar <- par(mfrow = c(2,2))
 
 # Generate data
-set.seed(42)
+#set.seed(42)
 n_points <- 100
 xtab <- seq(0, 1, length.out = n_points)
 

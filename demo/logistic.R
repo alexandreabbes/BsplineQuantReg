@@ -11,7 +11,7 @@ cat("========================================\n\n")
 oldpar <- par(mfrow = c(2,2))
 
 # Generate data from a logistic/sigmoid function
-set.seed(42)
+#set.seed(42)
 n_points <- 200
 x <- seq(-5, 5, length.out = n_points)
 
@@ -23,7 +23,7 @@ noise <- rnorm(n_points, 0, 0.05) * (1 + 0.5 * exp(-(x^2)/4))
 y <- true_logistic(x) + noise
 
 # Knots (equally spaced quantiles)
-kn <- 12
+kn <- 6
 knots <- quantile(x, probs = seq(0, 1, length.out = kn + 1))
 
 cat(sprintf("Number of points: %d\n", n_points))
@@ -50,7 +50,7 @@ y_true <- true_logistic(x_eval)
 par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
 
 # Plot 1: Data and fits
-plot(x, y, pch = 16, cex = 0.4, col = "gray",
+plot(x, y, pch = 16, cex = 0.4, col = "black",
      xlab = "x", ylab = "y",
      main = "Quantile Regression on Logistic Curve")
 lines(x_eval, y_true, col = "black", lwd = 2, lty = 2)
@@ -70,7 +70,7 @@ fit_monot <- SplineConstQuantRegBs3(x, y, knots, tau = 0.5,
                                     monot = 1, convcons = 0)
 y_monot <- spline_eval(fit_monot, x_eval)
 
-plot(x, y, pch = 16, cex = 0.4, col = "gray",
+plot(x, y, pch = 16, cex = 0.4, col = "black",
      xlab = "x", ylab = "y",
      main = "Median Regression with Monotonicity")
 lines(x_eval, y_true, col = "black", lwd = 2, lty = 2)

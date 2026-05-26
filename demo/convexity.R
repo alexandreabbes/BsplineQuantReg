@@ -14,7 +14,7 @@ cat("========================================\n")
 cat("Demo: Convexity & Concavity Constraints\n")
 cat("========================================\n\n")
 
-set.seed(42)
+#set.seed(42)
 n_points <- 150
 xtab <- seq(-2, 2, length.out = n_points)
 
@@ -73,7 +73,7 @@ y_partial <- spline_eval(fit_partial, x_eval)
 par(mfrow = c(2, 2), mar = c(4, 4, 3, 2))
 
 # Plot 1: Unconstrained
-plot(xtab, ytab, pch = 16, cex = 0.4, col = "lightgray",
+plot(xtab, ytab, pch = 16, cex = 0.4, col = "black",
      xlab = "x", ylab = "y", main = "Unconstrained Fit")
 lines(x_eval, y_true, col = "black", lwd = 2, lty = 2)
 lines(x_eval, y_uncon, col = "red", lwd = 2)
@@ -81,7 +81,7 @@ legend("bottomleft", legend = c("True", "Unconstrained"),
        col = c("black", "red"), lty = c(2, 1), lwd = 2, cex = 0.6)
 
 # Plot 2: Convexity everywhere
-plot(xtab, ytab, pch = 16, cex = 0.4, col = "lightgray",
+plot(xtab, ytab, pch = 16, cex = 0.4, col = "black",
      xlab = "x", ylab = "y", main = "Convexity Constraint (everywhere)")
 lines(x_eval, y_true, col = "black", lwd = 2, lty = 2)
 lines(x_eval, y_convex, col = "blue", lwd = 2)
@@ -89,7 +89,7 @@ legend("bottomleft", legend = c("True", "Convex"),
        col = c("black", "blue"), lty = c(2, 1), lwd = 2, cex = 0.7)
 
 # Plot 3: Concavity everywhere
-plot(xtab, ytab, pch = 16, cex = 0.4, col = "lightgray",
+plot(xtab, ytab, pch = 16, cex = 0.4, col = "black",
      xlab = "x", ylab = "y", main = "Concavity Constraint (everywhere)")
 lines(x_eval, y_true, col = "black", lwd = 2, lty = 2)
 lines(x_eval, y_concave, col = "darkgreen", lwd = 2)
@@ -97,7 +97,7 @@ legend("bottomleft", legend = c("True", "Concave"),
        col = c("black", "darkgreen"), lty = c(2, 1), lwd = 2, cex = 0.7)
 
 # Plot 4: Partial convexity (x >= 0 only)
-plot(xtab, ytab, pch = 16, cex = 0.4, col = "lightgray",
+plot(xtab, ytab, pch = 16, cex = 0.4, col = "black",
      xlab = "x", ylab = "y", main = "Partial Convexity (x >= 0 only)")
 lines(x_eval, y_true, col = "black", lwd = 2, lty = 2)
 lines(x_eval, y_partial, col = "purple", lwd = 2)

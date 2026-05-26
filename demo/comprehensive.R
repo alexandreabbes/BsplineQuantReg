@@ -99,7 +99,7 @@ compute_derivative <- function(y, x) {
   diff(y) / diff(x)
 }
 
-deriv_croiss <- compute_derivative(y_croiss, x_eval)
+deriv_croiss <- compute_derivative(y_croiss1, x_eval)
 deriv_decroiss <- compute_derivative(y_decroiss, x_eval)
 
 cat("Verification of constraints:\n")
