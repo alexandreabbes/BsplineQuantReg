@@ -21,7 +21,7 @@ test_karlin_simple <- function(verbose=FALSE,seed=NULL) {
 
   # simple pscillating data
   #ytab <- -3 * xtab +sin(3*2*xtab*3.14)+ 0.2 * rnorm(n_points)
-  ytab <- 2* xtab + 0.5 * sin(6 * pi * xtab) + 0.05 * rnorm(n_points+1)
+  ytab <- 2* xtab + 0.5 * sin(6 * pi * xtab) + 0.1 * rnorm(n_points+1)
   #ytab<-xtab*(1-xtab)
   kn <- 12
 

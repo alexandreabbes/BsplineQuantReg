@@ -237,7 +237,6 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
     convcons <- rep(convcons, (kn+1))
   }
   # eliminate the null (unconstrained) case
-
   if (any(convcons !=0)){
     CV<-list(convcons*(deriv_coeffs2 %*% alpha)>=0) # Very simple, only use the second derivatives at the knots.
     constraints<-c(constraints,CV)
