@@ -21,12 +21,12 @@ bibentry(
   title = "Quantile regression with cubic polynomial splines under shape constraints with applications",
   author = c(person("Alexandre"," Abbes")),
   year = "2025",
-  doi = "10.5281/zenodo.16999784",
-  url = "https://doi.org/10.5281/zenodo.16999784",
+  doi = "10.5281/zenodo.17427913",
+  url = "https://doi.org/10.5281/zenodo.17427913",
   textVersion = paste(
     "Abbes, A. (2025).",
     "Quantile regression with cubic polynomial splines under shape constraints with applications",
-    "Zenodo. doi:10.5281/zenodo.16999784"
+    "Zenodo. doi:10.5281/zenodo.17427913"
   )
 )
 
