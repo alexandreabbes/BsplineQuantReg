@@ -35,8 +35,8 @@ Type 'q()' to quit R.
 > ### * </HEADER>
 > library('BsplineQuantReg')
 BsplineQuantReg(version 0.1.0-beta)
-This is a BETA version. The API may change in future releases.
-Use demo() to see examples: demo(package = 'BsplineQuantReg')
+Quantile regression with splines under shape constraints
+With independent B-splines tools
 
 Attaching package: 'BsplineQuantReg'
 
@@ -89,34 +89,19 @@ The following object is masked from 'package:base':
 > 
 > ### ** Examples
 > 
-> set.seed(42)
+> #optional set.seed(42)
 > x <- seq(0, 1, length=100)
 > y <- 2*x + sin(6*pi*x)/2 + rnorm(100, 0, 0.05)
 > knots <- quantile(x, probs=seq(0,1,length.out=10))
 > 
 > # Median quantile regression without constraints
 > fit <- SplineConstQuantRegBs3(x, y, knots, tau=0.5)
-knots: 0 0.1111111 0.2222222 0.3333333 0.4444444 0.5555556 0.6666667 0.7777778 0.8888889 1 
-Monotonicity constraints (Karlin): 0 0 0 0 0 0 0 0 0 
-Nombre de fonctions de base 12 
-attempt with  solver: CLARABEL 
-Solveur succeeded: CLARABEL 
 > 
 > # With increasing monotonicity constraint
 > fit_monot <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, monot=1)
-knots: 0 0.1111111 0.2222222 0.3333333 0.4444444 0.5555556 0.6666667 0.7777778 0.8888889 1 
-Monotonicity constraints (Karlin): 1 1 1 1 1 1 1 1 1 
-Nombre de fonctions de base 12 
-attempt with  solver: CLARABEL 
-Solveur succeeded: CLARABEL 
 > 
 > # With convexity constraint
 > fit_convex <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, convcons=1)
-knots: 0 0.1111111 0.2222222 0.3333333 0.4444444 0.5555556 0.6666667 0.7777778 0.8888889 1 
-Monotonicity constraints (Karlin): 0 0 0 0 0 0 0 0 0 
-Nombre de fonctions de base 12 
-attempt with  solver: CLARABEL 
-Solveur succeeded: CLARABEL 
 > 
 > 
 > 
@@ -172,18 +157,14 @@ Solveur succeeded: CLARABEL
 > 
 > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 > ### Name: polyderiv
-> ### Title: Polynomial derivative
+> ### Title: Polynomial derivative Computes the derivative of order 'der' of
+> ###   a polynomial.
 > ### Aliases: polyderiv
 > 
 > ### ** Examples
 > 
 > # P(x) = x^2 -> P'(x) = 2x
 > polyderiv(c(1, 0, 0), 1) # returns c(2, 0)
-[1] 3
-     [,1] [,2] [,3]
-[1,]    0    0    0
-[2,]    2    0    0
-[3,]    0    1    0
 [1] 2 0
 > 
 > 
@@ -211,6 +192,26 @@ Solveur succeeded: CLARABEL
 > 
 > base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 > base::cat("polymul", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+> cleanEx()
+> nameEx("reduce_pol")
+> ### * reduce_pol
+> 
+> flush(stderr()); flush(stdout())
+> 
+> base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+> ### Name: reduce_pol
+> ### Title: Reduce polynomial
+> ### Aliases: reduce_pol
+> 
+> ### ** Examples
+> 
+> reduce_pol(c(0,0, 1, 1))
+[1] 1 1
+> 
+> 
+> 
+> base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+> base::cat("reduce_pol", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 > cleanEx()
 > nameEx("spline_eval")
 > ### * spline_eval
@@ -248,41 +249,12 @@ Solveur succeeded: CLARABEL
 > ### ** Examples
 > 
 > test_karlin_simple()
-knots: 0 0.08333333 0.1666667 0.25 0.3333333 0.4166667 0.5 0.5833333 0.6666667 0.75 0.8333333 0.9166667 1 
-Monotonicity constraints (Karlin): 0 0 0 0 0 0 0 0 0 0 0 0 
-Nombre de fonctions de base 15 
-attempt with  solver: OSQP 
-Solveur succeeded: OSQP 
+Warning in value[[3L]](cond) :
+  Missed:there is no package called 'rlang'
 
-=== TEST CROISSANT PARTIEL ===
-knots: 0 0.08333333 0.1666667 0.25 0.3333333 0.4166667 0.5 0.5833333 0.6666667 0.75 0.8333333 0.9166667 1 
-Monotonicity constraints (Karlin): 1 1 1 1 1 1 1 0 0 0 0 0 
-Nombre de fonctions de base 15 
-attempt with  solver: OSQP 
-Missed: there is no package called 'rlang' 
-attempt with  solver: CLARABEL 
-Solveur succeeded: CLARABEL 
+Warning in value[[3L]](cond) :
+  Missed:there is no package called 'rlang'
 
-=== TEST DECROISSANT ===
-knots: 0 0.08333333 0.1666667 0.25 0.3333333 0.4166667 0.5 0.5833333 0.6666667 0.75 0.8333333 0.9166667 1 
-Monotonicity constraints (Karlin): -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 
-Nombre de fonctions de base 15 
-attempt with  solver: OSQP 
-Missed: there is no package called 'rlang' 
-attempt with  solver: CLARABEL 
-Solveur succeeded: CLARABEL 
-
-=== TEST CONVEXE ===
-knots: 0 0.08333333 0.1666667 0.25 0.3333333 0.4166667 0.5 0.5833333 0.6666667 0.75 0.8333333 0.9166667 1 
-Monotonicity constraints (Karlin): 0 0 0 0 0 0 0 0 0 0 0 0 
-Nombre de fonctions de base 15 
-attempt with  solver: CLARABEL 
-Solveur succeeded: CLARABEL 
-knots: 0 0.08333333 0.1666667 0.25 0.3333333 0.4166667 0.5 0.5833333 0.6666667 0.75 0.8333333 0.9166667 1 
-Monotonicity constraints (Karlin): 0 0 0 0 0 0 0 0 0 0 0 0 
-Nombre de fonctions de base 15 
-attempt with  solver: CLARABEL 
-Solveur succeeded: CLARABEL 
 > 
 > 
 > 
@@ -293,7 +265,7 @@ Solveur succeeded: CLARABEL
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  18.72 0.94 24.36 NA NA 
+Time elapsed:  18.95 0.73 22.83 NA NA 
 > grDevices::dev.off()
 null device 
           1 

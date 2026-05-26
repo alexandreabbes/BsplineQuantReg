@@ -7,6 +7,7 @@
 # 3. Mixed: Decreasing only between 1956-1973, unconstrained elsewhere
 
 library(BsplineQuantReg)
+oldpar <- par(mfrow = c(2,2))
 
 cat("========================================\n")
 cat("Demo: Temperature Anomaly Trend Analysis\n")
@@ -185,6 +186,8 @@ rect(decr_start, -0.8, decr_end, 0.5, col = rgb(1, 0.5, 0, 0.1), border = NA)
 legend("topleft", legend = c("tau = 0.1", "tau = 0.5", "tau = 0.9"),
        col = colors, lty = c(2, 1, 2), lwd = 2, cex = 0.8)
 grid()
+
+par(oldpar)
 
 # ============================================================
 # Conclusion

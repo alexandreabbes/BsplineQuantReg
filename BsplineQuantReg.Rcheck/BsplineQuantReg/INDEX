@@ -9,7 +9,7 @@ SplineConstQuantRegBs3
                         splines
 Spline_der_knots        Derivatives at knots of a B-spline
 apply_karlin_constraints
-                        Karlin-Studden constraints for monotonicity
+                        Karlin-Studden constraints for positivity
 bs_direct               Direct evaluation of a B-spline basis
 bspline_to_deriv_coeffs_pp
                         Convert B-spline to derivative coefficients
@@ -19,7 +19,8 @@ is_beta                 Check if package is beta version
 package_version         Get package version
 poly_eval               Evaluate polynomial
 polyadd                 Polynomial addition
-polyderiv               Polynomial derivative
+polyderiv               Polynomial derivative Computes the derivative
+                        of order 'der' of a polynomial.
 polymul                 Polynomial multiplication
 reduce_pol              Reduce polynomial
 spline_eval             Evaluate a B-spline

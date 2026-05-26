@@ -6,6 +6,8 @@
 # 2. Concavity constraint (second derivative <= 0)
 # 3. Partial convexity (only on the right half)
 
+oldpar <- par(mfrow = c(2,2))
+
 library(BsplineQuantReg)
 
 cat("========================================\n")
@@ -105,6 +107,11 @@ text(-0.8, 1.5, "Unconstrained", col = "red", cex = 0.7)
 legend("bottomleft", legend = c("True", "Partial convex"),
        col = c("black", "purple"), lty = c(2, 1), lwd = 2, cex = 0.7)
 
+
+par(oldpar)
+
 cat("========================================\n")
 cat("Demo completed.\n")
 cat("========================================\n")
+
+

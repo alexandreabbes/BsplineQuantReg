@@ -1,4 +1,4 @@
-* using log directory 'C:/Users/Alexandre/Documents/BsplineQuantReg/BsplineQuantReg.Rcheck'
+* using log directory 'D:/Users/Abbes/Documents/homeW/phd/Const_Spline/Python_sage/R_code/BsplineQuantReg/BsplineQuantReg.Rcheck'
 * using R version 4.5.2 (2025-10-31 ucrt)
 * using platform: x86_64-w64-mingw32
 * R was compiled by
@@ -11,7 +11,7 @@
 * checking extension type ... Package
 * this is package 'BsplineQuantReg' version '0.1.0'
 * package encoding: UTF-8
-* checking CRAN incoming feasibility ... [32s] NOTE
+* checking CRAN incoming feasibility ... [46s] NOTE
 Maintainer: 'Alexandre Abbes <alexandre.abbes@proton.me>'
 
 New submission
@@ -22,12 +22,10 @@ New submission
 * checking for executable files ... OK
 * checking for hidden files and directories ... OK
 * checking for portable file names ... OK
-* checking whether package 'BsplineQuantReg' can be installed ... [21s] OK
+* checking whether package 'BsplineQuantReg' can be installed ... [26s] OK
 * checking installed package size ... OK
 * checking package directory ... OK
-* checking for future file timestamps ... NOTE
-unable to verify current time
-* checking 'build' directory ... OK
+* checking for future file timestamps ... OK
 * checking DESCRIPTION meta-information ... OK
 * checking top-level files ... OK
 * checking for left-over files ... OK
@@ -47,7 +45,7 @@ unable to verify current time
 * checking S3 generic/method consistency ... OK
 * checking replacement functions ... OK
 * checking foreign function calls ... OK
-* checking R code for possible problems ... [20s] OK
+* checking R code for possible problems ... [17s] OK
 * checking Rd files ... OK
 * checking Rd metadata ... OK
 * checking Rd line widths ... OK
@@ -57,17 +55,12 @@ unable to verify current time
 * checking Rd \usage sections ... OK
 * checking Rd contents ... OK
 * checking for unstated dependencies in examples ... OK
-* checking installed files from 'inst/doc' ... OK
-* checking files in 'vignettes' ... OK
-* checking examples ... [25s] NOTE
+* checking examples ... [24s] NOTE
 Examples with CPU (user + system) or elapsed time > 5s
                        user system elapsed
-SplineConstQuantRegBs3 5.93   0.47    7.24
-test_karlin_simple     6.24   0.10    8.95
+SplineConstQuantRegBs3 6.00   0.33    7.90
+test_karlin_simple     5.66   0.11    5.77
 * checking for unstated dependencies in 'demo' ... OK
-* checking for unstated dependencies in vignettes ... OK
-* checking package vignettes ... OK
-* checking re-building of vignette outputs ... OK
 * checking PDF version of manual ... OK
 * checking HTML version of manual ... OK
 * checking for non-standard things in the check directory ... OK
@@ -75,4 +68,4 @@ test_karlin_simple     6.24   0.10    8.95
 Found the following files/directories:
   'lastMiKTeXException'
 * DONE
-Status: 4 NOTEs
+Status: 3 NOTEs

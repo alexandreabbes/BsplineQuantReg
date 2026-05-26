@@ -8,6 +8,8 @@ cat("========================================\n")
 cat("Demo: Logistic Curve Quantile Regression\n")
 cat("========================================\n\n")
 
+oldpar <- par(mfrow = c(2,2))
+
 # Generate data from a logistic/sigmoid function
 set.seed(42)
 n_points <- 200
@@ -86,4 +88,5 @@ if(min(dy) >= -1e-6) {
 legend("topleft", legend = c("True", "Monotonic fit (tau=0.5)"),
        col = c("black", "blue"), lty = c(2, 1), lwd = 2,cex=0.6)
 
+par(oldpar)
 cat("\nDemo completed.\n")

@@ -5,6 +5,8 @@
 # Load the package
 library(BsplineQuantReg)
 
+oldpar <- par(mfrow = c(2,2))
+
 # Generate data
 set.seed(42)
 n_points <- 100
@@ -44,4 +46,6 @@ lines(x_eval, y_inc, col = "blue", lwd = 2)
 plot(xtab, ytab, pch = 16, cex = 0.5, col = "gray", main = "Decreasing")
 lines(x_eval, y_dec, col = "green", lwd = 2)
 
+
+par(oldpar)
 cat("\nDemo completed. The increasing fit should have non-negative slope.\n")

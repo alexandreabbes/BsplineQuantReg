@@ -11,6 +11,9 @@ view_basis(Bspline, xvalues = 0)
 
 \item{xvalues}{Vector of evaluation points for plotting (by default 100 points are computed in the knot range)}
 }
+\value{
+No return value, called for side effects (generates a plot)
+}
 \description{
-Plots all basis functions of a B-spline.
+Plots all  functions of a B-spline basis.
 }

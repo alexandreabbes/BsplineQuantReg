@@ -4,7 +4,7 @@
 \alias{bspline_to_deriv_coeffs_pp}
 \title{Convert B-spline to derivative coefficients}
 \usage{
-bspline_to_deriv_coeffs_pp(tn, degree = 3, xvalues = 0)
+bspline_to_deriv_coeffs_pp(tn, degree = 3, xvalues = 0, verbose = FALSE)
 }
 \arguments{
 \item{tn}{Knot vector (effective partition, not extended)}
@@ -12,6 +12,8 @@ bspline_to_deriv_coeffs_pp(tn, degree = 3, xvalues = 0)
 \item{degree}{Spline degree (default = 3)}
 
 \item{xvalues}{Evaluation points for design matrix (0 = no evaluation)}
+
+\item{verbose}{boolean FALSE (default) or TRUE.}
 }
 \value{
 A list containing:

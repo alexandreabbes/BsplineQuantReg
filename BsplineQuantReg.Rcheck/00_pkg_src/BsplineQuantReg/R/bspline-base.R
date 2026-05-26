@@ -5,12 +5,13 @@
 #' Omega function for De Boor recursion
 #'
 #' Computes the affine element used in the recursive De Boor algorithm
-#' for B-spline construction.
+#' for B-spline construction. for a given extended knots partition s(1),..
+#' Omega(j,l)(x)=(s(j-x))/(s(j+l-1)-s(j)\), with l: order of the spline
 #'
 #' @param s Extended knot vector
 #' @param j Knot index
 #' @param o Spline order (degree + 1)
-#' @return Vector of coefficients [alpha, beta] representing (alpha*t + beta)
+#' @return (Side function) A Vector of coefficients [alpha, beta] representing (alpha*t + beta)
 #' @keywords internal
 
 Omega<-function(s,j,o)#t: knots in the base t-t[j]
@@ -24,6 +25,7 @@ Omega<-function(s,j,o)#t: knots in the base t-t[j]
   return(w)
   }
 }
+
 #' Build B-spline basis in piecewise polynomial form
 #' Computes local polynomial coefficients for each B-spline basis function
 #' on each interval. Polynomials are expressed in the canonical basis
@@ -34,6 +36,7 @@ Omega<-function(s,j,o)#t: knots in the base t-t[j]
 #'  and the ends.  its length is number of intervals+1+2*degree.
 #' @param degree B-spline degree (default = 3 for cubic)
 #' @param der Derivative order (0 = original basis)
+#' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list containing:
 #'   \item{base}{Coefficients in the local bases, in the form of an 3-d array [j,nu,coeff], j : the number of the spline in the basis,
 #'   nu: the number of the interval in the extended notation, coeff : the coefficients in decreasing order
@@ -56,7 +59,7 @@ Omega<-function(s,j,o)#t: knots in the base t-t[j]
 #'
 #' @export
 
-Bspline_base<-function(sn,degree=3,der=0)
+Bspline_base<-function(sn,degree=3,der=0,verbose=FALSE)
 {
   tn=sn[(degree+1):(length(sn)-degree)] #effective knots partition
   kn=length(tn)-1 # tn is the interior knots without the extended partition.
@@ -131,11 +134,12 @@ Bspline_base<-function(sn,degree=3,der=0)
 #'
 #' @param bspline Object returned by \code{Bspline_base}
 #' @param der Derivative order
+#' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list similar to \code{Bspline_base} for the derivative basis
 #' @export
 
 
-Bspline_deriv<-function(bspline,der=2){
+Bspline_deriv<-function(bspline,der=2,verbose=FALSE){
   #computes the derivative fo a Bspline basis
   Bn=bspline$base
   B0=bspline$base0

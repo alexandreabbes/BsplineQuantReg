@@ -4,7 +4,12 @@
 \alias{test_karlin_simple}
 \title{Comprehensive test function}
 \usage{
-test_karlin_simple()
+test_karlin_simple(verbose = FALSE, seed = NULL)
+}
+\arguments{
+\item{verbose}{boolean FALSE (default) or TRUE.}
+
+\item{seed}{(default=NULL) value for the random generator.}
 }
 \value{
 No return value, produces plots.

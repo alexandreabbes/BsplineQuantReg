@@ -4,14 +4,19 @@
 \alias{reduce_pol}
 \title{Reduce polynomial}
 \usage{
-reduce_pol(p)
+reduce_pol(p, verbose = FALSE)
 }
 \arguments{
-\item{p}{Polynomial coefficient vector}
+\item{p}{Polynomial coefficient vector(coef in decreasing order)}
+
+\item{verbose}{boolean FALSE (default) or TRUE.}
 }
 \value{
 Reduced vector (without leading zeros)
 }
 \description{
 Removes leading zeros from a polynomial coefficient vector.
+}
+\examples{
+reduce_pol(c(0,0, 1, 1))
 }

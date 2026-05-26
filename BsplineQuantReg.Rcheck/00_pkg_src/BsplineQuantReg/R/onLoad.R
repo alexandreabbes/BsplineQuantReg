@@ -14,7 +14,8 @@
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage(
     "BsplineQuantReg(version 0.1.0-beta)\n",
-    "This is a BETA version. The API may change in future releases.\n",
-    "Use demo() to see examples: demo(package = 'BsplineQuantReg')"
+    "Quantile regression with splines under shape constraints\n",
+    "With independent B-splines tools"
+#    "Use demo() to see examples: demo(package = 'BsplineQuantReg')"
   )
 }

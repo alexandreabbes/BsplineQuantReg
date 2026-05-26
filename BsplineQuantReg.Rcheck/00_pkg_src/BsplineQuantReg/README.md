@@ -7,11 +7,11 @@ If you use this package in your research, please cite:
 @Article{Abbes2026,
   author  = {Alexandre Abbes},
   title   = {Quantile regression with cubic polynomial splines under shape constraints with applications},
-  year    = {2025},
-  doi     = {10.5281/zenodo.16999784}
+  year    = {2026},
+  doi     = {10.5281/zenodo.17427913}
 }
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16999784.svg)](https://doi.org/10.5281/zenodo.16999784)
+[![DOI](https://doi.org/10.5281/zenodo.17427913)](https://doi.org/10.5281/zenodo.17427913)
 
 ## Beta Version Notice
 

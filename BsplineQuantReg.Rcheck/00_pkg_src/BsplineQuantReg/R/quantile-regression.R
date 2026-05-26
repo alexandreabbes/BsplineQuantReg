@@ -8,12 +8,13 @@
 #' @param tn Knot vector (effective partition, not extended)
 #' @param degree Spline degree (default = 3)
 #' @param xvalues Evaluation points for design matrix (0 = no evaluation)
+#' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list containing:
 #'   \item{d0}{Design matrix (if xvalues provided)}
 #'   \item{d1}{First derivative coefficients [a3, a2, a1] for each interval}
 #'   \item{d2}{Second derivative values at knots}
 #' @export
-bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0) {
+bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0, verbose=FALSE) {
 
   # create  basis with create.bspline.basis
   kn <- length(tn) - 1
@@ -28,9 +29,9 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0) {
   basis<-BB$base
 
   N <-BB$n_splines
-
-  cat("Nombre de fonctions de base", N, "\n")
-
+  if (verbose) {
+    message("Number of  basis functions", N, "\n")
+  }
   # Matrix of normalised coef derivativs
   deriv_coeffs <- array(0, dim = c(kn, N, 3))
   deriv2_val<-array(0, dim = c(kn+1, N))
@@ -60,18 +61,19 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0) {
   return(list(d0=yvalues,d1=deriv_coeffs, d2=deriv2_val))
 }
 
-#' Karlin-Studden constraints for monotonicity
+#' Karlin-Studden constraints for positivity
 #'
-#' Applies Karlin-Studden SOCP constraints to ensure monotonicity of a
+#' Applies Karlin-Studden SOCP constraints to ensure positivity of a
 #' quadratic polynomial on the interval [0,1].
 #'
 #' @param p2 Coefficient of u^2
 #' @param p1 Coefficient of u
 #' @param p0 Constant term
 #' @param z0 Auxiliary SOCP variable
+#' @param verbose boolean FALSE (default) or TRUE.
 #' @return List of CVXR constraints
 #' @export
-apply_karlin_constraints <- function(p2, p1, p0, z0) {
+apply_karlin_constraints <- function(p2, p1, p0, z0,verbose=FALSE) {
   # P2, p1, p0 sont les coefficients du polynome quadratique: p2*u^2 + p1*u + p0
   # Dans la notation de l'article
 
@@ -82,7 +84,7 @@ apply_karlin_constraints <- function(p2, p1, p0, z0) {
   K2_vec <- (p0+p2+ z0)
 
   constraints <- c(constraints, list(K2_vec >= p_norm(K1_vec, 2)))
-
+  if (verbose){message("constraints;\n",constraints)}
   return(constraints)
 }
 
@@ -101,13 +103,14 @@ apply_karlin_constraints <- function(p2, p1, p0, z0) {
 #'        1 = convex, -1 = concave, 0 = unconstrained. If scalar, repeated.
 #' @param solver CVXR solver to use (default = "CLARABEL")
 #' @param weight Observation weights (default = 1 for all)
+#' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list containing:
 #'   \item{coefficients}{B-spline coefficients (including y mean)}
 #'   \item{degree}{Spline degree (always 3)}
 #'   \item{knots}{Knot vector used}
 #'   \item{int_knots}{Same as knots (compatibility)}
 #' @examples
-#' set.seed(42)
+#' #optional set.seed(42)
 #' x <- seq(0, 1, length=100)
 #' y <- 2*x + sin(6*pi*x)/2 + rnorm(100, 0, 0.05)
 #' knots <- quantile(x, probs=seq(0,1,length.out=10))
@@ -154,7 +157,8 @@ apply_karlin_constraints <- function(p2, p1, p0, z0) {
 SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
                                    monot = 0,
                                    convcons=0,
-                                   solver = "CLARABEL", weight = NULL)
+                                   solver = "CLARABEL", weight = NULL,
+                                   verbose=FALSE)
 {
 
   if (is.null(weight)) {
@@ -175,13 +179,16 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
   }
 
   kn <- length(knots) - 1
-
-  cat("knots:", knots, "\n")
+  if (verbose) {
+    message("knots:", knots, "\n")
+  }
 
   if (length(monot) == 1) {
     monot <- rep(monot, kn)
   }
-  cat("Monotonicity constraints (Karlin):", monot, "\n")
+  if (verbose) {
+  message("Monotonicity constraints (Karlin):", monot, "\n")
+  }
   boundary_knots <- range(knots)
   degree=3
   N=length(knots)+3-1
@@ -189,7 +196,7 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
   int_knots=knots[2:kn]
 
   # Calcul des coefficients normalises des derivees
-  deriv_spline <- bspline_to_deriv_coeffs_pp(knots, degree = 3,xvalues=xtab)
+  deriv_spline <- bspline_to_deriv_coeffs_pp(knots, degree = 3,xvalues=xtab,verbose=verbose)
   deriv_coeffs <-deriv_spline$d1
   deriv_coeffs2<-deriv_spline$d2
   B<-deriv_spline$d0
@@ -219,7 +226,7 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
         b_coef=sum(deriv_coeffs[i,,2]*alpha) *monot[i]
         c_coef=sum(deriv_coeffs[i,,3]*alpha) *monot[i]
         #a*x^2+b*x+c
-        CK<-apply_karlin_constraints(a_coef,b_coef,c_coef,z_vars[[i]])
+        CK<-apply_karlin_constraints(a_coef,b_coef,c_coef,z_vars[[i]],verbose=verbose)
         constraints<-c(constraints,CK)
       }
     }
@@ -242,13 +249,17 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
   solvers_to_try <- c(solver, "CLARABEL", "OSQP", "ECOS", "SCS")
 
   for (s in unique(solvers_to_try)) {
-    cat("attempt with  solver:", s, "\n")
+    if (verbose) {
+      message("attempt with  solver:", s, "\n")
+      }
     result <- tryCatch(
-      psolve(problem, solver = toupper(s), verbose = FALSE),
-    error = function(e) {cat("Missed:", e$message, "\n")
+      psolve(problem, solver = toupper(s), verbose=verbose),
+    error = function(e) {warning("Missed:", e$message, "\n")
       NULL} )
     if (!is.null(result) && !is.null(value(alpha))) {
-      cat("Solveur succeeded:", s, "\n")
+      if (verbose) {
+        message("Solveur succeeded:", s, "\n")
+      }
       break}
   }
 
@@ -258,11 +269,11 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
   }
 
   alpha_val <- value(alpha)+y_mean
-
-  #  cat("Statut:", result$status, "\n")
-  #  cat("Valeur objectif:", result$value, "\n")
-  #  cat("Coefficients alpha (range):", range(alpha_val), "\n")
-
+  if (verbose) {
+    message(" Statut:", result$status, "\n",
+            "Valeur objectif:", result$value, "\n",
+             "Coefficients alpha (range):", range(alpha_val), "\n")
+}
 
   return(list(
     #spline = spline_result,

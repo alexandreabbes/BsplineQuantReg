@@ -7,7 +7,7 @@ Computes local polynomial coefficients for each B-spline basis function
 on each interval. Polynomials are expressed in the canonical basis
 Uses De Boor's recursion formula.}
 \usage{
-Bspline_base(sn, degree = 3, der = 0)
+Bspline_base(sn, degree = 3, der = 0, verbose = FALSE)
 }
 \arguments{
 \item{sn}{Extended knot vector (including endpoint repetitions)
@@ -18,6 +18,8 @@ then sn should be given as a vector with  "degree" times t_0 and t_kn at the beg
 \item{degree}{B-spline degree (default = 3 for cubic)}
 
 \item{der}{Derivative order (0 = original basis)}
+
+\item{verbose}{boolean FALSE (default) or TRUE.}
 }
 \value{
 A list containing:

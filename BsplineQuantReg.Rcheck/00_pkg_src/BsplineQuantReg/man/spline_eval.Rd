@@ -7,12 +7,12 @@
 spline_eval(Bspline, xvalues)
 }
 \arguments{
-\item{Bspline}{Spline object (list with coefficients, degree, knots)}
+\item{Bspline}{Spline object (list with coefficients on the Bspline basis, degree, extended knots)}
 
 \item{xvalues}{Vector of evaluation points}
 }
 \value{
-Spline values at the requested points
+vector of same length as xvalues, with Spline values at the requested points
 }
 \description{
 Evaluates a spline (linear combination of B-splines) at given points.

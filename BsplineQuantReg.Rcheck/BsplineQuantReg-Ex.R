@@ -60,7 +60,7 @@ base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 
 ### ** Examples
 
-set.seed(42)
+#optional set.seed(42)
 x <- seq(0, 1, length=100)
 y <- 2*x + sin(6*pi*x)/2 + rnorm(100, 0, 0.05)
 knots <- quantile(x, probs=seq(0,1,length.out=10))
@@ -126,7 +126,8 @@ flush(stderr()); flush(stdout())
 
 base::assign(".ptime", proc.time(), pos = "CheckExEnv")
 ### Name: polyderiv
-### Title: Polynomial derivative
+### Title: Polynomial derivative Computes the derivative of order 'der' of
+###   a polynomial.
 ### Aliases: polyderiv
 
 ### ** Examples
@@ -158,6 +159,25 @@ polymul(c(1, 1), c(1, 1)) # returns c(1, 2, 1)
 
 base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
 base::cat("polymul", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
+cleanEx()
+nameEx("reduce_pol")
+### * reduce_pol
+
+flush(stderr()); flush(stdout())
+
+base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+### Name: reduce_pol
+### Title: Reduce polynomial
+### Aliases: reduce_pol
+
+### ** Examples
+
+reduce_pol(c(0,0, 1, 1))
+
+
+
+base::assign(".dptime", (proc.time() - get(".ptime", pos = "CheckExEnv")), pos = "CheckExEnv")
+base::cat("reduce_pol", base::get(".format_ptime", pos = 'CheckExEnv')(get(".dptime", pos = "CheckExEnv")), "\n", file=base::get(".ExTimings", pos = 'CheckExEnv'), append=TRUE, sep="\t")
 cleanEx()
 nameEx("spline_eval")
 ### * spline_eval

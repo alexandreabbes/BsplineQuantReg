@@ -10,6 +10,8 @@
 
 library(BsplineQuantReg)
 
+oldpar <- par(mfrow = c(2,2))
+
 cat("========================================\n")
 cat("Demo: Temperature Anomaly Trend Analysis\n")
 cat("========================================\n\n")
@@ -234,3 +236,4 @@ cat("\nThis demonstrates that flexible constraint patterns\n")
 cat("are more realistic than global monotonicity.\n")
 cat("\nDemo completed.\n")
 
+par(oldpar)

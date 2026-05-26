@@ -4,12 +4,14 @@
 \alias{polyadd}
 \title{Polynomial addition}
 \usage{
-polyadd(p1, p2)
+polyadd(p1, p2, verbose = FALSE)
 }
 \arguments{
 \item{p1}{First polynomial (coefficient vector)}
 
 \item{p2}{Second polynomial (coefficient vector)}
+
+\item{verbose}{boolean FALSE (default) or TRUE.}
 }
 \value{
 Coefficient vector of the sum
