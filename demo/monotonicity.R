@@ -9,7 +9,7 @@ oldpar <- par(mfrow = c(2,2))
 
 # Generate data
 #set.seed(42)
-n_points <- 100
+n_points <- 50
 xtab <- seq(0, 1, length.out = n_points)
 
 # Increasing function with noise
@@ -43,10 +43,10 @@ y_inc1 <- spline_eval(fit_inc1, x_eval)
 y_dec <- spline_eval(fit_dec, x_eval)
 
 par(mfrow = c(2, 2))
-plot(xtab, ytab, pch = 16, cex = 0.5, col = "black", main = "Data")
-plot(xtab, ytab, pch = 16, cex = 0.5, col = "black", main = "Unconstrained")
+plot(xtab, ytab, pch = 16,  col = "black", main = "Data")
+plot(xtab, ytab, pch = 16,  col = "black", main = "Unconstrained")
 lines(x_eval, y_uncon, col = "red", lwd = 2)
-plot(xtab, ytab, pch = 16, cex = 0.5, col = "black", main = "Increasing")
+plot(xtab, ytab, pch = 16,  col = "black", main = "Increasing")
 lines(x_eval, y_inc1,col='yellow', lwd = 2)
 lines(x_eval, y_inc2,col='red', lwd = 2)
 lines(x_eval, y_inc3,col='brown', lwd = 2)
@@ -54,7 +54,7 @@ legend("topleft", legend = c(paste("tau =", c(0.1,0.5,0.9))),
        col = colors, lty = c(rep(1, 3)),
        lwd = 1.5, cex = 0.6)
 
-plot(xtab, ytab, pch = 16, cex = 0.5, col = "black", main = "Decreasing")
+plot(xtab, ytab, pch = 16,  col = "black", main = "Decreasing")
 lines(x_eval, y_dec, col = "green", lwd = 2)
 
 

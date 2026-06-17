@@ -165,7 +165,7 @@ cat(sprintf("                       derivative between 1945-1970: range [%.4f, %
 par(mfrow = c(2, 2), mar = c(4, 4, 4, 3))
 
 # Plot 1: Unconstrained fit
-plot(years, temperature, pch = 16, cex = 0.6, col = "black",
+plot(years, temperature, pch = 16,  col = "black",
      xlab = "Year", ylab = "Temperature Anomaly (C)",
      main = "1. Unconstrained Median (tau = 0.5)")
 lines(years_eval, y_uncon, col = "red", lwd = 2)
@@ -175,7 +175,7 @@ abline(h = 0, col = "black", lty = 3, lwd = 0.5)
 grid()
 
 # Plot 2: Full monotonicity (too restrictive)
-plot(years, temperature, pch = 16, cex = 0.6, col = "black",
+plot(years, temperature, pch = 16,  col = "black",
      xlab = "Year", ylab = "Temperature Anomaly (C)",
      main = "2. Full Increasing Constraint (too restrictive)")
 lines(years_eval, y_full_inc, col = "blue", lwd = 2)
@@ -186,7 +186,7 @@ text(1948, -0.1, "Forced increasing\nbut data shows cooling", col = "blue", cex 
 grid()
 
 # Plot 3: Mixed constraints (decreasing 1945-1970, increasing elsewhere)
-plot(years, temperature, pch = 16, cex = 0.6, col = "black",
+plot(years, temperature, pch = 16,  col = "black",
      xlab = "Year", ylab = "Temperature Anomaly (C)",
      main = "3. Mixed Constraints")
 lines(years_eval, y_mixed, col = "darkgreen", lwd = 2)
@@ -203,7 +203,7 @@ grid()
 
 # Plot 4: Multiple quantiles with mixed constraints
 colors <- c("orange", "red", "darkred")
-plot(years, temperature, pch = 16, cex = 0.6, col = "black",
+plot(years, temperature, pch = 16,  col = "black",
      xlab = "Year", ylab = "Temperature Anomaly (C)",
      main = "4. Quantile Regression with Mixed Constraints")
 for (i in seq_along(tau_multi)) {

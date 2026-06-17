@@ -3,3 +3,5 @@
 ^doc$
 ^Meta$
 ^docs$
+^\.positai$
+^\.claude$

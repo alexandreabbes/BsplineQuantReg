@@ -19,14 +19,14 @@ oldpar <- par(mfrow = c(2, 2), mar = c(4, 4, 4, 2))
 
 # Generate data from a logistic/sigmoid function
 #set.seed(42)
-n_points <- 200
+n_points <- 20
 x <- seq(-5, 5, length.out = n_points)
 
 # Logistic (sigmoid) function: P(x) = 1 / (1 + exp(-x))
 true_logistic <- function(x) 1 / (1 + exp(-x))
 
 # Add heteroscedastic noise (more noise in the middle)
-noise <- rnorm(n_points, 0, 0.05) * (1 + 0.5 * exp(-(x^2)/4))
+noise <- rnorm(n_points, 0, 0.1)
 y <- true_logistic(x) + noise
 
 # Knots (equally spaced quantiles)
@@ -84,7 +84,7 @@ y_true <- true_logistic(x_eval)
 # ============================================================
 # Plot 1: Multiple quantiles
 # ============================================================
-plot(x, y, pch = 16, cex = 0.4, col = "black",
+plot(x, y, pch = 16, col = "black",
      xlab = "x", ylab = "y",
      main = "1. Quantile Regression\nMultiple Quantiles")
 lines(x_eval, y_true, col = "black", lwd = 2, lty = 2)
@@ -108,7 +108,7 @@ fit_monot <- SplineConstQuantRegBs3(x, y, knots, tau = 0.5,
                                     monot = 1, convcons = 0)
 y_monot <- spline_eval(fit_monot, x_eval)
 
-plot(x, y, pch = 16, cex = 0.4, col = "black",
+plot(x, y, pch = 16,  col = "black",
      xlab = "x", ylab = "y",
      main = "2. Median Regression\nwith Monotonicity Constraint")
 lines(x_eval, y_true, col = "black", lwd = 2, lty = 2)
@@ -135,7 +135,7 @@ fit_conv <- SplineConstQuantRegBs3(x, y, knots, tau = 0.5,
                                    monot = 0, convcons = convex)
 y_conv <- spline_eval(fit_conv, x_eval)
 
-plot(x, y, pch = 16, cex = 0.4, col = "black",
+plot(x, y, pch = 16,  col = "black",
      xlab = "x", ylab = "y",
      main = "3. Median Regression\nwith Convex/Concave Constraint")
 lines(x_eval, y_true, col = "black", lwd = 2, lty = 2)
@@ -160,7 +160,7 @@ fit_both <- SplineConstQuantRegBs3(x, y, knots, tau = 0.5,
                                    monot = 1, convcons = convex)
 y_both <- spline_eval(fit_both, x_eval)
 
-plot(x, y, pch = 16, cex = 0.4, col = "black",
+plot(x, y, pch = 16,  col = "black",
      xlab = "x", ylab = "y",
      main = "4. Median Regression\nMonotonicity + Convex/Concave")
 lines(x_eval, y_true, col = "black", lwd = 2, lty = 2)

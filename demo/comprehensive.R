@@ -12,6 +12,7 @@
 
 oldpar <- par(mfrow = c(2,2))
 
+
 library(BsplineQuantReg)
 
 cat("==============================================\n")
@@ -114,7 +115,7 @@ cat("\n")
 par(mfrow = c(2, 2), mar = c(4, 4, 4, 2))
 
 # Plot 1: Partial increasing constraint
-plot(xtab, ytab, pch = 16, cex = 0.5, col = "black",
+plot(xtab, ytab, pch = 16,  col = "black",
      xlab = "x", ylab = "y",
      main = "Partial Increasing Constraint\n(first 7 intervals only)\n tau=0.5, 0.1")
 lines(x_eval, y_croiss1, col = "blue", lwd = 2)
@@ -127,7 +128,7 @@ text(knots[n_constrained + 1] + 0.02, max(ytab) - 0.2,
 grid()
 
 # Plot 2: Full decreasing constraint
-plot(xtab, ytab, pch = 16, cex = 0.5, col = "black",
+plot(xtab, ytab, pch = 16,  col = "black",
      xlab = "x", ylab = "y",
      main = "Full Decreasing Constraint\n(everywhere)")
 lines(x_eval, y_decroiss, col = "darkgreen", lwd = 2)
@@ -135,7 +136,7 @@ abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
 grid()
 
 # Plot 3: Convexity constraint
-plot(xtab, ytab, pch = 16, cex = 0.5, col = "black",
+plot(xtab, ytab, pch = 16,  col = "black",
      xlab = "x", ylab = "y",
      main = "Convexity Constraint\n(second derivative >= 0)")
 lines(x_eval, y_convexe, col = "purple", lwd = 2)
@@ -143,7 +144,7 @@ abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
 grid()
 
 # Plot 4: Unconstrained (tau = 0.9)
-plot(xtab, ytab, pch = 16, cex = 0.5, col = "black",
+plot(xtab, ytab, pch = 16,  col = "black",
      xlab = "x", ylab = "y",
      main = "Unconstrained\n(tau = 0.9, , 0.5, 0.1)")
 lines(x_eval, y_uncon1, col = "red", lwd = 2)
