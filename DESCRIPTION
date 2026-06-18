@@ -2,7 +2,7 @@ Package: BsplineQuantReg
 Type: Package
 Title: 'Constrained Quantile Regression with Cubic B-Splines'
 Version: 0.1.0
-Date: 2026-05-04
+Date: 2026-06-01
 Authors@R: person("Alexandre", "Abbes", email = "alexandre.abbes@proton.me", role = c('aut', 'cre'))
 Description: Quantile regression with cubic B-splines under monotonicity
     and convexity constraints using the Karlin-Studden SOCP formulation.
