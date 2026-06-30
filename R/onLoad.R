@@ -13,9 +13,9 @@
 #' @keywords internal
 .onAttach <- function(libname, pkgname) {
   packageStartupMessage(
-    "BsplineQuantReg(version 0.1.0-beta)\n",
-    "Quantile regression with splines under shape constraints\n",
-    "With independent B-splines tools"
-#    "Use demo() to see examples: demo(package = 'BsplineQuantReg')"
+    "BsplineQuantReg (version ", utils::packageVersion("BsplineQuantReg"), ")\n",
+    "Constrained Quantile Regression with Cubic B-Splines\n",
+    "Available on CRAN: https://cran.r-project.org/package=BsplineQuantReg\n",
+    "Use demo() to see examples: demo(package = 'BsplineQuantReg')"
   )
 }

@@ -11,17 +11,19 @@ If you use this package in your research, please cite:
   doi     = {10.5281/zenodo.17427913}
 }
 
+# BsplineQuantReg
+
+[![CRAN status](https://www.r-pkg.org/badges/version/BsplineQuantReg)](https://cran.r-project.org/package=BsplineQuantReg)
 [![DOI](https://doi.org/10.5281/zenodo.17427913)](https://doi.org/10.5281/zenodo.17427913)
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/BsplineQuantReg)](https://cran.r-project.org/package=BsplineQuantReg)
 
-## Beta Version Notice
+**Constrained Quantile Regression with Cubic B-Splines**
 
-This package is currently in **beta** (version 0.1.0-beta). 
+This package is now available on CRAN! 🎉
 
 ### What to expect:
-- ✅ Core functionality (quantile regression, monotonicity, convexity) is stable
-- ⚠️ API may change based on user feedback
-- 📝 Documentation is being refined
-- 🐛 Please report issues on GitHub
+
+
 
 ## Related Packages
 
@@ -59,20 +61,36 @@ The `cobs` package (Constrained B-Splines) is the closest to this package, but w
 Due to the current implementation (pure R with CVXR), the package is **significantly slower** than its Python counterpart. Cubic B-spline quantile regression with constraints involves solving SOCP problems, and the R implementation does not yet leverage optimized linear algebra libraries.
 [Python version](https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines) 
 
-Current benchmarking (median regression, n=1000, kn=20, cubic splines):
-
-⚠️ The R version is currently **50-100x slower** than Python (estimation) 
 
 ### Future Improvements
 
 We plan to improve performance in future releases by:
-- Linking with faster optimization libraries (OSQP, Gurobi)
-- Implementing more efficient SOCP solvers
 - Optimizing the B-spline basis computation
+- Implement the quartic version already available in Python.
+- Improve the API based on user feedback
+
+
+🐛 Please report issues on GitHub
 
 **The Python version remains the recommended choice for production use.**
 
-### Installation for beta testing:
+## Installation
 
-# Install from GitHub
+### From CRAN (stable, recommended)
+```r
+install.packages("BsplineQuantReg")
+
+### Install from GitHub (development version)
 pak::pak("alexandreabbes/BsplineQuantReg")
+# or
+devtools::install_github("alexandreabbes/BsplineQuantReg")
+
+###System Requirements
+##Linux Users
+
+##On Linux systems, the packages CVXR and CLARABEL require the Rust compiler and Cargo package manager to be installed.
+#Ubuntu/Debian:
+# Install Rust and Cargo
+```bash (sudo or root)
+apt-get install rust
+apt-get install cargo

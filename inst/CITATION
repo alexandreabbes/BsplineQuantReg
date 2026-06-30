@@ -1,19 +1,6 @@
 citHeader("To cite the ConstrainedQuantileSplines package in publications, please use:")
 
 
-bibentry(
-  bibtype = "Manual",
-  title = "R code for Quantile Regression with Bspline under Shape Constraints",
-  author = c(person("Alexandre"," Abbes")),
-  year = "2026",
-  note = "R package version 0.1.0",
-  url = "https://github.com/alexandreabbes/BsplineQuantReg",
-  textVersion = paste(
-    "Abbes, A. (2026).",
-    "BsplineQuantReg: Quantile Regression with Shape Constraints (R package version 0.1.0).",
-    "https://github.com/alexandreabbes/BsplineQuantReg")
-  )
-
 
 bibentry(
   bibtype = "Article",
@@ -43,5 +30,22 @@ bibentry(
     "Python code for quantile regression with polynomial splines under shape constraints, with degree 1 to 4",
     "(Python code draft version).",
     "https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines"
+  )
+)
+
+
+
+bibentry(
+  bibtype = "Manual",
+  title = "BsplineQuantReg: Constrained Quantile Regression with Cubic B-Splines",
+  author = c(person(given = "Alexandre", family = "Abbes")),
+  year = "2026",
+  note = paste("R package version", utils::packageVersion("BsplineQuantReg")),
+  url = "https://cran.r-project.org/package=BsplineQuantReg",
+  textVersion = paste(
+    "Abbes, A. (2026).",
+    "BsplineQuantReg: Constrained Quantile Regression with Cubic B-Splines",
+    "(R package version", utils::packageVersion("BsplineQuantReg"), ").",
+    "https://cran.r-project.org/package=BsplineQuantReg"
   )
 )

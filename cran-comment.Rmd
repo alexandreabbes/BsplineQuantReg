@@ -1,0 +1,11 @@
+---
+title: "cran-comment"
+output: html_document
+---
+
+## cran-comments.md
+
+This is a minor update:
+- Remove "beta" status
+- Add system requirements (Rust/Cargo for Linux) to README
+- Update CRAN badges
