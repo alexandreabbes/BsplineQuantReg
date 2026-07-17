@@ -29,7 +29,6 @@ spline_eval<-function(Bspline,xvalues)
   #to accelerate the calculations
   t1=knots[1]
   tkn=rev(knots)[1] #last knot
-
   sn=c(rep(t1,degree),knots,rep(tkn,degree) ) #extended knot partition
   BB=Bspline_base(sn,degree=degree)
   Bvalues=t(bs_direct(BB,xvalues))
@@ -55,18 +54,18 @@ bs_direct<-function(Basis,xvalues)
   #comme la fonction bs de R, mais en utilisant la
   # base calculee sous PP-forme : coeff des polynomes sur la base locale.
   #indep. du choix de la notation croissant/decroissant
-  n=length(xvalues)
-  int_knots=Basis$int_knots#interior knots
-  kn=length(knots)
-  degree=Basis$degree
+  n_values=length(xvalues)
+  int_knots=Basis$int_knots  # knots
+  kn=length(knots)-1
+  d=Basis$degree
   nsplines=Basis$n_splines
-  bb=Basis$base[,(degree+1):(nsplines),]
-  #internal bspline knots
-  yvalues=array(data=0,c(nsplines,n))
-
+  if (d>0){bb=Basis$base[,(d+1):(nsplines),]}
+  if (d==0){bb=Basis$base}
+  yvalues=array(data=0,c(nsplines,n_values))
+  print(knots)
   for (j in 1:nsplines)
   {
-    p=makpp(bb[j,,],tn=c(int_knots))
+    p=makpp(bb[j,,],tn=c(knots))
     yvalues[j,]<-evalpp(p,xvalues)
   }
   return(yvalues)
@@ -85,11 +84,13 @@ bs_direct<-function(Basis,xvalues)
 evalpp<-function(p,xvalues){
   #this evaluates a polynomial p under the pp form,
   #p if given with its knots and the local coefficients
-  #This funciton is independent from the order convention   for polynomials
+  #This funciton is independent from the order convention
+  #for polynomials
+  #The xvalues out of the knots give 0 in the corresponding yvalues
   tn=p$knots
   coeff=p$coefficients
   kn=length(tn)
-  n=length(xvalues)
+  n_values=length(xvalues)
 
   pval<-c()
   for (i in 1:(kn-1))
@@ -105,6 +106,9 @@ evalpp<-function(p,xvalues){
   #pval=c(pval,polyval(p=rev(poly_loc),xval)) #if use of R convention
   h=tn[kn]-tn[kn-1]
   pval=c(pval,poly_eval(poly_loc,h)) #use our convention for polynomial
+  #zero1=rep(0,length(xvalues<tn[1]))
+  #zero2=rep(0,length(xvalues>tn[kn]))
+  #return(c(zero1,pval,zero2))
   return(pval)
 }
 
@@ -136,18 +140,18 @@ makpp<-function(coef,tn){
 #'
 #' Plots all  functions of a B-spline basis.
 #'
-#' @param Bspline Object returned by \code{Bspline_base}
+#' @param BB Object returned by \code{Bspline_base}
 #' @param xvalues Vector of evaluation points for plotting (by default 100 points are computed in the knot range)
 #' @return No return value, called for side effects (generates a plot)
 #' @export
 #'
-view_basis<-function(Bspline,xvalues=0)
+view_basis<-function(BB,xvalues=0)
 {
   if (length(xvalues)==1){
-    k=range(Bspline$knots)
+    k=range(BB$knots)
     xvalues=(k[1]:(k[2]*100))/100}
 
-  yvalues=bs_direct(Bspline,xvalues)
+  yvalues=bs_direct(BB,xvalues)
 
   matplot(xvalues, t(yvalues))
 }

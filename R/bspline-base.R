@@ -70,7 +70,9 @@ Bspline_base<-function(sn,degree=3,der=0,verbose=FALSE)
 
   for (i in (degree+1):(kn+degree)){B[1,i,i,degree+1]<-1}#in decreasing convention
   if (degree>0){
-    for (o in (2:(degree+1))){
+    for (o in (2:(degree+1)))#first Bspline base
+      #to be computed: order2=degree 1.
+      {
       #k : dimension of local basis=deg+1
       for (j in (1:(n_splines))) {
         #go through the elements of the basis
