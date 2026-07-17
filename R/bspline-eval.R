@@ -24,7 +24,7 @@ spline_eval<-function(Bspline,xvalues)
 {
   knot=Bspline$knot #interior knot
   degree=Bspline$degree
-  coefficients=Bspline$coefficients
+  coeff=Bspline$coefficients
   #Bvalues=bs(xvalues,knot=knot,degree)  "can be used instead of the following lines
   #to accelerate the calculations
   t1=knot[1]
@@ -33,7 +33,7 @@ spline_eval<-function(Bspline,xvalues)
   BB=Bspline_base(sn,degree=degree)
   Bvalues=t(bs_direct(BB,xvalues))
   N=length(knot)+degree-1
-  yvalues=Bvalues[,1:N]%*%coefficients
+  yvalues=Bvalues[,1:N]%*%coeff
   return(yvalues)
 }
 
@@ -77,7 +77,7 @@ bs_direct<-function(Basis,xvalues)
 #'
 #' Evaluates a piecewise polynomial function at given points.
 #'
-#' @param p List with components \code{ext_knot} (ext_knot) and \code{coefficients}
+#' @param p List with components \code{ext_knot} (ext_knot) and \code{coeff}
 #' @param xvalues Vector of evaluation points
 #' @return Function values at the requested points
 #' @keywords internal
@@ -122,18 +122,18 @@ evalpp<-function(p,xvalues){
 #' @return List with components \code{coefficients} and \code{knot}
 #' @keywords internal
 
-makpp<-function(coef,tn){
-  #coef is an array of dim: kn,(d+1)
+makpp<-function(coeff,tn){
+  #coeff is an array of dim: kn,(d+1)
   #kn=length(tn)
   #this is independent from the notation convention order
-  kn=dim(coef)[1]
-  o=dim(coef)[2]
+  kn=dim(coeff)[1]
+  o=dim(coeff)[2]
   if (length(tn) != (kn+1)){
-    stop("length of coef and number of knot do not match")
+    stop("length of coeff and number of knot do not match")
 
   }
   else{
-    return(list(coefficients=(coef),knot=tn))
+    return(list(coefficients=(coeff),knot=tn))
   }
 }
 

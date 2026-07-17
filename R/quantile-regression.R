@@ -32,7 +32,7 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0, verbose=FALSE) {
   if (verbose) {
     message("Number of  basis functions", N, "\n")
   }
-  # Matrix of normalised coef derivativs
+  # Matrix of normalised coefficient derivativs
   deriv_coeffs <- array(0, dim = c(kn, N, 3))
   deriv2_val<-array(0, dim = c(kn+1, N))
 
