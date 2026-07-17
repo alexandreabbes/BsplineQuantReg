@@ -6,7 +6,9 @@ output: html_document
 Version=1.0.2
 =============
 1) Replace the variable "knots" by the variable "knot" everywhere to avoid confusion with knots() R build-in function
-2) 
+2) change notation paradigm:
+variable "knot" refers to knots including ends (replace int_knots in version 1.0.1)
+variable "ext_knot" refers to extended knot partition (replace knots in version 1.0.1)
 
 
 Version=1.0.1
