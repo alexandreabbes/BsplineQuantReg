@@ -107,10 +107,10 @@ apply_karlin_quadratic <- function(p2, p1, p0, z0, sign = 1) {
   return(constraints)
 }
 
-#' Apply linear constraints at knots for the third derivative
+#' Apply linear constraints at knot for the third derivative
 #'
 #' For a quartic spline, the third derivative is affine (linear) on each interval.
-#' This function applies sign constraints at the knots.
+#' This function applies sign constraints at the knot.
 #'
 #' @param const_value Value of the third derivative at a knot
 #' @param sign Sign of the constraint (+1 for >= 0, -1 for <= 0)
@@ -133,22 +133,22 @@ apply_linear_constraint <- function(const_value, sign = 1) {
 #' Computes normalized first, second, and third derivative coefficients
 #' for quartic B-splines on each interval.
 #'
-#' @param knots Knot vector (effective partition)
+#' @param knot Knot vector (effective partition)
 #' @param degree Spline degree (should be 4)
 #' @param xvalues Evaluation points for design matrix
 #' @return A list containing:
 #'   \item{d0}{Design matrix (if xvalues provided)}
 #'   \item{d1}{First derivative coefficients [a3, a2, a1, a0] for each interval}
 #'   \item{d2}{Second derivative coefficients [a2, a1, a0] for each interval}
-#'   \item{d3}{Third derivative values at knots (linear constraints)}
+#'   \item{d3}{Third derivative values at knot (linear constraints)}
 #' @export
-bspline_to_deriv_coeffs_quart <- function(knots, degree = 4, xvalues = 0) {
+bspline_to_deriv_coeffs_quart <- function(knot, degree = 4, xvalues = 0) {
 
-  kn <- length(knots) - 1
+  kn <- length(knot) - 1
   N <- kn + degree
 
   # Extended knot vector
-  sn <- c(rep(knots[1], degree), knots, rep(knots[kn + 1], degree))
+  sn <- c(rep(knot[1], degree), knot, rep(knot[kn + 1], degree))
 
   # Build B-spline basis
   BB <- Bspline_base(sn, degree = degree)
@@ -164,10 +164,10 @@ bspline_to_deriv_coeffs_quart <- function(knots, degree = 4, xvalues = 0) {
   # Second derivative: quadratic on each interval -> [a2, a1, a0] for a2*u^2 + a1*u + a0
   deriv2_coeffs <- array(0, dim = c(kn, N, 3))
 
-  # Third derivative at knots: linear constraints
+  # Third derivative at knot: linear constraints
   # For quartic splines, third derivative is affine on each interval
-  # We evaluate at knots for linear constraints
-  deriv3_knots <- array(0, dim = c(kn + 1, N))
+  # We evaluate at knot for linear constraints
+  deriv3_knot <- array(0, dim = c(kn + 1, N))
 
   for (j in 1:N) {
     for (nu in (degree + 1):(kn + degree)) {
@@ -199,9 +199,9 @@ bspline_to_deriv_coeffs_quart <- function(knots, degree = 4, xvalues = 0) {
       )
     }
 
-    # Third derivative at knots (for linear constraints)
+    # Third derivative at knot (for linear constraints)
     # For quartic splines, third derivative is affine on each interval
-    # We evaluate at knots for linear constraints
+    # We evaluate at knot for linear constraints
     for (i in 1:(kn + 1)) {
       # Evaluate at knot i
       if (i <= kn) {
@@ -212,12 +212,12 @@ bspline_to_deriv_coeffs_quart <- function(knots, degree = 4, xvalues = 0) {
         a4 <- basis[j, nu, 1]
         # P'''(x) = 6*a3 + 24*a4*(x - t_k)
         # At knot i (x = t_k): P'''(t_k) = 6*a3
-        deriv3_knots[i, j] <- 6 * a3
+        deriv3_knot[i, j] <- 6 * a3
       } else {
         # Last knot: use polynomial on last interval
         nu <- degree + kn
         a3 <- basis[j, nu, 2]
-        deriv3_knots[i, j] <- 6 * a3
+        deriv3_knot[i, j] <- 6 * a3
       }
     }
   }
@@ -233,7 +233,7 @@ bspline_to_deriv_coeffs_quart <- function(knots, degree = 4, xvalues = 0) {
     d0 = yvalues,
     d1 = deriv1_coeffs,
     d2 = deriv2_coeffs,
-    d3 = deriv3_knots
+    d3 = deriv3_knot
   ))
 }
 
@@ -242,24 +242,24 @@ bspline_to_deriv_coeffs_quart <- function(knots, degree = 4, xvalues = 0) {
 #' Performs quantile regression using quartic (degree 4) B-splines with
 #' monotonicity (Karlin-Studden constraints on the cubic derivative),
 #' convexity (Karlin-Studden constraints on the quadratic second derivative),
-#' and third derivative constraints (linear at knots).
+#' and third derivative constraints (linear at knot).
 #'
 #' @param xtab Predictor vector (x)
 #' @param ytab Response vector (y)
-#' @param knots Knot vector or number of knots
+#' @param knot Knot vector or number of knot
 #' @param tau Quantile (between 0 and 1)
 #' @param monot Monotonicity constraint vector per interval:
 #'        1 = increasing, -1 = decreasing, 0 = unconstrained
 #' @param convcons Convexity constraint vector per interval:
 #'        1 = convex, -1 = concave, 0 = unconstrained
-#' @param der3cons Third derivative constraint vector at knots:
+#' @param der3cons Third derivative constraint vector at knot:
 #'        1 = positive third derivative, -1 = negative, 0 = unconstrained
 #' @param solver CVXR solver to use (default = "OSQP")
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose Logical; if TRUE, print progress messages
-#' @return A list containing coefficients, degree, and knots
+#' @return A list containing coefficients, degree, and knot
 #' @export
-SplineQuarticQuant <- function(xtab, ytab, knots, tau,
+SplineQuarticQuant <- function(xtab, ytab, knot, tau,
                                monot = 0,
                                convcons = 0,
                                der3cons = 0,
@@ -279,19 +279,19 @@ SplineQuarticQuant <- function(xtab, ytab, knots, tau,
 
   n <- length(xtab)
 
-  # Handle knots
-  if (length(knots) == 1 && is.numeric(knots)) {
-    kn <- knots - 1
-    knots <- quantile(xtab, probs = seq(0, 1, length.out = kn + 1))
+  # Handle knot
+  if (length(knot) == 1 && is.numeric(knot)) {
+    kn <- knot - 1
+    knot <- quantile(xtab, probs = seq(0, 1, length.out = kn + 1))
   }
 
-  kn <- length(knots) - 1
+  kn <- length(knot) - 1
   degree <- 4
   N <- kn + degree  # Number of basis functions for quartic = kn + 4
 
   if (verbose) {
     cat("=== Quartic Spline Quantile Regression (degree = 4) ===\n")
-    cat(sprintf("Knots: %d, Basis functions: %d\n", kn, N))
+    cat(sprintf("knot: %d, Basis functions: %d\n", kn, N))
   }
 
   # Handle constraints
@@ -314,7 +314,7 @@ SplineQuarticQuant <- function(xtab, ytab, knots, tau,
   }
 
   # Build B-spline basis and derivative coefficients
-  deriv_data <- bspline_to_deriv_coeffs_quart(knots, degree = 4, xvalues = xtab)
+  deriv_data <- bspline_to_deriv_coeffs_quart(knot, degree = 4, xvalues = xtab)
 
   B <- deriv_data$d0
   B <- t(B)  # Design matrix: n x N
@@ -322,7 +322,7 @@ SplineQuarticQuant <- function(xtab, ytab, knots, tau,
   # Derivative coefficients
   deriv1_coeffs <- deriv_data$d1  # [kn, N, 4] for cubic derivative
   deriv2_coeffs <- deriv_data$d2  # [kn, N, 3] for quadratic second derivative
-  deriv3_knots <- deriv_data$d3   # [kn+1, N] for linear third derivative at knots
+  deriv3_knot <- deriv_data$d3   # [kn+1, N] for linear third derivative at knot
 
   # Center data
   y_mean <- mean(ytab)
@@ -397,14 +397,14 @@ SplineQuarticQuant <- function(xtab, ytab, knots, tau,
     }
   }
 
-  # 3. Third derivative constraints (linear at knots)
+  # 3. Third derivative constraints (linear at knot)
   # For quartic splines, third derivative is affine on each interval
-  # We impose sign constraints at knots
+  # We impose sign constraints at knot
   if (any(der3cons != 0)) {
     for (i in 1:(kn + 1)) {
       if (der3cons[i] != 0) {
         # Third derivative value at knot i
-        s3_val <- sum(alpha * deriv3_knots[i, ])
+        s3_val <- sum(alpha * deriv3_knot[i, ])
         lin_constr <- apply_linear_constraint(s3_val, sign = der3cons[i])
         constraints <- c(constraints, lin_constr)
       }
@@ -448,8 +448,8 @@ SplineQuarticQuant <- function(xtab, ytab, knots, tau,
   return(list(
     coefficients = alpha_val,
     degree = degree,
-    knots = knots,
-    int_knots= knots[2:kn],
+    knot = knot,
+    int_knot= knot[2:kn],
     y_mean = y_mean,
     status = result$status,
     value = result$value
@@ -464,14 +464,14 @@ SplineQuarticQuant <- function(xtab, ytab, knots, tau,
 #' @inheritParams SplineQuarticQuant
 #' @return Same as SplineQuarticQuant
 #' @export
-SplineConstQuantRegBs4 <- function(xtab, ytab, knots, tau,
+SplineConstQuantRegBs4 <- function(xtab, ytab, knot, tau,
                                    monot = 0,
                                    convcons = 0,
                                    der3cons = 0,
                                    solver = "OSQP",
                                    weight = NULL,
                                    verbose = FALSE) {
-  SplineQuarticQuant(xtab, ytab, knots, tau,
+  SplineQuarticQuant(xtab, ytab, knot, tau,
                      monot = monot,
                      convcons = convcons,
                      der3cons = der3cons,

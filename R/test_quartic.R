@@ -12,32 +12,32 @@ library(BsplineQuantReg)
   y <- 4 * x^4 - 3 * x^2 + 0.5 * sin(4 * pi * x) + 0.05 * rnorm(n)
 
   kn <- 6
-  knots <- (0:(kn))/(kn)
-  knots<-knots
+  knot <- (0:(kn))/(kn)
+  knot<-knot
   cat("=== Comparing Quartic vs Cubic Splines ===\n\n")
 
   # Quartic spline (unconstrained)
   cat("Fitting quartic spline (unconstrained)...\n")
-  fit_quart <- SplineConstQuantRegBs4(x, y, knots, tau = 0.5, verbose = TRUE)
+  fit_quart <- SplineConstQuantRegBs4(x, y, knot, tau = 0.5, verbose = TRUE)
 
   # Quartic spline with monotonicity
   cat("\nFitting quartic spline (increasing)...\n")
-  fit_quart_monot <- SplineConstQuantRegBs4(x, y, knots, tau = 0.5,
+  fit_quart_monot <- SplineConstQuantRegBs4(x, y, knot, tau = 0.5,
                                             monot = 1, verbose = TRUE)
 
   # Quartic spline with convexity
   cat("\nFitting quartic spline (convex)...\n")
-  fit_quart_conv <- SplineConstQuantRegBs4(x, y, knots, tau = 0.5,
+  fit_quart_conv <- SplineConstQuantRegBs4(x, y, knot, tau = 0.5,
                                            convcons = 1, verbose = TRUE)
 
   # Quartic spline with third derivative constraint
   cat("\nFitting quartic spline (positive 3rd derivative)...\n")
-  fit_quart_d3 <- SplineConstQuantRegBs4(x, y, knots, tau = 0.5,
+  fit_quart_d3 <- SplineConstQuantRegBs4(x, y, knot, tau = 0.5,
                                          der3cons = 1, verbose = TRUE)
 
   # Cubic spline for comparison
   cat("\nFitting cubic spline (unconstrained)...\n")
-  fit_cubic <- SplineConstQuantRegBs3(x, y, knots, tau = 0.5, verbose = FALSE)
+  fit_cubic <- SplineConstQuantRegBs3(x, y, knot, tau = 0.5, verbose = FALSE)
 
   # Evaluation
   x_eval <- seq(0, 1, length.out = 200)
@@ -52,19 +52,19 @@ library(BsplineQuantReg)
 
   plot(x, y, pch = 16, cex = 0.4, col = "gray", main = "Quartic (unconstrained)")
   lines(x_eval, y_quart, col = "blue", lwd = 2)
-  abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
+  abline(v = knot, col = "blue", lty = 2, lwd = 0.5)
 
   plot(x, y, pch = 16, cex = 0.4, col = "gray", main = "Quartic (increasing)")
   lines(x_eval, y_quart_monot, col = "darkgreen", lwd = 2)
-  abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
+  abline(v = knot, col = "blue", lty = 2, lwd = 0.5)
 
   plot(x, y, pch = 16, cex = 0.4, col = "gray", main = "Quartic (convex)")
   lines(x_eval, y_quart_conv, col = "purple", lwd = 2)
-  abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
+  abline(v = knot, col = "blue", lty = 2, lwd = 0.5)
 
   plot(x, y, pch = 16, cex = 0.4, col = "gray", main = "Quartic (3rd deriv >= 0)")
   lines(x_eval, y_quart_d3, col = "orange", lwd = 2)
-  abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
+  abline(v = knot, col = "blue", lty = 2, lwd = 0.5)
 
   plot(x, y, pch = 16, cex = 0.4, col = "gray", main = "Cubic (unconstrained)")
   lines(x_eval, y_cubic, col = "red", lwd = 2)

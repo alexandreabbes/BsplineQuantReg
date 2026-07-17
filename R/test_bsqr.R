@@ -28,25 +28,25 @@ test_karlin_simple <- function(verbose=FALSE,seed=NULL) {
   n=7
   monot=c(rep(1,n),rep(0,(12-n)))
   #  monot=0
-  knots <- quantile(xtab, probs = seq(0, 1, length.out = kn + 1))
-  res<-SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.9,
+  knot <- quantile(xtab, probs = seq(0, 1, length.out = kn + 1))
+  res<-SplineConstQuantRegBs3(xtab, ytab, knot, tau = 0.9,
                               monot = 0, solver = "OSQP")
   if (verbose) {
     message("\n===  PARTIAL INCREASING TEST ===\n")
   }
 
-  res_croissant <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+  res_croissant <- SplineConstQuantRegBs3(xtab, ytab, knot, tau = 0.5,
                                           monot = monot, convcons=0,solver = "OSQP")
 
   if (verbose) {
     message("\n=== DECREASING TEST ===\n")}
 
-  res_decroissant <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+  res_decroissant <- SplineConstQuantRegBs3(xtab, ytab, knot, tau = 0.5,
                                             monot = -1, solver = "OSQP")
   if (verbose) {
     message("\n=== CONVEX  TEST ===\n")}
-  res_convexe <- SplineConstQuantRegBs3(xtab, ytab, knots,monot=0,convcons=1, tau = 0.5)
-  res_convexe <- SplineConstQuantRegBs3(xtab, ytab, knots,monot=0,convcons=1, tau = 0.5)
+  res_convexe <- SplineConstQuantRegBs3(xtab, ytab, knot,monot=0,convcons=1, tau = 0.5)
+  res_convexe <- SplineConstQuantRegBs3(xtab, ytab, knot,monot=0,convcons=1, tau = 0.5)
   #                                                   monot = -1, solver = "OSQP")
   # Visualisation
   par(mfrow = c(2, 2))
@@ -58,13 +58,13 @@ test_karlin_simple <- function(verbose=FALSE,seed=NULL) {
 
   # Croissant
   plot(xtab, ytab, pch = 16, cex = 0.5, col = "black",
-       main = "increasing constraint (On the first inter-knots)")
+       main = "increasing constraint (On the first inter-knot)")
   lines(x_eval,y_croiss,lwd=2)
 
   #  view_spline
   #lines(x_eval, y_croiss, col = "red", lwd = 2)
 
-  abline(v = knots, col = "blue", lty = 2)
+  abline(v = knot, col = "blue", lty = 2)
 
   # Decroissant
   plot(xtab, ytab, pch = 16, cex = 0.5, col = "black",
@@ -72,7 +72,7 @@ test_karlin_simple <- function(verbose=FALSE,seed=NULL) {
 
   lines(x_eval, y_decroiss, col = "red", lwd = 2)
 
-  abline(v = knots, col = "blue", lty = 2)
+  abline(v = knot, col = "blue", lty = 2)
 
 
   # Convexe
@@ -81,13 +81,13 @@ test_karlin_simple <- function(verbose=FALSE,seed=NULL) {
   if (!is.null(res_convexe)) {
     lines(x_eval, y_convexe, col = "red", lwd = 2)
   }
-  abline(v = knots, col = "blue", lty = 2)
+  abline(v = knot, col = "blue", lty = 2)
 
   # sans contraintes
   plot(xtab, ytab, pch = 16, cex = 0.5, col = "black",
        main = "without constraint ")
   lines(x_eval,y_sans,lwd=2)
-  abline(v = knots, col = "blue", lty = 2)
+  abline(v = knot, col = "blue", lty = 2)
 
 }
 #

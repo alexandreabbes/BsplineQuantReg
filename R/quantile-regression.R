@@ -12,7 +12,7 @@
 #' @return A list containing:
 #'   \item{d0}{Design matrix (if xvalues provided)}
 #'   \item{d1}{First derivative coefficients [a3, a2, a1] for each interval}
-#'   \item{d2}{Second derivative values at knots}
+#'   \item{d2}{Second derivative values at knot}
 #' @export
 bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0, verbose=FALSE) {
 
@@ -24,7 +24,7 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0, verbose=FALSE) {
 
   norder <- degree + 1  # 4 pour cubique
 
-  sn=c(tn[1]*rep(1,degree),tn,tn[kn+1]*rep(1,degree)) # this is the extended knots sequence
+  sn=c(tn[1]*rep(1,degree),tn,tn[kn+1]*rep(1,degree)) # this is the extended knot sequence
   BB <- Bspline_base(sn,degree)
   basis<-BB$base
 
@@ -95,7 +95,7 @@ apply_karlin_constraints <- function(p2, p1, p0, z0,verbose=FALSE) {
 #'
 #' @param xtab Predictor vector (x)
 #' @param ytab Response vector (y)
-#' @param knots Knot vector or number of knots (quantiles are then used)
+#' @param knot Knot vector or number of knot (quantiles are then used)
 #' @param tau Quantile (between 0 and 1)
 #' @param monot Monotonicity constraint vector per interval:
 #'        1 = increasing, -1 = decreasing, 0 = unconstrained. If scalar, repeated.
@@ -107,22 +107,22 @@ apply_karlin_constraints <- function(p2, p1, p0, z0,verbose=FALSE) {
 #' @return A list containing:
 #'   \item{coefficients}{B-spline coefficients (including y mean)}
 #'   \item{degree}{Spline degree (always 3)}
-#'   \item{knots}{Knot vector used}
-#'   \item{int_knots}{Same as knots (compatibility)}
+#'   \item{knot}{Knot vector used}
+#'   \item{int_knot}{Same as knot (compatibility)}
 #' @examples
 #' #optional set.seed(42)
 #' x <- seq(0, 1, length=100)
 #' y <- 2*x + sin(6*pi*x)/2 + rnorm(100, 0, 0.05)
-#' knots <- quantile(x, probs=seq(0,1,length.out=10))
+#' knot <- quantile(x, probs=seq(0,1,length.out=10))
 #'
 #' # Median quantile regression without constraints
-#' fit <- SplineConstQuantRegBs3(x, y, knots, tau=0.5)
+#' fit <- SplineConstQuantRegBs3(x, y, knot, tau=0.5)
 #'
 #' # With increasing monotonicity constraint
-#' fit_monot <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, monot=1)
+#' fit_monot <- SplineConstQuantRegBs3(x, y, knot, tau=0.5, monot=1)
 #'
 #' # With convexity constraint
-#' fit_convex <- SplineConstQuantRegBs3(x, y, knots, tau=0.5, convcons=1)
+#' fit_convex <- SplineConstQuantRegBs3(x, y, knot, tau=0.5, convcons=1)
 #'
 #' @seealso
 #' Related R packages:
@@ -154,7 +154,7 @@ apply_karlin_constraints <- function(p2, p1, p0, z0,verbose=FALSE) {
 #' @export
 
 
-SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
+SplineConstQuantRegBs3 <- function(xtab, ytab, knot, tau,
                                    monot = 0,
                                    convcons=0,
                                    solver = "CLARABEL", weight = NULL,
@@ -172,15 +172,15 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
 
   n <- length(xtab)
 
-  if (length(knots) == 1 && is.numeric(knots))
+  if (length(knot) == 1 && is.numeric(knot))
   {
-    kn <- knots - 1
-    knots <- quantile(xtab, probs = seq(0, 1, length.out = kn + 1))
+    kn <- knot - 1
+    knot <- quantile(xtab, probs = seq(0, 1, length.out = kn + 1))
   }
 
-  kn <- length(knots) - 1
+  kn <- length(knot) - 1
   if (verbose) {
-    message("knots:", knots, "\n")
+    message("knot:", knot, "\n")
   }
 
   if (length(monot) == 1) {
@@ -189,14 +189,14 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
   if (verbose) {
   message("Monotonicity constraints (Karlin):", monot, "\n")
   }
-  boundary_knots <- range(knots)
+  boundary_knot <- range(knot)
   degree=3
-  N=length(knots)+3-1
+  N=length(knot)+3-1
 
-  int_knots=knots[2:kn]
+  int_knot=knot[2:kn]
 
   # Calcul des coefficients normalises des derivees
-  deriv_spline <- bspline_to_deriv_coeffs_pp(knots, degree = 3,xvalues=xtab,verbose=verbose)
+  deriv_spline <- bspline_to_deriv_coeffs_pp(knot, degree = 3,xvalues=xtab,verbose=verbose)
   deriv_coeffs <-deriv_spline$d1
   deriv_coeffs2<-deriv_spline$d2
   B<-deriv_spline$d0
@@ -238,7 +238,7 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
   }
   # eliminate the null (unconstrained) case
   if (any(convcons !=0)){
-    CV<-list(convcons*(deriv_coeffs2 %*% alpha)>=0) # Very simple, only use the second derivatives at the knots.
+    CV<-list(convcons*(deriv_coeffs2 %*% alpha)>=0) # Very simple, only use the second derivatives at the knot.
     constraints<-c(constraints,CV)
   }
 
@@ -279,7 +279,7 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knots, tau,
     coefficients = alpha_val,
     degree=3,
     #basis_matrix = B,
-    knots = knots,
-    int_knots = knots
+    knot = knot,
+    int_knot = knot
   ))
 }

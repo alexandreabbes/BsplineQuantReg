@@ -1,11 +1,11 @@
 # bs_direct, makpp, evalpp, spline_eval, view_spline
-# Spline_der_knots, bspline_to_deriv_coeffs_pp
+# Spline_der_knot, bspline_to_deriv_coeffs_pp
 
 #' Evaluate a B-spline
 #'
 #' Evaluates a spline (linear combination of B-splines) at given points.
 #'
-#' @param Bspline Spline object (list with coefficients on the Bspline basis, degree, extended knots)
+#' @param Bspline Spline object (list with coefficients on the Bspline basis, degree, extended knot)
 #' @param xvalues Vector of evaluation points
 #' @return vector of same length as xvalues, with Spline values at the requested points
 #' @examples
@@ -19,20 +19,20 @@
 spline_eval<-function(Bspline,xvalues)
   #Bspline has a new type R container,
   #designed by its coefficients, the degree
-  #and the knots
+  #and the knot
   #It is independent from the polynomial notation order
 {
-  knots=Bspline$int_knots #interior knots
+  knot=Bspline$int_knot #interior knot
   degree=Bspline$degree
   coefficients=Bspline$coefficients
-  #Bvalues=bs(xvalues,knots=knots,degree)  "can be used instead of the following lines
+  #Bvalues=bs(xvalues,knot=knot,degree)  "can be used instead of the following lines
   #to accelerate the calculations
-  t1=knots[1]
-  tkn=rev(knots)[1] #last knot
-  sn=c(rep(t1,degree),knots,rep(tkn,degree) ) #extended knot partition
+  t1=knot[1]
+  tkn=rev(knot)[1] #last knot
+  sn=c(rep(t1,degree),knot,rep(tkn,degree) ) #extended knot partition
   BB=Bspline_base(sn,degree=degree)
   Bvalues=t(bs_direct(BB,xvalues))
-  N=length(knots)+degree-1
+  N=length(knot)+degree-1
   yvalues=Bvalues[,1:N]%*%coefficients
   return(yvalues)
 }
@@ -55,17 +55,17 @@ bs_direct<-function(Basis,xvalues)
   # base calculee sous PP-forme : coeff des polynomes sur la base locale.
   #indep. du choix de la notation croissant/decroissant
   n_values=length(xvalues)
-  int_knots=Basis$int_knots  # knots
-  kn=length(knots)-1
+  int_knot=Basis$int_knot  # knot
+  kn=length(knot)-1
   d=Basis$degree
   nsplines=Basis$n_splines
   if (d>0){bb=Basis$base[,(d+1):(nsplines),]}
   if (d==0){bb=Basis$base}
   yvalues=array(data=0,c(nsplines,n_values))
-  print(knots)
+  print(knot)
   for (j in 1:nsplines)
   {
-    p=makpp(bb[j,,],tn=c(knots))
+    p=makpp(bb[j,,],tn=c(knot))
     yvalues[j,]<-evalpp(p,xvalues)
   }
   return(yvalues)
@@ -76,18 +76,18 @@ bs_direct<-function(Basis,xvalues)
 #'
 #' Evaluates a piecewise polynomial function at given points.
 #'
-#' @param p List with components \code{knots} (knots) and \code{coefficients}
+#' @param p List with components \code{knot} (knot) and \code{coefficients}
 #' @param xvalues Vector of evaluation points
 #' @return Function values at the requested points
 #' @keywords internal
 
 evalpp<-function(p,xvalues){
   #this evaluates a polynomial p under the pp form,
-  #p if given with its knots and the local coefficients
+  #p if given with its knot and the local coefficients
   #This funciton is independent from the order convention
   #for polynomials
-  #The xvalues out of the knots give 0 in the corresponding yvalues
-  tn=p$knots
+  #The xvalues out of the knot give 0 in the corresponding yvalues
+  tn=p$knot
   coeff=p$coefficients
   kn=length(tn)
   n_values=length(xvalues)
@@ -114,11 +114,11 @@ evalpp<-function(p,xvalues){
 
 #' Build a piecewise polynomial (PP) form
 #'
-#' Creates a PP structure from polynomial coefficients and knots.
+#' Creates a PP structure from polynomial coefficients and knot.
 #'
 #' @param coef Coefficient matrix (kn x (degree+1))
 #' @param tn Knot vector of length kn+1
-#' @return List with components \code{coefficients} and \code{knots}
+#' @return List with components \code{coefficients} and \code{knot}
 #' @keywords internal
 
 makpp<-function(coef,tn){
@@ -128,11 +128,11 @@ makpp<-function(coef,tn){
   kn=dim(coef)[1]
   o=dim(coef)[2]
   if (length(tn) != (kn+1)){
-    stop("length of coef and number of knots do not match")
+    stop("length of coef and number of knot do not match")
 
   }
   else{
-    return(list(coefficients=(coef),knots=tn))
+    return(list(coefficients=(coef),knot=tn))
   }
 }
 
@@ -148,7 +148,7 @@ makpp<-function(coef,tn){
 view_basis<-function(BB,xvalues=0)
 {
   if (length(xvalues)==1){
-    k=range(BB$knots)
+    k=range(BB$knot)
     xvalues=(k[1]:(k[2]*100))/100}
 
   yvalues=bs_direct(BB,xvalues)
@@ -157,31 +157,31 @@ view_basis<-function(BB,xvalues=0)
 }
 
 
-#' Derivatives at knots of a B-spline
+#' Derivatives at knot of a B-spline
 #'
-#' Computes derivative values of a B-spline at knots (efficient because it
+#' Computes derivative values of a B-spline at knot (efficient because it
 #' directly uses polynomial coefficients).
 #'
 #' @param Bspline Object returned by \code{Bspline_base}
 #' @param der Derivative order (default = 1)
-#' @return Matrix of derivative values (n_splines x n_knots)
+#' @return Matrix of derivative values (n_splines x n_knot)
 #' @export
 
-Spline_der_knots<-function(Bspline,der=1)
-  #compute the values of a derivatives only at the knots
+Spline_der_knot<-function(Bspline,der=1)
+  #compute the values of a derivatives only at the knot
   #(simple, it only uses the coefficients)
 {
   coeff=Bspline$base
   nsplines=Bspline$n_splines
-  tn=Bspline$int_knots
+  tn=Bspline$int_knot
   kn=length(tn)
   m=Bspline$degree
   if (der>m){
-    Der2_knots=array(data=0,c(nsplines,kn))
+    Der2_knot=array(data=0,c(nsplines,kn))
   }
   else{
-    #Der2_knots=coeff[,,(der+1)]*factorial(der) #in increasing pol notation
-    Der2_knots=coeff[,,(m-der+1)]*factorial(der) #in decreasing notation
+    #Der2_knot=coeff[,,(der+1)]*factorial(der) #in increasing pol notation
+    Der2_knot=coeff[,,(m-der+1)]*factorial(der) #in decreasing notation
     #computation of the last value
     h=tn[kn]-tn[kn-1]
     for (j in 1:nsplines)
@@ -189,9 +189,9 @@ Spline_der_knots<-function(Bspline,der=1)
       p_kn_der=polyderiv(coeff[j,kn+m-1,],der)
 
       v_kn=poly_eval(p_kn_der,h)
-      Der2_knots[j,kn+m]=v_kn
+      Der2_knot[j,kn+m]=v_kn
     }
   }
-  return(t(Der2_knots))
+  return(t(Der2_knot))
 }
 
