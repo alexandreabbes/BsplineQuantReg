@@ -22,7 +22,7 @@ spline_eval<-function(Bspline,xvalues)
   #and the knot
   #It is independent from the polynomial notation order
 {
-  knot=Bspline$int_knot #interior knot
+  knot=Bspline$knot #interior knot
   degree=Bspline$degree
   coefficients=Bspline$coefficients
   #Bvalues=bs(xvalues,knot=knot,degree)  "can be used instead of the following lines
@@ -55,17 +55,18 @@ bs_direct<-function(Basis,xvalues)
   # base calculee sous PP-forme : coeff des polynomes sur la base locale.
   #indep. du choix de la notation croissant/decroissant
   n_values=length(xvalues)
-  int_knot=Basis$int_knot  # knot
+  knot=Basis$knot  # knot
   kn=length(knot)-1
   d=Basis$degree
   nsplines=Basis$n_splines
   if (d>0){bb=Basis$base[,(d+1):(nsplines),]}
   if (d==0){bb=Basis$base}
   yvalues=array(data=0,c(nsplines,n_values))
-  print(knot)
+  print(c('les noeuds de la spline',knot))
+  print(Basis$n_splines)
   for (j in 1:nsplines)
   {
-    p=makpp(bb[j,,],tn=c(knot))
+    p=makpp(bb[j,,],tn=knot)
     yvalues[j,]<-evalpp(p,xvalues)
   }
   return(yvalues)
@@ -76,7 +77,7 @@ bs_direct<-function(Basis,xvalues)
 #'
 #' Evaluates a piecewise polynomial function at given points.
 #'
-#' @param p List with components \code{knot} (knot) and \code{coefficients}
+#' @param p List with components \code{ext_knot} (ext_knot) and \code{coefficients}
 #' @param xvalues Vector of evaluation points
 #' @return Function values at the requested points
 #' @keywords internal
@@ -148,7 +149,7 @@ makpp<-function(coef,tn){
 view_basis<-function(BB,xvalues=0)
 {
   if (length(xvalues)==1){
-    k=range(BB$knot)
+    k=range(BB$ext_knot)
     xvalues=(k[1]:(k[2]*100))/100}
 
   yvalues=bs_direct(BB,xvalues)
@@ -173,7 +174,7 @@ Spline_der_knot<-function(Bspline,der=1)
 {
   coeff=Bspline$base
   nsplines=Bspline$n_splines
-  tn=Bspline$int_knot
+  tn=Bspline$ext_knot
   kn=length(tn)
   m=Bspline$degree
   if (der>m){

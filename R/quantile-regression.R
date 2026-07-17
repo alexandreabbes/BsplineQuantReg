@@ -107,8 +107,8 @@ apply_karlin_constraints <- function(p2, p1, p0, z0,verbose=FALSE) {
 #' @return A list containing:
 #'   \item{coefficients}{B-spline coefficients (including y mean)}
 #'   \item{degree}{Spline degree (always 3)}
-#'   \item{knot}{Knot vector used}
-#'   \item{int_knot}{Same as knot (compatibility)}
+#'   \item{ext_knot}{ext_knot vector used}
+#'   \item{int_knot}{knot vector}
 #' @examples
 #' #optional set.seed(42)
 #' x <- seq(0, 1, length=100)

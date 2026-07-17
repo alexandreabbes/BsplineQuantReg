@@ -1,7 +1,5 @@
 # Omega, Bspline_base, Bspline_deriv
 
-
-
 #' Omega function for De Boor recursion
 #'
 #' Computes the affine element used in the recursive De Boor algorithm
@@ -43,8 +41,8 @@ Omega<-function(s,j,o)#t: knot in the base t-t[j]
 #'   convention on the local bases (t-s_nu)^l, l=3..1
 #'   base[j,,] is a matrix of piecewise polynomial function compatible with the pp-form.}
 #'   \item{base0}{Coefficients in canonical basis (centered at 0) (1, t, t^2, t^3) centered at the interval origin.}
-#'   \item{knot}{Extended knot vector}
-#'   \item{int_knot}{Internal knot (effective partition including ends)}
+#'   \item{ext_knot}{Extended knot vector}
+#'   \item{knot}{Effective knot partition including ends)}
 #'   \item{degree}{Spline degree}
 #'   \item{n_splines}{Number of basis functions}
 #'   \item{deriv_order}{Applied derivative order}
@@ -62,7 +60,7 @@ Omega<-function(s,j,o)#t: knot in the base t-t[j]
 Bspline_base<-function(sn,degree=3,der=0,verbose=FALSE)
 {
   tn=sn[(degree+1):(length(sn)-degree)] #effective knot partition
-  kn=length(tn)-1 # tn is the interior knot without the extended partition.
+  kn=length(tn)-1 # tn is the list of knot without the extended partition.
 
   n_intervals<-kn+2*degree #Nb extended intervals
   n_splines<-kn+degree
@@ -124,7 +122,7 @@ Bspline_base<-function(sn,degree=3,der=0,verbose=FALSE)
     Base0=Bspline_deriv(Base0,der = der)
     BaseL=Bspline_deriv(BaseL,der=der)
   }
-  return(list(base =BaseL ,base0=Base0, knot = sn, int_knot=tn, degree = degree, n_splines = (n_splines),deriv_order=der ) )
+  return(list(base =BaseL ,base0=Base0, ext_knot = sn, knot=tn, degree = degree, n_splines = (n_splines),deriv_order=der ) )
   #  return (B)
 }
 
@@ -146,11 +144,11 @@ Bspline_deriv<-function(bspline,der=2,verbose=FALSE){
   Bn=bspline$base
   B0=bspline$base0
   n_splines=bspline$n_splines
-  knot=bspline$knot
+  ext_knot=bspline$ext_knot
 
   degree=bspline$degree
   degree_der=max(degree-der,0)
-  NS=length(knot)-1 #Nb extended intervals
+  NS=length(ext_knot)-1 #Nb extended intervals
   Bn_der=array(dim=c(n_splines,NS,max((degree_der+1),1) ),0)
 
   B0_der=array(dim=dim(Bn_der),0)
@@ -167,5 +165,5 @@ Bspline_deriv<-function(bspline,der=2,verbose=FALSE){
     }
   }
 
-  return(list(base =Bn_der, base0=B0_der, knot = knot, int_knot=bspline$int_knot, degree = degree_der, n_splines = (n_splines) ) )
+  return(list(base =Bn_der, base0=B0_der, ext_knot = ext_knot, knot=bspline$knot, degree = degree_der, n_splines = (n_splines) ) )
 }
