@@ -9,7 +9,7 @@ Version=1.0.2
 2) change notation paradigm:
 variable "knot" refers to knots including ends (replace int_knots in version 1.0.1)
 variable "ext_knot" refers to extended knot partition (replace knots in version 1.0.1)
-
+3) Add case degree=0 which caused problems since some variables (coeff) lose 1 dimension. R automaticaly reduces the dimension of the arrays.
 
 Version=1.0.1
 =============
