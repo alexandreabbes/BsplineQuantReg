@@ -6,8 +6,8 @@
 #' Evaluates a spline (linear combination of B-splines) at given points.
 #'
 #' @param Bspline Spline object (list with coefficients on the Bspline basis, degree, extended knot)
-#' @param xvalues Vector of evaluation points
-#' @return vector of same length as xvalues, with Spline values at the requested points
+#' @param x_values Vector of evaluation points
+#' @return vector of same length as x_values, with Spline values at the requested points
 #' @examples
 #'{ # Create and evaluate a spline
 #' tn<-c(0,1,2,3,4,5)
@@ -16,22 +16,22 @@
 #' #alternatively compute the base before to optimize if needed
 #' sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
 #' Bsbase <- Bspline_base(sn, degree=3)
-#' Bvalues <-bs_direct(Bsbase,xvalues)
+#' Bvalues <-bs_direct(Bsbase,x_values)
 #' y <- spline_eval(Bspline=Bspline, Bvalues=Bvalues )}
 #' @export
 
-spline_eval<-function(Bspline, xvalues=NULL, Bvalues=NULL)
+spline_eval<-function(Bspline, x_values=NULL, Bvalues=NULL)
   #Bspline has a new type R container,
   #designed by its coefficients, the degree
   #and the knot,
   #It is independent from the polynomial notation order
-  #If the values are
 {
   knot=Bspline$knot #vector of effective knots
   degree=Bspline$degree
   coeff=Bspline$coefficients
-  #Bvalues=bs(xvalues,knot=knot,degree)  "can be used instead of the following lines
+  #Bvalues=bs(x_values,knot=knot,degree)  "can be used instead of the following lines
   #to accelerate the calculations
+  if (is.null(x_values)){x_values<-knots}# values at knots by default
   if (is.null(Bvalues))
       # if the values of the basis
       #are not provided, or do not match the spline coefficients
@@ -40,8 +40,10 @@ spline_eval<-function(Bspline, xvalues=NULL, Bvalues=NULL)
       tkn=rev(knot)[1] #last knot
       sn=c(rep(t1,degree),knot,rep(tkn,degree) ) #extended knot partition
       BB=Bspline_base(sn,degree=degree) # first compute the Basis
-      Bvalues=t(bs_direct(BB,xvalues))} # then evaluate the basis as the values
-  yvalues<-t(Bvalues)%*%coeff
+      Bvalues=t(bs_direct(BB,x_values))} # then evaluate the basis as the values
+  print(c('coeff',dim(coeff)))
+  print(c('Bvalues',dim(Bvalues)))
+  yvalues<-(Bvalues)%*%coeff
   return(yvalues)
 }
 
@@ -52,17 +54,17 @@ spline_eval<-function(Bspline, xvalues=NULL, Bvalues=NULL)
 #' Computes the values of all B-spline basis functions at given points.
 #'
 #' @param Basis Object returned by \code{Bspline_base}
-#' @param xvalues Vector of evaluation points
-#' @return Matrix of basis function values (n_splines x length(xvalues))
+#' @param x_values Vector of evaluation points
+#' @return Matrix of basis function values (n_splines x length(x_values))
 #' @export
 
-bs_direct<-function(Basis,xvalues)
+bs_direct<-function(Basis,x_values)
 {
   #Calcule les valeurs d'une base Bspline.
   #comme la fonction bs de R, mais en utilisant la
   # base calculee sous PP-forme : coeff des polynomes sur la base locale.
   #indep. du choix de la notation croissant/decroissant
-  n_values=length(xvalues)
+  n_values=length(x_values)
   knot=Basis$knot  # knot
   kn=length(knot)-1
   d=Basis$degree
@@ -73,14 +75,14 @@ bs_direct<-function(Basis,xvalues)
     for (j in 1:nsplines)
     {
     p=makpp(bb[j,,],tn=knot)
-    yvalues[j,]<-evalpp(p,xvalues)
+    yvalues[j,]<-evalpp(p,x_values)
     }}
      if (d==0){
        bb=Basis$base
       for (j in 1:nsplines)
     {
       p=makpp(bb[j,],tn=knot)
-      yvalues[j,]<-evalpp(p,xvalues)
+      yvalues[j,]<-evalpp(p,x_values)
     }
     }
 
@@ -92,26 +94,26 @@ bs_direct<-function(Basis,xvalues)
 #' Evaluates a piecewise polynomial function at given points.
 #'
 #' @param p List with components \code{ext_knot} (ext_knot) and \code{coeff}
-#' @param xvalues Vector of evaluation points
+#' @param x_values Vector of evaluation points
 #' @return Function values at the requested points
 #' @keywords internal
 
-evalpp<-function(p,xvalues){
+evalpp<-function(p,x_values){
   #this evaluates a polynomial p under the pp form,
   #p if given with its knot and the local coefficients
   #This funciton is independent from the order convention
   #for polynomials
-  #The xvalues out of the knot give 0 in the corresponding yvalues
+  #The x_values out of the knot give 0 in the corresponding yvalues
   tn=p$knot
   coeff=p$coefficients
   kn=length(tn)-1 #number of intervals
-  n_values=length(xvalues)
+  n_values=length(x_values)
 
   pval<-c()
   if (!is.null(dim(coeff))){
     for (i in 1:(kn))
   {
-    xval=xvalues[(xvalues>=tn[i]) & (xvalues<tn[i+1])]
+    xval=x_values[(x_values>=tn[i]) & (x_values<tn[i+1])]
     poly_loc<-coeff[i,]
     # reverse our convention to match polyval convention
     #pval<-c(pval,polyval(p=rev(poly_loc),xval) )
@@ -122,7 +124,7 @@ evalpp<-function(p,xvalues){
   if (is.null(dim(coeff)))# if degree=0
     {
     for (i in 1:(kn)) {
-    xval=xvalues[(xvalues>=tn[i]) & (xvalues<tn[i+1])]
+    xval=x_values[(x_values>=tn[i]) & (x_values<tn[i+1])]
     poly_loc<-coeff[i]
     # reverse our convention to match polyval convention
     #pval<-c(pval,polyval(p=rev(poly_loc),xval) )
@@ -130,9 +132,9 @@ evalpp<-function(p,xvalues){
     #shit to fit the local basis
     pval<-c(pval,poly_eval(poly_loc,h))
 }}
-  xval=xvalues[xvalues==tn[kn+1]]
+  xval=x_values[x_values==tn[kn+1]]
   if (length(xval)>0){
-  h=tn[kn+1]-tn[kn] # if the last knot is in xvalues
+  h=tn[kn+1]-tn[kn] # if the last knot is in x_values
   pval=c(pval,poly_eval(poly_loc,h))
 
   }
@@ -170,19 +172,19 @@ makpp<-function(coeff,tn){
 #' Plots all  functions of a B-spline basis.
 #'
 #' @param BB Object returned by \code{Bspline_base}
-#' @param xvalues Vector of evaluation points for plotting (by default 100 points are computed in the knot range)
+#' @param x_values Vector of evaluation points for plotting (by default 100 points are computed in the knot range)
 #' @return No return value, called for side effects (generates a plot)
 #' @export
 #'
-view_basis<-function(BB,xvalues=0)
+view_basis<-function(BB,x_values=0)
 {
-  if (length(xvalues)==1){
+  if (length(x_values)==1){
     k=range(BB$ext_knot)
-    xvalues=(k[1]:(k[2]*100))/100}
+    x_values=(k[1]:(k[2]*100))/100}
 
-  yvalues=bs_direct(BB,xvalues)
+  yvalues=bs_direct(BB,x_values)
 
-  matplot(xvalues, t(yvalues))
+  matplot(x_values, t(yvalues))
 }
 
 

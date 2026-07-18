@@ -135,14 +135,14 @@ apply_linear_constraint <- function(const_value, sign = 1) {
 #'
 #' @param knot Knot vector (effective partition)
 #' @param degree Spline degree (should be 4)
-#' @param xvalues Evaluation points for design matrix
+#' @param x_values Evaluation points for design matrix
 #' @return A list containing:
-#'   \item{d0}{Design matrix (if xvalues provided)}
+#'   \item{d0}{Design matrix (if x_values provided)}
 #'   \item{d1}{First derivative coefficients [a3, a2, a1, a0] for each interval}
 #'   \item{d2}{Second derivative coefficients [a2, a1, a0] for each interval}
 #'   \item{d3}{Third derivative values at knot (linear constraints)}
 #' @export
-bspline_to_deriv_coeffs_quart <- function(knot, degree = 4, xvalues = 0) {
+bspline_to_deriv_coeffs_quart <- function(knot, degree = 4, x_values = 0) {
 
   kn <- length(knot) - 1
   N <- kn + degree
@@ -222,9 +222,9 @@ bspline_to_deriv_coeffs_quart <- function(knot, degree = 4, xvalues = 0) {
     }
   }
 
-  # Design matrix if xvalues provided
-  if (length(xvalues) != 1) {
-    yvalues <- bs_direct(BB, xvalues)
+  # Design matrix if x_values provided
+  if (length(x_values) != 1) {
+    yvalues <- bs_direct(BB, x_values)
   } else {
     yvalues <- 0
   }
@@ -314,7 +314,7 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
   }
 
   # Build B-spline basis and derivative coefficients
-  deriv_data <- bspline_to_deriv_coeffs_quart(knot, degree = 4, xvalues = xtab)
+  deriv_data <- bspline_to_deriv_coeffs_quart(knot, degree = 4, x_values = xtab)
 
   B <- deriv_data$d0
   B <- t(B)  # Design matrix: n x N
@@ -446,10 +446,9 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
 
   # Return results
   return(list(
-    coefficients = alpha_val,
+    coefficients = (alpha_val),
     degree = degree,
-    knot = knot,
-    int_knot= knot[2:kn],
+    knot = t(knot),
     y_mean = y_mean,
     status = result$status,
     value = result$value

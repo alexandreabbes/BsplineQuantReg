@@ -9,7 +9,7 @@ library(BsplineQuantReg)
   x <- seq(0, 1, length.out = n)
 
   # Quartic function with noise (ideal for quartic splines)
-  y <- 4 * x^4 - 3 * x^2 + 0.5 * sin(4 * pi * x) + 0.05 * rnorm(n)
+  y <- 4 * x^4 - 3 * x^2 + 0.5 * sin(4 * pi * x) + 0.2 * rnorm(n)
 
   kn <- 6
   knot <- (0:(kn))/(kn)
@@ -50,23 +50,23 @@ library(BsplineQuantReg)
   # Plot
   par(mfrow = c(2, 3), mar = c(4, 4, 4, 2))
 
-  plot(x, y, pch = 16, cex = 0.4, col = "gray", main = "Quartic (unconstrained)")
+  plot(x, y, pch = 16, cex = 0.4, col = "black", main = "Quartic (unconstrained)")
   lines(x_eval, y_quart, col = "blue", lwd = 2)
   abline(v = knot, col = "blue", lty = 2, lwd = 0.5)
 
-  plot(x, y, pch = 16, cex = 0.4, col = "gray", main = "Quartic (increasing)")
+  plot(x, y, pch = 16, cex = 0.4, col = "black", main = "Quartic (increasing)")
   lines(x_eval, y_quart_monot, col = "darkgreen", lwd = 2)
   abline(v = knot, col = "blue", lty = 2, lwd = 0.5)
 
-  plot(x, y, pch = 16, cex = 0.4, col = "gray", main = "Quartic (convex)")
+  plot(x, y, pch = 16, cex = 0.4, col = "black", main = "Quartic (convex)")
   lines(x_eval, y_quart_conv, col = "purple", lwd = 2)
   abline(v = knot, col = "blue", lty = 2, lwd = 0.5)
 
-  plot(x, y, pch = 16, cex = 0.4, col = "gray", main = "Quartic (3rd deriv >= 0)")
+  plot(x, y, pch = 16, cex = 0.4, col = "black", main = "Quartic (3rd deriv >= 0)")
   lines(x_eval, y_quart_d3, col = "orange", lwd = 2)
   abline(v = knot, col = "blue", lty = 2, lwd = 0.5)
 
-  plot(x, y, pch = 16, cex = 0.4, col = "gray", main = "Cubic (unconstrained)")
+  plot(x, y, pch = 16, cex = 0.4, col = "black", main = "Cubic (unconstrained)")
   lines(x_eval, y_cubic, col = "red", lwd = 2)
 
 #  return(list(quart = fit_quart, quart_monot = fit_quart_monot,

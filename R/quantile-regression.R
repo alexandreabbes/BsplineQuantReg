@@ -7,14 +7,14 @@
 #'
 #' @param tn Knot vector (effective partition, not extended)
 #' @param degree Spline degree (default = 3)
-#' @param xvalues Evaluation points for design matrix (0 = no evaluation)
+#' @param x_values Evaluation points for design matrix (0 = no evaluation)
 #' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list containing:
-#'   \item{d0}{Design matrix (if xvalues provided)}
+#'   \item{d0}{Design matrix (if x_values provided)}
 #'   \item{d1}{First derivative coefficients [a3, a2, a1] for each interval}
 #'   \item{d2}{Second derivative values at knot}
 #' @export
-bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0, verbose=FALSE) {
+bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,x_values=0, verbose=FALSE) {
 
   # create  basis with create.bspline.basis
   kn <- length(tn) - 1
@@ -56,7 +56,7 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,xvalues=0, verbose=FALSE) {
     c2=6*basis[j,nu,1]
     deriv2_val[nu-degree+1,j]=c1+c2*h
   }
-  if (length(xvalues)!=1){yvalues=bs_direct(BB,xvalues)}
+  if (length(x_values)!=1){yvalues=bs_direct(BB,x_values)}
   else {yvalues=0}
   return(list(d0=yvalues,d1=deriv_coeffs, d2=deriv2_val))
 }
@@ -196,7 +196,7 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knot, tau,
   int_knot=knot[2:kn]
 
   # Calcul des coefficients normalises des derivees
-  deriv_spline <- bspline_to_deriv_coeffs_pp(knot, degree = 3,xvalues=xtab,verbose=verbose)
+  deriv_spline <- bspline_to_deriv_coeffs_pp(knot, degree = 3,x_values=xtab,verbose=verbose)
   deriv_coeffs <-deriv_spline$d1
   deriv_coeffs2<-deriv_spline$d2
   B<-deriv_spline$d0
