@@ -57,14 +57,13 @@ Omega<-function(s,j,o)#t: knot in the base t-t[j]
 #'
 #' @export
 
-Bspline_base<-function(sn,degree=3,der=0,verbose=FALSE)
+Bspline_base<-function(sn,degree=3,der=NULL,verbose=FALSE)
 {
   tn=sn[(degree+1):(length(sn)-degree)] #effective knot partition
   kn=length(tn)-1 # tn is the list of knot without the extended partition.
-
-  n_intervals<-kn+2*degree #Nb extended intervals
+  n_ext_intervals<-kn+2*degree #Nb extended intervals
   n_splines<-kn+degree
-  B<-array(0,dim=c((degree+1),n_splines,n_intervals,(degree+1))) # B is the initial B-spline basis : piecewise constant
+  B<-array(0,dim=c((degree+1),n_splines,n_ext_intervals,(degree+1))) # B is the initial B-spline basis : piecewise constant
 
   for (i in (degree+1):(kn+degree)){B[1,i,i,degree+1]<-1}#in decreasing convention
   if (degree>0){
@@ -74,7 +73,7 @@ Bspline_base<-function(sn,degree=3,der=0,verbose=FALSE)
       #k : dimension of local basis=deg+1
       for (j in (1:(n_splines))) {
         #go through the elements of the basis
-        for (nu in ((degree+1):(n_intervals))) #go through the  pieces of the spline of order l
+        for (nu in ((degree+1):(n_ext_intervals))) #go through the  pieces of the spline of order l
         {
           #Bjnu<-B[(o-1),j,nu,1:(o-1)] #inc. convention
           Bjnu<-reduce_pol(B[(o-1),j,nu,(degree+1-(o-1)):(degree+1)])#dec. convention
@@ -107,7 +106,7 @@ Bspline_base<-function(sn,degree=3,der=0,verbose=FALSE)
   Bn=array(0,dim=dim(B))
   for (o in 1:(degree+1)){
     for (j in 1:n_splines)
-    {for (nu in 1:n_intervals)
+    {for (nu in 1:n_ext_intervals)
     {
       Bn[o,j,nu,]<-change_polynomial_base_taylor(B[o,j,nu,],0,sn[nu])
     }}}
@@ -118,11 +117,12 @@ Bspline_base<-function(sn,degree=3,der=0,verbose=FALSE)
   Base0=round(Base0,10)
   BaseL=round(BaseL,10)
 
-  if (der!=0){
+  if ( !is.null(der) ){
     Base0=Bspline_deriv(Base0,der = der)
     BaseL=Bspline_deriv(BaseL,der=der)
-  }
-  return(list(base =BaseL ,base0=Base0, ext_knot = sn, knot=tn, degree = degree, n_splines = (n_splines),deriv_order=der ) )
+  } else{deriv_order<-0}
+
+  return(list(base =BaseL ,base0=Base0, ext_knot = sn, knot=tn, degree = degree, n_splines = (n_splines), deriv_order=der ) )
   #  return (B)
 }
 
@@ -141,6 +141,7 @@ Bspline_base<-function(sn,degree=3,der=0,verbose=FALSE)
 
 Bspline_deriv<-function(bspline,der=2,verbose=FALSE){
   #computes the derivative fo a Bspline basis
+  if (is.null(der)){der<-0}
   Bn=bspline$base
   B0=bspline$base0
   n_splines=bspline$n_splines
