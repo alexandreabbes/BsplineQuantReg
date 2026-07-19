@@ -21,8 +21,8 @@ test_karlin_simple <- function(verbose=FALSE,seed=NULL) {
 
   # simple pscillating data
   #ytab <- -3 * xtab +sin(3*2*xtab*3.14)+ 0.2 * rnorm(n_points)
-  ytab <- 2* xtab + 0.5 * sin(6 * pi * xtab) + 0.1 * rnorm(n_points+1)
-  #ytab<-xtab*(1-xtab)
+  #ytab <- 2* xtab + 0.5 * sin(6 * pi * xtab) + 0.1 * rnorm(n_points+1)
+  ytab<-xtab*(1-xtab)
   kn <- 12
 
   n=7
@@ -46,8 +46,8 @@ test_karlin_simple <- function(verbose=FALSE,seed=NULL) {
   if (verbose) {
     message("\n=== CONVEX  TEST ===\n")}
   res_convexe <- SplineConstQuantRegBs3(xtab, ytab, knot,monot=0,convcons=1, tau = 0.5)
-  res_convexe <- SplineConstQuantRegBs3(xtab, ytab, knot,monot=0,convcons=1, tau = 0.5)
-  #                                                   monot = -1, solver = "OSQP")
+
+
   # Visualisation
   par(mfrow = c(2, 2))
   x_eval <- seq(0, 1, length.out = 200)

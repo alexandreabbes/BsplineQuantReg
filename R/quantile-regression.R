@@ -18,7 +18,6 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,x_values=0, verbose=FALSE) 
 
   # create  basis with create.bspline.basis
   kn <- length(tn) - 1
-
   # Nombre correct de fonctions de base: kn + degree+1
   nbasis <- kn + degree
 
@@ -35,58 +34,38 @@ bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,x_values=0, verbose=FALSE) 
   # Matrix of normalised coefficient derivativs
   deriv_coeffs <- array(0, dim = c(kn, N, 3))
   deriv2_val<-array(0, dim = c(kn+1, N))
-
+  deriv3_val<-array(0, dim = c(kn, N))
   for (j in 1:N){
     for (nu in (degree+1):(kn+degree))
     {
-
       h=sn[nu+1]-sn[nu]
-      a3<-3*basis[j,nu,1]*h^2
+      c3<-basis[j,nu,1]
+      c2<-basis[j,nu,2]
+      a3<-3*c3*h^2
       a2<-2*basis[j,nu,2]*h
       a1<-basis[j,nu,3]
-      c1<-2*basis[j,nu,2]
-
       # coeffs_poly est [a3, a2, a1, a0] a0+a1*x+a_2*x^2+a3*x^3
-      deriv_coeffs[nu-degree,j,]=c(a3,a2,a1)
-      deriv2_val[nu-degree,j]=c1
+      deriv_coeffs[nu-degree,j,]<-c(a3,a2,a1)
+      deriv2_val[nu-degree,j]<-c2
+      deriv3_val[nu-degree,j]<-c3 #up to a factor 6, but the sign is the same.
     }
 
     # for the last knot the second deriv is an affine function
-    # c1+c2(t-t_{kn-1}) h is the last intervall space
-    c2=6*basis[j,nu,1]
-    deriv2_val[nu-degree+1,j]=c1+c2*h
+    # p+m(t-t_{kn-1}) h is the last intervall space
+    p<-2*basis[j,nu,2]
+    m<-6*basis[j,nu,1]
+    deriv2_val[nu-degree+1,j]=p+m*h
   }
   if (length(x_values)!=1){yvalues=bs_direct(BB,x_values)}
   else {yvalues=0}
-  return(list(d0=yvalues,d1=deriv_coeffs, d2=deriv2_val))
+  return(list(d0=yvalues,d1=deriv_coeffs, d2=deriv2_val,d3=deriv3_val))
 }
 
-#' Karlin-Studden constraints for positivity
-#'
-#' Applies Karlin-Studden SOCP constraints to ensure positivity of a
-#' quadratic polynomial on the interval [0,1].
-#'
-#' @param p2 Coefficient of u^2
-#' @param p1 Coefficient of u
-#' @param p0 Constant term
-#' @param z0 Auxiliary SOCP variable
-#' @param verbose boolean FALSE (default) or TRUE.
-#' @return List of CVXR constraints
-#' @export
-apply_karlin_constraints <- function(p2, p1, p0, z0,verbose=FALSE) {
-  # P2, p1, p0 sont les coefficients du polynome quadratique: p2*u^2 + p1*u + p0
-  # Dans la notation de l'article
-
-  constraints <- list()
-  constraints <- c(constraints, list(z0 >= 0))
-
-  K1_vec <- vstack(p0 - p2 - z0,p1-z0)
-  K2_vec <- (p0+p2+ z0)
-
-  constraints <- c(constraints, list(K2_vec >= p_norm(K1_vec, 2)))
-  if (verbose){message("constraints;\n",constraints)}
-  return(constraints)
-}
+#' Local Wrapper function to apply_karlin_quadratic
+apply_karlin_constraints<-function(p2, p1, p0, z0,verbose=FALSE)
+  {
+  apply_karlin_quadratic(p2=p2, p1=p1, p0=p0, z0=z0,sign=1,verbose=verbose)
+  }
 
 #' Constrained quantile regression with cubic splines
 #'
@@ -154,9 +133,10 @@ apply_karlin_constraints <- function(p2, p1, p0, z0,verbose=FALSE) {
 #' @export
 
 
-SplineConstQuantRegBs3 <- function(xtab, ytab, knot, tau,
+SplineCubicQuant<- function(xtab, ytab, knot, tau,
                                    monot = 0,
                                    convcons=0,
+                                   der3cons=0,
                                    solver = "CLARABEL", weight = NULL,
                                    verbose=FALSE)
 {
@@ -183,9 +163,7 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knot, tau,
     message("knot:", knot, "\n")
   }
 
-  if (length(monot) == 1) {
-    monot <- rep(monot, kn)
-  }
+
   if (verbose) {
   message("Monotonicity constraints (Karlin):", monot, "\n")
   }
@@ -199,6 +177,7 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knot, tau,
   deriv_spline <- bspline_to_deriv_coeffs_pp(knot, degree = 3,x_values=xtab,verbose=verbose)
   deriv_coeffs <-deriv_spline$d1
   deriv_coeffs2<-deriv_spline$d2
+  deriv_coeffs3<-deriv_spline$d3
   B<-deriv_spline$d0
   B=t(B)
   y_mean <- mean(ytab)
@@ -219,6 +198,9 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knot, tau,
   z_vars <- list()
 
   if (any(monot != 0)) {
+    if (length(monot) == 1) {
+      monot <- rep(monot, kn)
+    }
     for (i in 1:(kn)) {
       if (monot[i] != 0) {
         z_vars[[i]] <- Variable(1, name = paste0("z", i))
@@ -233,15 +215,19 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knot, tau,
   }
 
   #"contraintes convexes
-  if (length(convcons) == 1) {
-    convcons <- rep(convcons, (kn+1))
-  }
   # eliminate the null (unconstrained) case
   if (any(convcons !=0)){
-    CV<-list(convcons*(deriv_coeffs2 %*% alpha)>=0) # Very simple, only use the second derivatives at the knot.
+    if (length(convcons) == 1) {
+      convcons <- rep(convcons, (kn+1))}
+    print(convcons)
+    CV<-list((convcons*(deriv_coeffs2 %*% alpha))>=0) # Very simple, only use the second derivatives at the knot.
     constraints<-c(constraints,CV)
   }
-
+#3rd derivative constraints
+  if (any(der3cons!=0)){
+    der3cons<-rep(der3cons,kn)
+    DER3<-list(der3cons*alpha*deriv_coeffs3>0)
+  }
   problem <- Problem(objective, constraints)
 
   result <- NULL
@@ -283,3 +269,23 @@ SplineConstQuantRegBs3 <- function(xtab, ytab, knot, tau,
     int_knot = knot
   ))
 }
+
+#' Wrapper function for Cubic spline quantile regression
+#'
+#' This is a convenience wrapper for SplineCubicQuant
+#' with convention of previous versions  SplineConstQuantRegBs3.
+#'
+#' @inheritParams SplineCubicQuant
+#' @return Same as SplineCubicQuant
+#' @export
+
+SplineConstQuantRegBs3<-function(xtab, ytab, knot, tau,
+                                         monot = 0,
+                                         convcons=0,
+                                         solver = "CLARABEL", weight = NULL,
+                                         verbose=FALSE)
+          {SplineCubicQuant(xtab, ytab, knot, tau,
+          monot = monot,
+          convcons=convcons,
+          solver = solver, weight = weight,
+          verbose=verbose)}
