@@ -9,9 +9,9 @@ library(BsplineQuantReg)
   x <- seq(0, 1, length.out = n)
 
   # Quartic function with noise (ideal for quartic splines)
-  y <- 4 * x^4 - 3 * x^2 + 0.5 * sin(4 * pi * x) + 0.2 * rnorm(n)
+  y <- 4 * x^4 - 3 * x^2 + 0.5 * sin(8 * pi * x) + 0.2 * rnorm(n)
 
-  kn <- 6
+  kn <- 16
   knot <- (0:(kn))/(kn)
   knot<-knot
   cat("=== Comparing Quartic vs Cubic Splines ===\n\n")
@@ -28,12 +28,12 @@ library(BsplineQuantReg)
   # Quartic spline with convexity
   cat("\nFitting quartic spline (convex)...\n")
   fit_quart_conv <- SplineConstQuantRegBs4(x, y, knot, tau = 0.5,
-                                           convcons = 1, verbose = TRUE)
+                                           convcons = -1, verbose = TRUE)
 
   # Quartic spline with third derivative constraint
   cat("\nFitting quartic spline (positive 3rd derivative)...\n")
   fit_quart_d3 <- SplineConstQuantRegBs4(x, y, knot, tau = 0.5,
-                                         der3cons = 1, verbose = TRUE)
+                                         der3cons = -1, verbose = TRUE)
 
   # Cubic spline for comparison
   cat("\nFitting cubic spline (unconstrained)...\n")
