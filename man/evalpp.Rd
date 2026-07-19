@@ -4,12 +4,12 @@
 \alias{evalpp}
 \title{Evaluate a piecewise polynomial (PP) form}
 \usage{
-evalpp(p, xvalues)
+evalpp(p, x_values)
 }
 \arguments{
-\item{p}{List with components \code{knots} (knots) and \code{coefficients}}
+\item{p}{List with components \code{ext_knot} (ext_knot) and \code{coeff}}
 
-\item{xvalues}{Vector of evaluation points}
+\item{x_values}{Vector of evaluation points}
 }
 \value{
 Function values at the requested points

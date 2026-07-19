@@ -226,3 +226,64 @@ Spline_der_knot<-function(Bsbase,der=1)
   return(t(Der2_knot))
 }
 
+#' Create a callable spline object
+#'
+#' Transforms a spline regression result into a callable function that
+#' can be evaluated at any point, while preserving access to parameters.
+#'
+#' @param result A list returned by quantile_spline or one of the degree-specific functions
+#' @return A function that can be called as `result(x)` and has attributes
+#'         for `degree`, `knot`, `coefficients`, and `status`
+#' @export
+make_spline <- function(result) {
+
+  # Extract components
+  coeff <- result$coefficients
+  deg <- result$degree
+  knots <- result$knot
+
+  # Create the callable function
+  spline_func <- function(x_values, Bvalues=NULL) {
+    # Build the spline object structure expected by spline_eval
+    spline_obj <- list(
+      coefficients = coeff,
+      degree = deg,
+      knot = knots
+    )
+    class(spline_obj) <- "Bspline"
+
+    # Evaluate the spline
+    spline_eval(spline_obj, x_values, Bvalues=Bvalues)
+  }
+
+  # Attach parameters as attributes (accessible via attr())
+  attr(spline_func, "degree") <- deg
+  attr(spline_func, "knot") <- knots
+  attr(spline_func, "coefficients") <- coeff
+  attr(spline_func, "status") <- result$status
+  attr(spline_func, "value") <- result$value
+  attr(spline_func, "y_mean") <- result$y_mean
+
+  # Store the full result as an attribute
+  attr(spline_func, "result") <- result
+
+  # Set class for print method
+  class(spline_func) <- c("callable_spline", "function")
+
+  return(spline_func)
+}
+
+#' Print method for callable spline
+#'
+#' @param x A callable spline object
+#' @param ... Additional arguments
+#' @export
+print.callable_spline <- function(x, ...) {
+  cat("Callable Spline Object\n")
+  cat("  Degree:", attr(x, "degree"), "\n")
+  cat("  Knots:", length(attr(x, "knot")), "knots\n")
+  cat("  Coefficients:", length(attr(x, "coefficients")), "\n")
+  cat("  Status:", attr(x, "status"), "\n")
+  cat("  Usage: my_spline(x) to evaluate\n")
+  invisible(x)
+}

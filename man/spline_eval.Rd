@@ -4,23 +4,27 @@
 \alias{spline_eval}
 \title{Evaluate a B-spline}
 \usage{
-spline_eval(Bspline, xvalues)
+spline_eval(Bspline, x_values = NULL, Bvalues = NULL)
 }
 \arguments{
-\item{Bspline}{Spline object (list with coefficients on the Bspline basis, degree, extended knots)}
+\item{Bspline}{Spline object (list with coefficients on the Bspline basis, degree, extended knot)}
 
-\item{xvalues}{Vector of evaluation points}
+\item{x_values}{Vector of evaluation points}
 }
 \value{
-vector of same length as xvalues, with Spline values at the requested points
+vector of same length as x_values, with Spline values at the requested points
 }
 \description{
 Evaluates a spline (linear combination of B-splines) at given points.
 }
 \examples{
 { # Create and evaluate a spline
+tn<-c(0,1,2,3,4,5)
+Bspline=list(degree=3, knot=tn,coefficients=runif(basis$n_splines))
+y <- spline_eval(Bspline, seq(0,5,length=100))
+#alternatively compute the base before to optimize if needed
 sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
-basis <- Bspline_base(sn, degree=3)
-basis$coefficients <- runif(basis$n_splines)
-y <- spline_eval(basis, seq(0,5,length=100))}
+Bsbase <- Bspline_base(sn, degree=3)
+Bvalues <-bs_direct(Bsbase,x_values)
+y <- spline_eval(Bspline=Bspline, Bvalues=Bvalues )}
 }

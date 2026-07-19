@@ -1,7 +1,7 @@
 # Test: Quartic Spline Quantile Regression
 # Compare with cubic version
 
-library(BsplineQuantReg)
+#library(BsplineQuantReg)
 
 #test_quartic <- function() {
   set.seed(42)

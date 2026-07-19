@@ -165,7 +165,8 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
   }
 #3rd derivative constraints
   if (any(der3cons!=0)){
-    der3cons<-rep(der3cons,kn)
+    if (length(der3cons)==1){der3cons<-rep(der3cons,kn)}
+
     DER3<-list((der3cons*(deriv_coeffs3%*%alpha))>=0)
     constraints<-c(constraints,DER3)
   }

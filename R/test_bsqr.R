@@ -20,9 +20,9 @@ test_karlin_simple <- function(verbose=FALSE,seed=NULL) {
   xtab <- (0:n_points)/n_points
 
   # simple pscillating data
-  #ytab <- -3 * xtab +sin(3*2*xtab*3.14)+ 0.2 * rnorm(n_points)
+  #ytab <- -3 * xtab +sin(3*2*xtab*3.14)+ 0.2 * rnorm(n_points+1)
   #ytab <- 2* xtab + 0.5 * sin(6 * pi * xtab) + 0.1 * rnorm(n_points+1)
-  ytab<-xtab*(1-xtab)
+  ytab<-xtab*(1-xtab)+0.05 * rnorm(n_points+1)
   kn <- 12
 
   n=7
@@ -45,8 +45,11 @@ test_karlin_simple <- function(verbose=FALSE,seed=NULL) {
                                             monot = -1, solver = "OSQP")
   if (verbose) {
     message("\n=== CONVEX  TEST ===\n")}
-  res_convexe <- SplineConstQuantRegBs3(xtab, ytab, knot,monot=0,convcons=1, tau = 0.5)
-
+  res_convexe <- SplineConstQuantRegBs3(xtab, ytab, knot,monot=0,convcons=-1, tau = 0.5)
+der3cons=rep(1,length(knot)-1)
+der3cons[1:7]<-0
+print(der3cons)
+    res_3rd <- quantile_spline(xtab, ytab, knot,monot=0,convcons=0,der3cons=der3cons, degree=4, tau = 0.5)
 
   # Visualisation
   par(mfrow = c(2, 2))
@@ -55,7 +58,7 @@ test_karlin_simple <- function(verbose=FALSE,seed=NULL) {
   y_croiss=spline_eval(res_croissant,x_eval)
   y_decroiss=spline_eval(res_decroissant,x_eval)
   y_convexe=spline_eval(res_convexe,x_eval)
-
+  y_3rd=spline_eval(res_3rd,x_eval)
   # Croissant
   plot(xtab, ytab, pch = 16, cex = 0.5, col = "black",
        main = "increasing constraint (On the first inter-knot)")
@@ -88,6 +91,10 @@ test_karlin_simple <- function(verbose=FALSE,seed=NULL) {
        main = "without constraint ")
   lines(x_eval,y_sans,lwd=2)
   abline(v = knot, col = "blue", lty = 2)
-
+#der3>0
+  plot(xtab, ytab, pch = 16, cex = 0.5, col = "black",
+      main = "3rd deriv")
+  lines(x_eval,y_3rd,lwd=2)
+  abline(v = knot, col = "blue", lty = 2)
 }
 #

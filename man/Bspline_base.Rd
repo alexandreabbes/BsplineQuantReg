@@ -7,11 +7,11 @@ Computes local polynomial coefficients for each B-spline basis function
 on each interval. Polynomials are expressed in the canonical basis
 Uses De Boor's recursion formula.}
 \usage{
-Bspline_base(sn, degree = 3, der = 0, verbose = FALSE)
+Bspline_base(sn, degree = 3, der = NULL, verbose = FALSE)
 }
 \arguments{
 \item{sn}{Extended knot vector (including endpoint repetitions)
-This means if t0..tkn it the set of knots
+This means if t0..tkn it the set of knot
 then sn should be given as a vector with  "degree" times t_0 and t_kn at the begining
  and the ends.  its length is number of intervals+1+2*degree.}
 
@@ -28,8 +28,8 @@ A list containing:
   convention on the local bases (t-s_nu)^l, l=3..1
   base[j,,] is a matrix of piecewise polynomial function compatible with the pp-form.}
   \item{base0}{Coefficients in canonical basis (centered at 0) (1, t, t^2, t^3) centered at the interval origin.}
-  \item{knots}{Extended knot vector}
-  \item{int_knots}{Internal knots (effective partition including ends)}
+  \item{ext_knot}{Extended knot vector}
+  \item{knot}{Effective knot partition including ends)}
   \item{degree}{Spline degree}
   \item{n_splines}{Number of basis functions}
   \item{deriv_order}{Applied derivative order}

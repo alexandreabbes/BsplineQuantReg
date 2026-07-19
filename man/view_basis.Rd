@@ -4,12 +4,12 @@
 \alias{view_basis}
 \title{Visualize a B-spline functions basis}
 \usage{
-view_basis(Bspline, xvalues = 0)
+view_basis(BB, x_values = 0)
 }
 \arguments{
-\item{Bspline}{Object returned by \code{Bspline_base}}
+\item{BB}{Object returned by \code{Bspline_base}}
 
-\item{xvalues}{Vector of evaluation points for plotting (by default 100 points are computed in the knot range)}
+\item{x_values}{Vector of evaluation points for plotting (by default 100 points are computed in the knot range)}
 }
 \value{
 No return value, called for side effects (generates a plot)

@@ -57,7 +57,7 @@
 #' \code{\link{SplineLinearQuant}}, \code{\link{SplineQuadraticQuant}},
 #' \code{\link{SplineCubicQuant}}, \code{\link{SplineQuarticQuant}}
 #' @export
-quantile_spline <- function(xtab, ytab, knot, tau,
+quantile_spline_bak <- function(xtab, ytab, knot, tau,
                             degree = 3,
                             monot = 0,
                             convcons = 0,
@@ -120,6 +120,69 @@ quantile_spline <- function(xtab, ytab, knot, tau,
                               weight = weight,
                               verbose = verbose))
   }
+}
+
+
+#' Unified Quantile Regression with B-Splines of Any Degree (1 to 4)
+#'
+#' @param ... (autres paramètres existants)
+#' @param callable Logical; if TRUE, return a callable function instead of a list.
+#'                 Default is FALSE for backward compatibility.
+#' @return If callable = FALSE, a list. If callable = TRUE, a callable function.
+#' @export
+quantile_spline <- function(xtab, ytab, knot, tau,
+                            degree = 3,
+                            monot = 0,
+                            convcons = 0,
+                            der3cons = 0,
+                            solver = "CLARABEL",
+                            weight = NULL,
+                            verbose = FALSE,
+                            callable = FALSE) {
+
+  # Validate degree
+  if (degree < 1 || degree > 4) {
+    stop("degree must be between 1 and 4. Received: ", degree)
+  }
+
+  # Dispatch to the appropriate function based on degree
+  if (degree == 1) {
+    result <- SplineLinearQuant(xtab, ytab, knot, tau,
+                                monot = monot,
+                                solver = solver,
+                                weight = weight,
+                                verbose = verbose)
+  } else if (degree == 2) {
+    result <- SplineQuadraticQuant(xtab, ytab, knot, tau,
+                                   monot = monot,
+                                   convcons = convcons,
+                                   solver = solver,
+                                   weight = weight,
+                                   verbose = verbose)
+  } else if (degree == 3) {
+    result <- SplineCubicQuant(xtab, ytab, knot, tau,
+                               monot = monot,
+                               convcons = convcons,
+                               der3cons = der3cons,
+                               solver = solver,
+                               weight = weight,
+                               verbose = verbose)
+  } else if (degree == 4) {
+    result <- SplineQuarticQuant(xtab, ytab, knot, tau,
+                                 monot = monot,
+                                 convcons = convcons,
+                                 der3cons = der3cons,
+                                 solver = solver,
+                                 weight = weight,
+                                 verbose = verbose)
+  }
+
+  # Return callable object if requested
+  if (callable) {
+    return(make_spline(result))
+  }
+
+  return(result)
 }
 
 #' Print method for quantile_spline results

@@ -64,7 +64,7 @@ apply_karlin_cubic <- function(p3, p2, p1, p0, z0, z1, sign = 1) {
 }
 
 
-' Karlin-Studden constraints for positivity
+#' Karlin-Studden constraints for positivity
 #'
 #' Applies Karlin-Studden SOCP constraints to ensure positivity of a
 #' quadratic polynomial on the interval [0,1].
@@ -75,7 +75,7 @@ apply_karlin_cubic <- function(p3, p2, p1, p0, z0, z1, sign = 1) {
 #' @param z0 Auxiliary SOCP variable
 #' @param verbose boolean FALSE (default) or TRUE.
 #' @return List of CVXR constraints
-#' @export
+#' @exportla
 
 apply_karlin_constraints_V1<- function(p2, p1, p0, z0,verbose=FALSE) {
   # P2, p1, p0 sont les coefficients du polynome quadratique: p2*u^2 + p1*u + p0
