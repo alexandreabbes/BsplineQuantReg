@@ -19,6 +19,8 @@ cat("==============================================\n")
 cat("Demo: Comprehensive Quantile Regression Tests\n")
 cat("==============================================\n\n")
 
+if (!exists("degree")){degree=3}
+
 # Generate synthetic data
 #set.seed(42)
 n_points <- 100
@@ -52,36 +54,38 @@ cat("Fitting models...\n")
 
 # Fit 1: Unconstrained (tau = 0.9, 0.5, 0.1)
 cat("  - Unconstrained (tau = 0.9, 0.5, 0.1)")
-res_uncon1 <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.9,
-                                    monot = 0, convcons = 0, solver = "OSQP")
-res_uncon2 <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.1,
-                                    monot = 0, convcons = 0, solver = "OSQP")
-res_uncon3 <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
-                                    monot = 0, convcons = 0, solver = "OSQP")
+res_uncon1 <- quantile_spline(xtab, ytab, knots, tau = 0.9,
+                                    monot = 0, convcons = 0,degree=degree, solver = "OSQP")
+res_uncon2 <- quantile_spline(xtab, ytab, knots, tau = 0.1,
+                                    monot = 0, convcons = 0,degree=degree, solver = "OSQP")
+res_uncon3 <- quantile_spline(xtab, ytab, knots, tau = 0.5,
+                                    monot = 0, convcons = 0,degree=degree, solver = "OSQP")
 
 cat(" done\n")
 
 # Fit 2: Partial increasing (tau = 0.5)
 cat("  - Partial increasing (tau = 0.5, 0.1, intervals 1-7)...")
-res_croissant1 <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+res_croissant1 <- quantile_spline(xtab, ytab, knots, tau = 0.5,
                                         monot = monot_partial, convcons = 0,
-                                        solver = "OSQP")
-res_croissant2 <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.1,
-                                         monot = monot_partial, convcons = 0,
+                                  degree=degree,solver = "OSQP")
+res_croissant2 <- quantile_spline(xtab, ytab, knots, tau = 0.1,
+                                         monot = monot_partial,degree=degree, convcons = 0,
                                          solver = "OSQP")
 cat(" done\n")
 
 # Fit 3: Full decreasing (tau = 0.5)
 cat("  - Full decreasing (tau = 0.5)...")
-res_decroissant <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+res_decroissant <- quantile_spline(xtab, ytab, knots, tau = 0.5,
                                           monot = -1, convcons = 0,
+                                   degree=degree,
                                           solver = "OSQP")
 cat(" done\n")
 
 # Fit 4: Convexity constraint (tau = 0.5)
 cat("  - Convexity constraint (tau = 0.5)...")
-res_convexe <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+res_convexe <- quantile_spline(xtab, ytab, knots, tau = 0.5,
                                       monot = 0, convcons = 1,
+                               degree=degree,
                                       solver = "OSQP")
 cat(" done\n\n")
 

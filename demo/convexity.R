@@ -14,6 +14,8 @@ cat("========================================\n")
 cat("Demo: Convexity & Concavity Constraints\n")
 cat("========================================\n\n")
 
+if (exists("degree")){degree=3}
+
 #set.seed(42)
 n_points <- 20
 xtab <- seq(-2, 2, length.out = n_points)
@@ -35,17 +37,17 @@ cat(sprintf("Number of intervals: %d\n\n", kn))
 # Fit models
 cat("Fitting models...\n")
 cat("  - Unconstrained...")
-fit_uncon <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+fit_uncon <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
                                     monot = 0, convcons = 0)
 cat(" done\n")
 
 cat("  - Convexity constraint (everywhere)...")
-fit_convex <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+fit_convex <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
                                      monot = 0, convcons = 1)
 cat(" done\n")
 
 cat("  - Concavity constraint (everywhere)...")
-fit_concave <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+fit_concave <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
                                       monot = 0, convcons = -1)
 cat(" done\n")
 
@@ -57,7 +59,7 @@ for (i in 1:(kn + 1)) {
   }
 }
 cat("  - Partial convexity (x >= 0 only)...")
-fit_partial <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+fit_partial <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
                                       monot = 0, convcons = convcons_partial)
 cat(" done\n\n")
 
