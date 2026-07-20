@@ -13,6 +13,8 @@ cat("========================================\n")
 cat("Demo: Temperature Anomaly Trend Analysis\n")
 cat("========================================\n\n")
 
+if (!exists("degree")){degree=3}
+
 # Create temperature data (1880-1992)
 years <- 1880:1992
 temperature <- c(
@@ -53,7 +55,7 @@ years_eval <- seq(min(years), max(years), length.out = 300)
 # Model 1: Unconstrained median regression
 # ============================================================
 cat("=== 1. Unconstrained median regression ===\n")
-fit_uncon <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+fit_uncon <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
                                     monot = 0, convcons = 0)
 y_uncon <- spline_eval(fit_uncon, years_eval)
 
@@ -61,7 +63,7 @@ y_uncon <- spline_eval(fit_uncon, years_eval)
 # Model 2: Uniform increasing constraint (everywhere)
 # ============================================================
 cat("\n=== 2. Uniform increasing constraint (everywhere) ===\n")
-fit_uniform_inc <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+fit_uniform_inc <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
                                           monot = 1, convcons = 0)
 y_uniform_inc <- spline_eval(fit_uniform_inc, years_eval)
 
@@ -112,7 +114,7 @@ for (i in 1:length(monot_mixed)) {
               i, knots[i], knots[i+1], constraint_type))
 }
 
-fit_mixed <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+fit_mixed <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
                                     monot = monot_mixed, convcons = 0)
 y_mixed <- spline_eval(fit_mixed, years_eval)
 
@@ -123,7 +125,7 @@ cat("\n=== 4. Multiple quantiles (0.1, 0.5, 0.9) with mixed constraints ===\n")
 tau_multi <- c(0.1, 0.5, 0.9)
 fits_multi <- list()
 for (i in seq_along(tau_multi)) {
-  fits_multi[[i]] <- SplineConstQuantRegBs3(xtab, ytab, knots,
+  fits_multi[[i]] <- quantile_spline(degree=degree,xtab, ytab, knots,
                                             tau = tau_multi[i],
                                             monot = monot_mixed,
                                             convcons = 0)

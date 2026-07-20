@@ -7,6 +7,9 @@ library(BsplineQuantReg)
 
 oldpar <- par(mfrow = c(2,2))
 
+
+if (!exists("degree")){degree=3}
+
 # Generate data
 #set.seed(42)
 n_points <- 50
@@ -20,18 +23,18 @@ kn <- 10
 knots <- quantile(xtab, probs = seq(0, 1, length.out = kn + 1))
 
 # Unconstrained fit
-fit_uncon <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+fit_uncon <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
                                     monot = 0, convcons = 0)
 
 # Increasing constraint
-fit_inc2 <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+fit_inc2 <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
                                   monot = 1, convcons = 0)
-fit_inc1 <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.1,
+fit_inc1 <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.1,
                                    monot = 1, convcons = 0)
-fit_inc3 <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.9,
+fit_inc3 <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.9,
                                    monot = 1, convcons = 0)
 # Decreasing constraint
-fit_dec <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+fit_dec <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
                                   monot = -1, convcons = 0)
 
 # Plot results

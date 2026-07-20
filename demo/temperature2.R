@@ -16,6 +16,9 @@ cat("========================================\n")
 cat("Demo: Temperature Anomaly Trend Analysis\n")
 cat("========================================\n\n")
 
+
+if (!exists("degree")){degree=3}
+
 # Create temperature data (1880-1992)
 years <- 1880:1992
 temperature <- c(
@@ -62,7 +65,7 @@ get_interval_idx <- function(year, knots_years) {
 # Model 1: Unconstrained median regression
 # ============================================================
 cat("=== 1. Unconstrained median regression ===\n")
-fit_uncon <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+fit_uncon <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
                                     monot = 0, convcons = 0)
 y_uncon <- spline_eval(fit_uncon, x_eval)
 
@@ -70,7 +73,7 @@ y_uncon <- spline_eval(fit_uncon, x_eval)
 # Model 2: Full monotonicity (increasing everywhere)
 # ============================================================
 cat("\n=== 2. Full increasing monotonicity (everywhere) ===\n")
-fit_full_inc <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+fit_full_inc <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
                                        monot = 1, convcons = 0)
 y_full_inc <- spline_eval(fit_full_inc, x_eval)
 
@@ -87,7 +90,7 @@ for (i in 1:length(monot_partial)) {
 }
 cat("\n=== 3. Partial monotonicity (increasing only after 1970) ===\n")
 cat("   Constrained intervals:", which(monot_partial == 1), "\n")
-fit_partial <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+fit_partial <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
                                       monot = monot_partial, convcons = 0)
 y_partial <- spline_eval(fit_partial, x_eval)
 
@@ -121,7 +124,7 @@ cat("   Decreasing between 1945 and 1970\n")
 cat("   Increasing elsewhere\n")
 cat("   Constraint vector:", monot_mixed, "\n")
 
-fit_mixed <- SplineConstQuantRegBs3(xtab, ytab, knots, tau = 0.5,
+fit_mixed <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
                                     monot = monot_mixed, convcons = 0)
 y_mixed <- spline_eval(fit_mixed, x_eval)
 
@@ -132,7 +135,7 @@ cat("\n=== 5. Multiple quantiles (0.1, 0.5, 0.9) with mixed constraints ===\n")
 tau_multi <- c(0.1, 0.5, 0.9)
 fits_multi <- list()
 for (i in seq_along(tau_multi)) {
-  fits_multi[[i]] <- SplineConstQuantRegBs3(xtab, ytab, knots,
+  fits_multi[[i]] <- quantile_spline(degree=degree,xtab, ytab, knots,
                                             tau = tau_multi[i],
                                             monot = monot_mixed,
                                             convcons = 0)

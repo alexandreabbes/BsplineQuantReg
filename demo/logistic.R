@@ -17,6 +17,8 @@ cat("========================================\n\n")
 # Save original graphical parameters
 oldpar <- par(mfrow = c(2, 2), mar = c(4, 4, 4, 2))
 
+if (!exists("degree")){degree=3}
+
 # Generate data from a logistic/sigmoid function
 #set.seed(42)
 n_points <- 20
@@ -73,7 +75,7 @@ cat("Fitting multiple quantiles...\n")
 for (i in seq_along(tau_values)) {
   tau <- tau_values[i]
   cat(sprintf("  tau = %.2f...\n", tau))
-  fits[[i]] <- SplineConstQuantRegBs3(x, y, knots, tau = tau,
+  fits[[i]] <- quantile_spline(degree=degree,x, y, knots, tau = tau,
                                       monot = 0, convcons = 0)
 }
 
@@ -104,7 +106,7 @@ legend("topleft", legend = c("True", paste("tau =", tau_values)),
 # Plot 2: Monotonicity constraint (increasing)
 # ============================================================
 cat("\n=== Fitting with monotonicity constraint ===\n")
-fit_monot <- SplineConstQuantRegBs3(x, y, knots, tau = 0.5,
+fit_monot <- quantile_spline(degree=degree,x, y, knots, tau = 0.5,
                                     monot = 1, convcons = 0)
 y_monot <- spline_eval(fit_monot, x_eval)
 
@@ -131,7 +133,7 @@ legend("topleft", legend = c("True", "Monotonic (tau=0.5)"),
 # Plot 3: Convexity constraint (convex left, concave right)
 # ============================================================
 cat("\n=== Fitting with convexity/concavity constraint ===\n")
-fit_conv <- SplineConstQuantRegBs3(x, y, knots, tau = 0.5,
+fit_conv <- quantile_spline(degree=degree,x, y, knots, tau = 0.5,
                                    monot = 0, convcons = convex)
 y_conv <- spline_eval(fit_conv, x_eval)
 
@@ -156,7 +158,7 @@ legend("topleft", legend = c("True", "Convex/Concave (tau=0.5)"),
 # Plot 4: Combined monotonicity + convexity
 # ============================================================
 cat("\n=== Fitting with monotonicity + convexity ===\n")
-fit_both <- SplineConstQuantRegBs3(x, y, knots, tau = 0.5,
+fit_both <- quantile_spline(degree=degree,x, y, knots, tau = 0.5,
                                    monot = 1, convcons = convex)
 y_both <- spline_eval(fit_both, x_eval)
 
