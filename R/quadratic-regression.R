@@ -27,73 +27,73 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
                                  solver = "OSQP",
                                  weight = NULL,
                                  verbose = FALSE) {
-  
+
   if (is.null(weight)) {
     weight <- rep(1, length(xtab))
   }
-  
+
   # Sort data
   ordre <- order(xtab)
   xtab <- xtab[ordre]
   ytab <- ytab[ordre]
   weight <- weight[ordre]
-  
+
   n <- length(xtab)
-  
+
   # Handle knots
   if (length(knot) == 1 && is.numeric(knot)) {
     kn <- knot - 1
     knot <- quantile(xtab, probs = seq(0, 1, length.out = kn + 1))
   }
-  
+
   kn <- length(knot) - 1
   degree <- 2
   N <- kn + degree  # Number of basis functions for quadratic = kn + 2
-  
+
   if (verbose) {
     message("=== Quadratic Spline Quantile Regression (degree = 2) ===")
     message(sprintf("Knots: %d, Basis functions: %d", kn, N))
   }
-  
+
   # Handle constraints
   if (length(monot) == 1) {
     monot <- rep(monot, kn)
   }
-  
+
   if (length(convcons) == 1) {
     convcons <- rep(convcons, kn)
   }
-  
+
   if (verbose) {
     message("Monotonicity constraints:", paste(monot, collapse = " "))
     message("Convexity constraints:", paste(convcons, collapse = " "))
   }
-  
+
   # Build B-spline basis and derivative coefficients
   deriv_data <- bspline_to_deriv_coeffs_quad(knot, degree = 2, x_values = xtab, verbose = verbose)
-  
+
   B <- deriv_data$d0
   B <- t(B)  # Design matrix: n x N
-  
+
   # Derivative coefficients
   deriv1_coeffs <- deriv_data$d1  # [kn, N, 2] for linear derivative
   deriv2_coeffs <- deriv_data$d2  # [kn, N] for constant second derivative
-  
+
   # Center data
   y_mean <- mean(ytab)
   ytab_centered <- ytab - y_mean
-  
+
   # Optimization variables
   alpha <- Variable(N)
   z_vars <- list()
-  
+
   # Objective function
   residuals <- ytab_centered - B %*% alpha
   weighted_loss <- sum(weight * (tau * pos(residuals) + (1 - tau) * pos(-residuals)))
   objective <- Minimize(weighted_loss)
-  
+
   constraints <- list()
-  
+
   # 1. Monotonicity constraints (Karlin-Studden on linear derivative)
   # Derivative is linear: P'(u) = a*u + b
   if (any(monot != 0)) {
@@ -103,10 +103,10 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
         # deriv1_coeffs[i, j, ] = [a, b] for a*u + b
         a_coef <- sum(alpha * deriv1_coeffs[i, , 1])
         b_coef <- sum(alpha * deriv1_coeffs[i, , 2])
-        
+
         # Apply sign of monotonicity
         s <- sign(monot[i])
-        
+
         if (s > 0) {
           # P'(u) >= 0 on [0,1] for linear: min(P'(0), P'(1)) >= 0
           constraints <- c(constraints, list(b_coef >= 0))
@@ -119,7 +119,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
       }
     }
   }
-  
+
   # 2. Convexity constraints (second derivative constant)
   # Second derivative is constant: P''(u) = c
   if (any(convcons != 0)) {
@@ -127,7 +127,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
       if (convcons[i] != 0) {
         # Second derivative value on interval i
         s2_val <- sum(alpha * deriv2_coeffs[i, ])
-        
+
         if (convcons[i] > 0) {
           constraints <- c(constraints, list(s2_val >= 0))
         } else {
@@ -136,13 +136,13 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
       }
     }
   }
-  
+
   # Solve the problem
   problem <- Problem(objective, constraints)
-  
+
   result <- NULL
   solvers_to_try <- c(solver, "OSQP", "ECOS", "SCS")
-  
+
   for (s in unique(solvers_to_try)) {
     if (verbose) message("Trying solver:", s)
     result <- tryCatch({
@@ -151,25 +151,25 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
       if (verbose) message("Failed:", e$message)
       NULL
     })
-    
+
     if (!is.null(result) && !is.null(value(alpha))) {
       if (verbose) message("Solver succeeded:", s)
       break
     }
   }
-  
+
   if (is.null(result) || is.null(value(alpha))) {
     warning("Optimization did not converge with any solver")
     return(NULL)
   }
-  
+
   alpha_val <- value(alpha) + y_mean
-  
+
   if (verbose) {
     message("Status:", result$status)
     message("Objective value:", result$value)
   }
-  
+
   # Return results
   return(list(
     coefficients = alpha_val,
@@ -182,7 +182,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
 }
 
 #' Wrapper function for quadratic spline quantile regression
-#'
+#' Previous version notation style
 #' This is a convenience wrapper for SplineQuadraticQuant.
 #'
 #' @inheritParams SplineQuadraticQuant

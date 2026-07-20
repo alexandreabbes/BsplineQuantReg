@@ -22,6 +22,8 @@
 #'        For degree 3: per interval (1 = positive, -1 = negative)
 #'        For degree 4: per knot (1 = positive, -1 = negative)
 #' @param solver CVXR solver to use (default = "CLARABEL")
+#' @param callable render the final container object callable:
+#'  y=Bspline(x) or y=Bspline(x,Bvalues) for evaluation at x
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose logical; if TRUE, print progress messages
 #' @return A list containing coefficients, degree, and knots
@@ -56,79 +58,6 @@
 #' @seealso
 #' \code{\link{SplineLinearQuant}}, \code{\link{SplineQuadraticQuant}},
 #' \code{\link{SplineCubicQuant}}, \code{\link{SplineQuarticQuant}}
-#' @export
-quantile_spline_bak <- function(xtab, ytab, knot, tau,
-                            degree = 3,
-                            monot = 0,
-                            convcons = 0,
-                            der3cons = 0,
-                            solver = "CLARABEL",
-                            weight = NULL,
-                            verbose = FALSE) {
-
-  # Validate degree
-  if (degree < 1 || degree > 4) {
-    stop("degree must be between 1 and 4. Received: ", degree)
-  }
-
-  # Dispatch to the appropriate function based on degree
-  if (degree == 1) {
-    # Linear spline: only monotonicity is available
-    if (any(convcons != 0) && verbose) {
-      warning("convcons is not available for linear splines (degree 1). Ignored.")
-    }
-    if (any(der3cons != 0) && verbose) {
-      warning("der3cons is not available for linear splines (degree 1). Ignored.")
-    }
-
-    return(SplineLinearQuant(xtab, ytab, knot, tau,
-                             monot = monot,
-                             solver = solver,
-                             weight = weight,
-                             verbose = verbose))
-
-  } else if (degree == 2) {
-    # Quadratic spline: monotonicity and convexity
-    if (any(der3cons != 0) && verbose) {
-      warning("der3cons is not available for quadratic splines (degree 2). Ignored.")
-    }
-
-    return(SplineQuadraticQuant(xtab, ytab, knot, tau,
-                                monot = monot,
-                                convcons = convcons,
-                                solver = solver,
-                                weight = weight,
-                                verbose = verbose))
-
-  } else if (degree == 3) {
-    # Cubic spline: monotonicity, convexity, third derivative
-    return(SplineCubicQuant(xtab, ytab, knot, tau,
-                            monot = monot,
-                            convcons = convcons,
-                            der3cons = der3cons,
-                            solver = solver,
-                            weight = weight,
-                            verbose = verbose))
-
-  } else if (degree == 4) {
-    # Quartic spline: monotonicity, convexity, third derivative
-    return(SplineQuarticQuant(xtab, ytab, knot, tau,
-                              monot = monot,
-                              convcons = convcons,
-                              der3cons = der3cons,
-                              solver = solver,
-                              weight = weight,
-                              verbose = verbose))
-  }
-}
-
-
-#' Unified Quantile Regression with B-Splines of Any Degree (1 to 4)
-#'
-#' @param ... (autres paramètres existants)
-#' @param callable Logical; if TRUE, return a callable function instead of a list.
-#'                 Default is FALSE for backward compatibility.
-#' @return If callable = FALSE, a list. If callable = TRUE, a callable function.
 #' @export
 quantile_spline <- function(xtab, ytab, knot, tau,
                             degree = 3,

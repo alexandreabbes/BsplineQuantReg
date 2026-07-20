@@ -1,8 +1,5 @@
-
-#' Convert B-spline to derivative coefficients
-#'
-#' Converts a B-spline basis to normalized first and second derivative
-#' coefficients on each interval.
+#' normalized first and second derivative coefficients on each interval.
+#' for a cubic B-spline basis
 #'
 #' @param tn Knot vector (effective partition, not extended)
 #' @param degree Spline degree (default = 3)
@@ -13,7 +10,7 @@
 #'   \item{d1}{First derivative coefficients [a3, a2, a1] for each interval}
 #'   \item{d2}{Second derivative values at knot}
 #' @export
-bspline_to_deriv_coeffs_pp <- function(tn,degree = 3,x_values=0, verbose=FALSE) {
+bspline_to_deriv_coeffs_cubic <- function(tn,degree = 3,x_values=0, verbose=FALSE) {
 
   # create  basis with create.bspline.basis
   kn <- length(tn) - 1
@@ -169,71 +166,9 @@ bspline_to_deriv_coeffs_quart <- function(knot, degree = 4, x_values = 0) {
   ))
 }
 
-# Derivative coefficients for linear and quadratic splines
-# Based on the Python implementation in quantile_reg.py
-# Author: Alexandre Abbes
 
-#' Convert linear B-spline to derivative coefficients
-#'
-#' Computes normalized first derivative coefficients for linear B-splines.
-#' For linear splines, the derivative is constant on each interval.
-#'
-#' @param tn Knot vector (effective partition)
-#' @param degree Spline degree (should be 1)
-#' @param x_values Evaluation points for design matrix (0 = no evaluation)
-#' @param verbose logical; if TRUE, print progress messages
-#' @return A list containing:
-#'   \item{d0}{Design matrix (if x_values provided)}
-#'   \item{d1}{First derivative values (constant per interval)}
-#' @export
-bspline_to_deriv_coeffs_lin <- function(tn, degree = 1, x_values = 0, verbose = FALSE) {
 
-  kn <- length(tn) - 1
-  N <- kn + degree  # Number of basis functions for linear = kn + 1
-
-  # Extended knot vector
-  sn <- c(rep(tn[1], degree), tn, rep(tn[kn + 1], degree))
-
-  # Build B-spline basis
-  BB <- Bspline_base(sn, degree = degree)
-  basis <- BB$base
-
-  if (verbose) {
-    message("Linear B-spline basis: ", N, " basis functions, ", kn, " intervals")
-  }
-
-  # First derivative: constant on each interval
-  # deriv1_coeffs[interval, basis] = constant value
-  deriv1_coeffs <- array(0, dim = c(kn, N))
-
-  for (j in 1:N) {
-    for (nu in (degree + 1):(kn + degree)) {
-      h <- sn[nu + 1] - sn[nu]
-
-      # basis[j, nu, ] = [a1, a0] for polynomial on interval
-      # P(u) = a0 + a1*u
-      a1 <- basis[j, nu, 1]
-
-      # First derivative: P'(u) = a1 (constant)
-      # Normalized: a1/h on [0,1]
-      deriv1_coeffs[nu - degree, j] <- a1 / h
-    }
-  }
-
-  # Design matrix if x_values provided
-  if (length(x_values) != 1) {
-    yvalues <- bs_direct(BB, x_values)
-  } else {
-    yvalues <- 0
-  }
-
-  return(list(
-    d0 = yvalues,
-    d1 = deriv1_coeffs
-  ))
-}
-
-#' Convert quadratic B-spline to derivative coefficients
+#' quadratic B-spline  derivative coefficients
 #'
 #' Computes normalized first and second derivative coefficients
 #' for quadratic B-splines on each interval.
@@ -299,5 +234,66 @@ bspline_to_deriv_coeffs_quad <- function(tn, degree = 2, x_values = 0, verbose =
     d0 = yvalues,
     d1 = deriv1_coeffs,
     d2 = deriv2_coeffs
+  ))
+}
+
+
+#' Derivative coefficients for linear B-spline to
+#'
+#' Computes normalized first derivative coefficients for linear B-splines.
+#' For linear splines, the derivative is constant on each interval.
+#'
+#' @param tn Knot vector (effective partition)
+#' @param degree Spline degree (should be 1)
+#' @param x_values Evaluation points for design matrix (0 = no evaluation)
+#' @param verbose logical; if TRUE, print progress messages
+#' @return A list containing:
+#'   \item{d0}{Design matrix (if x_values provided)}
+#'   \item{d1}{First derivative values (constant per interval)}
+#' @export
+bspline_to_deriv_coeffs_lin <- function(tn, degree = 1, x_values = 0, verbose = FALSE) {
+
+  kn <- length(tn) - 1
+  N <- kn + degree  # Number of basis functions for linear = kn + 1
+
+  # Extended knot vector
+  sn <- c(rep(tn[1], degree), tn, rep(tn[kn + 1], degree))
+
+  # Build B-spline basis
+  BB <- Bspline_base(sn, degree = degree)
+  basis <- BB$base
+
+  if (verbose) {
+    message("Linear B-spline basis: ", N, " basis functions, ", kn, " intervals")
+  }
+
+  # First derivative: constant on each interval
+  # deriv1_coeffs[interval, basis] = constant value
+  deriv1_coeffs <- array(0, dim = c(kn, N))
+
+  for (j in 1:N) {
+    for (nu in (degree + 1):(kn + degree)) {
+      h <- sn[nu + 1] - sn[nu]
+
+      # basis[j, nu, ] = [a1, a0] for polynomial on interval
+      # P(u) = a0 + a1*u
+      a1 <- basis[j, nu, 1]
+
+      # First derivative: P'(u) = a1 (constant)
+      # Normalized: a1/h on [0,1]
+      deriv1_coeffs[nu - degree, j] <- a1 / h
+    }
+  }
+
+  # Design matrix if x_values provided
+  if (length(x_values) != 1) {
+    yvalues <- bs_direct(BB, x_values)
+  } else {
+    yvalues <- 0
+  }
+
+  return(list(
+    d0 = yvalues,
+    d1 = deriv1_coeffs
   ))
 }

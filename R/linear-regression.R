@@ -1,5 +1,4 @@
 # Linear Spline Quantile Regression with Shape Constraints
-# Based on the Python implementation in quantile_reg.py
 # Author: Alexandre Abbes
 
 #' Quantile regression with linear splines and monotonicity constraints

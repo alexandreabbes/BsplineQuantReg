@@ -1,11 +1,3 @@
-# SplineConstQuantRegBs3, apply_karlin_constraints
-
-#' Local Wrapper function to apply_karlin_quadratic
-apply_karlin_constraints<-function(p2, p1, p0, z0,verbose=FALSE)
-  {
-  apply_karlin_quadratic(p2=p2, p1=p1, p0=p0, z0=z0,sign=1,verbose=verbose)
-  }
-
 #' Constrained quantile regression with cubic splines
 #'
 #' Performs quantile regression using cubic B-splines, with optional
@@ -19,6 +11,8 @@ apply_karlin_constraints<-function(p2, p1, p0, z0,verbose=FALSE)
 #'        1 = increasing, -1 = decreasing, 0 = unconstrained. If scalar, repeated.
 #' @param convcons Convexity constraint vector per knot:
 #'        1 = convex, -1 = concave, 0 = unconstrained. If scalar, repeated.
+#' @param der3cons Constraint on the 3rd derivative (on esach intervall:
+#'        -1: négative, 0: no constraint, 1: positive constraint
 #' @param solver CVXR solver to use (default = "CLARABEL")
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose boolean FALSE (default) or TRUE.
@@ -113,7 +107,7 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
   int_knot=knot[2:kn]
 
   # Calcul des coefficients normalises des derivees
-  deriv_spline <- bspline_to_deriv_coeffs_pp(knot, degree = 3,x_values=xtab,verbose=verbose)
+  deriv_spline <- bspline_to_deriv_coeffs_cubic(knot, degree = 3,x_values=xtab,verbose=verbose)
   deriv_coeffs <-deriv_spline$d1
   deriv_coeffs2<-deriv_spline$d2
   deriv_coeffs3<-deriv_spline$d3
@@ -147,7 +141,7 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
         b_coef=sum(deriv_coeffs[i,,2]*alpha) *monot[i]
         c_coef=sum(deriv_coeffs[i,,3]*alpha) *monot[i]
         #a*x^2+b*x+c
-        CK<-apply_karlin_constraints(a_coef,b_coef,c_coef,z_vars[[i]],verbose=verbose)
+        CK<-apply_karlin_quadratic(a_coef,b_coef,c_coef,z_vars[[i]])
         constraints<-c(constraints,CK)
       }
     }
@@ -216,7 +210,6 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
 #'
 #' This is a convenience wrapper for SplineCubicQuant
 #' with convention of previous versions  SplineConstQuantRegBs3.
-#'
 #' @inheritParams SplineCubicQuant
 #' @return Same as SplineCubicQuant
 #' @export

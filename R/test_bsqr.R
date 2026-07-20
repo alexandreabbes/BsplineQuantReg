@@ -4,24 +4,26 @@
 #' and displays results. Demo function.
 #' @param verbose boolean FALSE (default) or TRUE.
 #' @param seed (default=NULL) value for the random generator.
+#' @param degree 1, 2, 3 or 4 (default 3). The degree of the regression spline.
 #' @return No return value, produces plots.
 #' @examples
 #' test_karlin_simple()
 #' @export
-test_karlin_simple <- function(verbose=FALSE,seed=NULL) {
+test_karlin_simple <- function(verbose=FALSE,degree=3, seed=NULL) {
   # Store par
   old <- par(mfrow = c(2,2))
   # Restore par
   on.exit(par(old))
 
   if(!is.null(seed))
-    {    set.seed(seed)}
-  n_points <- 50
-  xtab <- (0:n_points)/n_points
+  {    set.seed(seed)}
 
+  n_points <- 50
+  xtab=(0:n_points)/(n_points)
+  print(degree)
   # simple pscillating data
-  #ytab <- -3 * xtab +sin(3*2*xtab*3.14)+ 0.2 * rnorm(n_points+1)
-  #ytab <- 2* xtab + 0.5 * sin(6 * pi * xtab) + 0.1 * rnorm(n_points+1)
+  #ytab<- -3 * xtab +sin(3*2*xtab*3.14)+ 0.2 * rnorm(n_points+1)
+  #ytab= <- 2* xtab + 0.5 * sin(6 * pi * xtab) + 0.1 * rnorm(n_points+1)
   ytab<-xtab*(1-xtab)+0.05 * rnorm(n_points+1)
   kn <- 12
 
@@ -29,27 +31,27 @@ test_karlin_simple <- function(verbose=FALSE,seed=NULL) {
   monot=c(rep(1,n),rep(0,(12-n)))
   #  monot=0
   knot <- quantile(xtab, probs = seq(0, 1, length.out = kn + 1))
-  res<-SplineConstQuantRegBs3(xtab, ytab, knot, tau = 0.9,
-                              monot = 0, solver = "OSQP")
+  res<-quantile_spline(xtab=xtab, ytab=ytab, knot, tau = 0.9,
+                              monot = 0, degree=degree, solver = "OSQP")
   if (verbose) {
     message("\n===  PARTIAL INCREASING TEST ===\n")
   }
 
-  res_croissant <- SplineConstQuantRegBs3(xtab, ytab, knot, tau = 0.5,
+  res_croissant <- quantile_spline(xtab=xtab, ytab=ytab, knot=knot, tau = 0.5,degree=degree,
                                           monot = monot, convcons=0,solver = "OSQP")
 
   if (verbose) {
     message("\n=== DECREASING TEST ===\n")}
 
-  res_decroissant <- SplineConstQuantRegBs3(xtab, ytab, knot, tau = 0.5,
+  res_decroissant <- quantile_spline(degree=degree,xtab=xtab, ytab=ytab, knot, tau = 0.5,
                                             monot = -1, solver = "OSQP")
   if (verbose) {
     message("\n=== CONVEX  TEST ===\n")}
-  res_convexe <- SplineConstQuantRegBs3(xtab, ytab, knot,monot=0,convcons=-1, tau = 0.5)
+  res_convexe <- quantile_spline(xtab=xtab, ytab=ytab, knot,degree=degree,monot=0,convcons=-1, tau = 0.5)
 der3cons=rep(1,length(knot)-1)
 der3cons[1:7]<-0
 print(der3cons)
-    res_3rd <- quantile_spline(xtab, ytab, knot,monot=0,convcons=0,der3cons=der3cons, degree=4, tau = 0.5)
+    res_3rd <- quantile_spline(xtab=xtab, ytab=ytab, knot=knot,degree=degree,monot=0,convcons=0,der3cons=der3cons, tau = 0.5)
 
   # Visualisation
   par(mfrow = c(2, 2))

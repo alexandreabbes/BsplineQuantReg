@@ -4,8 +4,6 @@
 # Author: Alexandre Abbes
 
 
-
-
 #' Quantile regression with quartic splines and shape constraints
 #'
 #' Performs quantile regression using quartic (degree 4) B-splines with

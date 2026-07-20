@@ -6,18 +6,25 @@
 #' Evaluates a spline (linear combination of B-splines) at given points.
 #'
 #' @param Bspline Spline object (list with coefficients on the Bspline basis, degree, extended knot)
-#' @param x_values Vector of evaluation points
+#' @param x_values Vector of evaluation points. By default, evaluation is calculated
+#' at the knots
+#' @param Bvalues : the values of the Bspline basis evaluated at the values x
+#' this increases the speed by avoiding re-doing the same calculations
+#' of the basis for each spline with the same knots.
 #' @return vector of same length as x_values, with Spline values at the requested points
 #' @examples
 #'{ # Create and evaluate a spline
+#' # This function is also used when a Bspline object is rendered callable as a function
+#' # with make_spline()
 #' tn<-c(0,1,2,3,4,5)
-#' Bspline=list(degree=3, knot=tn,coefficients=runif(basis$n_splines))
-#' y <- spline_eval(Bspline, seq(0,5,length=100))
+#' x_values<-seq(0,5,length=100)
+#' Bspline=list(degree=3, knot=tn,coefficients=runif(length(tn)+3-1))
+#' y <- spline_eval(Bspline, x_values)
 #' #alternatively compute the base before to optimize if needed
 #' sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
 #' Bsbase <- Bspline_base(sn, degree=3)
 #' Bvalues <-bs_direct(Bsbase,x_values)
-#' y <- spline_eval(Bspline=Bspline, Bvalues=Bvalues )}
+#' y <- spline_eval(Bspline=Bspline,x_values=x_values, Bvalues=Bvalues )}
 #' @export
 
 spline_eval<-function(Bspline, x_values=NULL, Bvalues=NULL)
@@ -40,9 +47,9 @@ spline_eval<-function(Bspline, x_values=NULL, Bvalues=NULL)
       tkn=rev(knot)[1] #last knot
       sn=c(rep(t1,degree),knot,rep(tkn,degree) ) #extended knot partition
       BB=Bspline_base(sn,degree=degree) # first compute the Basis
-      Bvalues=t(bs_direct(BB,x_values))} # then evaluate the basis as the values
-  print(c('coeff',dim(coeff)))
-  print(c('Bvalues',dim(Bvalues)))
+      Bvalues=t(bs_direct(BB,x_values))} # then evaluate the basis as the values}
+  db=dim(Bvalues)[2]
+  if (!db==length(coeff)){Bvalues=t(Bvalues)}
   yvalues<-(Bvalues)%*%coeff
   return(yvalues)
 }
@@ -145,7 +152,7 @@ evalpp<-function(p,x_values){
 #'
 #' Creates a PP structure from polynomial coefficients and knot.
 #'
-#' @param coef Coefficient matrix (kn x (degree+1))
+#' @param coeff Coefficient matrix (kn x (degree+1))
 #' @param tn Knot vector of length kn+1
 #' @return List with components \code{coefficients} and \code{knot}
 #' @keywords internal

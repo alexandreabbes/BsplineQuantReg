@@ -64,33 +64,6 @@ apply_karlin_cubic <- function(p3, p2, p1, p0, z0, z1, sign = 1) {
 }
 
 
-#' Karlin-Studden constraints for positivity
-#'
-#' Applies Karlin-Studden SOCP constraints to ensure positivity of a
-#' quadratic polynomial on the interval [0,1].
-#'
-#' @param p2 Coefficient of u^2
-#' @param p1 Coefficient of u
-#' @param p0 Constant term
-#' @param z0 Auxiliary SOCP variable
-#' @param verbose boolean FALSE (default) or TRUE.
-#' @return List of CVXR constraints
-#' @exportla
-
-apply_karlin_constraints_V1<- function(p2, p1, p0, z0,verbose=FALSE) {
-  # P2, p1, p0 sont les coefficients du polynome quadratique: p2*u^2 + p1*u + p0
-  # Dans la notation de l'article
-
-  constraints <- list()
-  constraints <- c(constraints, list(z0 >= 0))
-
-  K1_vec <- vstack(p0 - p2 - z0,p1-z0)
-  K2_vec <- (p0+p2+ z0)
-
-  constraints <- c(constraints, list(K2_vec >= p_norm(K1_vec, 2)))
-  if (verbose){message("constraints;\n",constraints)}
-  return(constraints)
-}
 
 
 
@@ -108,7 +81,8 @@ apply_karlin_constraints_V1<- function(p2, p1, p0, z0,verbose=FALSE) {
 #' @return List of CVXR constraints
 #' @keywords internal*
 
-apply_karlin_quadratic <- function(p2, p1, p0, z0, sign = 1, verbose=FALSE) {
+apply_karlin_quadratic <- function(p2, p1, p0, z0, sign = 1)
+  {
   constraints <- list()
 
   # z0 >= 0
@@ -120,10 +94,10 @@ apply_karlin_quadratic <- function(p2, p1, p0, z0, sign = 1, verbose=FALSE) {
     p0 <- -p0
   }
 
-  # Karlin-Studden characterization for quadratic polynomials
-  # p(u) = a*u^2 + b*u + c
-  # Condition: there exists z0 >= 0 such that
-  # (p0 + p2 + z0, p0 - p2 - z0, p1 - z0) in Q3
+   #Karlin-Studden characterization for quadratic polynomials)
+   #p(u) = a*u^2 + b*u + c
+   #Condition: there exists z0 >= 0 such that
+  # (p0 + p2 + z0, p0 - p2 - z0, p1 - z0) in Q3)
 
   K1_x <- p0 + p2 + z0
   K1_y <- p0 - p2 - z0

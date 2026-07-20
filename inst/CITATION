@@ -20,16 +20,17 @@ bibentry(
 
 bibentry(
   bibtype = "Manual",
-  title = "Python code for quantile regression with polynomial splines under shape constraints.",
+  title = "BsplineQuantRegpy",
   author = c(person("Alexandre"," Abbes")),
   year = "2026",
-  note = "Python version code of the R package BsplineQuantReg, with nice tk interface, and multiple constraints",
+  note = "Python version code of the R package BsplineQuantReg, with tk interface, spline degrees 1 to 4, handles multiple constraints",
+  url="https://pypi.org/search/?q=bsplinequantregpy",
   url = "https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines",
   textVersion = paste(
     "Abbes, A. (2026).",
     "Python code for quantile regression with polynomial splines under shape constraints, with degree 1 to 4",
-    "(Python code draft version).",
-    "https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines"
+    "https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines",
+    "https://pypi.org/search/?q=bsplinequantregpy"
   )
 )
 

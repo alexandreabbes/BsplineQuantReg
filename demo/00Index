@@ -4,3 +4,5 @@ temperature     Temperature anomaly analysis: uniform increasing vs mixed constr
 temperature2  The same as Temerature, but with other contraints
 logistic      test of regression related to the logistic function
 comprehensive  A simple test for different constraints on an ocsillating function
+degrees_comparison test simultaneously constraints regression with degrees 1,2,3,4
+demo_der3   Shows the effect of order 3 constraihts
