@@ -105,18 +105,17 @@ is the closest to this package.
 ## Performance Notice
 This R package is intended for demonstration, prototyping, and educational purposes.
 Due to the current implementation (pure R with CVXR),
-the package is  slower than its Python counterpart. B-spline quantile regression with constraints involves solving SOCP problems, and the R implementation does not yet leverage optimized linear algebra libraries.
+the package is  almost 5 times slower than its Python counterpart (benchmark test).
+B-spline quantile regression with constraints involves solving SOCP problems, 
+and the R implementation does not yet leverage optimized linear algebra libraries.
 
 Python version: https://pypi.org/project/BsplineQuantRegpy/
 
 ### Future Improvements
 
 - Optimize the B-spline basis computation
-- Implement the quartic version (already available in Python)
 - Improve the API based on user feedback
-- Link with faster optimization libraries (OSQP, Gurobi)
-
-The Python version is recommended for production use.
+- Add a graphical User interface (GUI)
 
 ## Getting Started
 
@@ -134,7 +133,8 @@ fit <- SplineCubicQuant(x, y, knots, tau = 0.5, monot = 1)
 
 # Evaluate the spline
 x_eval <- seq(0, 1, length.out = 200)
-y_eval <- spline_eval(fit, x_eval)
+#y_eval <- spline_eval(fit, x_eval) # deprecated now
+y_eval <- fit(x_eval) # the fit is now callable
 ```
 
 ## Demos

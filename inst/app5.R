@@ -45,21 +45,39 @@ ui <- fluidPage(
       width = 3,
       style = "background-color: #f8f9fa; border-radius: 5px;",
 
-      # ============ 1. DONNEES ============
+      # ============ DONNEES ============
       h4("1. Données", class = "text-primary"),
 
       fluidRow(
-        column(4, actionButton("test_data", "Test",
+        column(6, actionButton("test_data", "🧪 Test",
                                class = "btn-sm btn-success", style = "width:100%;")),
-        column(4, actionButton("temp_data", " Temp",
-                               class = "btn-sm btn-warning", style = "width:100%;")),
-        column(4, actionButton("load_csv", "CSV",
-                               class = "btn-sm btn-info", style = "width:100%;"))
-        #,
-        #column(6, actionButton("load_excel", "📊 Excel",
-        #                       class = "btn-sm btn-info", style = "width:100%;"))
+        column(6, actionButton("temp_data", "🌡️ Temp",
+                               class = "btn-sm btn-warning", style = "width:100%;"))
       ),
       br(),
+
+      h4("2. Spline", class = "text-primary"),
+      fluidRow(
+        column(6, numericInput("degree", "Degré:", value = 3, min = 1, max = 4)),
+        column(6, numericInput("knots_count", "Nœuds:", value = 10, min = 4, max = 30))
+      ),
+      fluidRow(
+        column(6, actionButton("add_knot_mode", "➕ Ajouter nœud",
+                               class = "btn-sm btn-primary", style = "width:100%;")),
+        column(6, actionButton("clear_knots", "🗑️ Effacer nœuds",
+                               class = "btn-sm btn-danger", style = "width:100%;"))
+      ),
+      br(),
+
+      fluidRow(
+        column(6, sliderInput("tau", "τ:", min = 0.05, max = 0.95, value = 0.5)),
+        column(6, selectInput("solver", "Solveur:",
+                              choices = c("CLARABEL", "OSQP", "ECOS", "SCS")))
+      )
+
+      ,
+
+
 
       h5("Intervalle:"),
       fluidRow(
@@ -78,21 +96,13 @@ ui <- fluidPage(
 
       hr(),
 
-      # ============ 2. SPLINE ============
+      # ============ SPLINE ============
       h4("2. Spline", class = "text-primary"),
 
       fluidRow(
         column(6, numericInput("degree", "Degré:", value = 3, min = 1, max = 4)),
-        column(6, numericInput("knots_count", "Nœuds auto:", value = 10, min = 2, max = 30))
+        column(6, numericInput("knots_count", "Nœuds:", value = 10, min = 4, max = 30))
       ),
-
-      fluidRow(
-        column(6, actionButton("add_knot_mode", "Ajouter nœud",
-                               class = "btn-sm btn-primary", style = "width:100%;")),
-        column(6, actionButton("clear_knots", "️ Effacer nœuds",
-                               class = "btn-sm btn-danger", style = "width:100%;"))
-      ),
-      br(),
 
       fluidRow(
         column(6, sliderInput("tau", "τ:", min = 0.05, max = 0.95, value = 0.5)),
@@ -100,8 +110,9 @@ ui <- fluidPage(
                               choices = c("CLARABEL", "OSQP", "ECOS", "SCS")))
       ),
 
+      hr(),
 
-      # ============ 3. CONTRAINTES ============
+      # ============ CONTRAINTES ============
       h4("3. Contraintes", class = "text-primary"),
 
       radioButtons("constraint_mode", "Mode:",
@@ -134,9 +145,9 @@ ui <- fluidPage(
             "3. Les champs X min/max se mettent à jour"),
 
         fluidRow(
-          column(6, actionButton("start_selection", " Sélectionner",
+          column(6, actionButton("start_selection", "🎯 Sélectionner",
                                  class = "btn-sm btn-warning", style = "width:100%;")),
-          column(6, actionButton("clear_regions", "️ Effacer",
+          column(6, actionButton("clear_regions", "🗑️ Effacer",
                                  class = "btn-sm btn-danger", style = "width:100%;"))
         ),
         br(),
@@ -160,9 +171,9 @@ ui <- fluidPage(
         ),
 
         fluidRow(
-          column(6, actionButton("add_region", "Ajouter",
+          column(6, actionButton("add_region", "➕ Ajouter",
                                  class = "btn-sm btn-primary", style = "width:100%;")),
-          column(6, actionButton("update_region", " Mettre à jour",
+          column(6, actionButton("update_region", "🔄 Mettre à jour",
                                  class = "btn-sm btn-info", style = "width:100%;"))
         ),
         br(),
@@ -171,7 +182,7 @@ ui <- fluidPage(
 
       hr(),
 
-      # ============ 4. EXECUTION ============
+      # ============ EXECUTION ============
       actionButton("run", "▶ Lancer",
                    class = "btn-success btn-lg", style = "width:100%;"),
 
@@ -184,8 +195,7 @@ ui <- fluidPage(
 
       hr(),
 
-      # ============ 5. DEMOS ============
-      h4("5. Démos", class = "text-primary"),
+      h4("4. Démos", class = "text-primary"),
       div(style = "display: flex; flex-wrap: wrap; gap: 5px;",
           actionButton("demo_comp", "Comprehensive", class = "btn-sm btn-info", style = "flex:1;"),
           actionButton("demo_log", "Logistic", class = "btn-sm btn-info", style = "flex:1;"),
@@ -215,16 +225,18 @@ ui <- fluidPage(
                           colourpicker::colourInput("curve_color", NULL, value = "blue"),
                           actionButton("apply_color", "Appliquer", class = "btn-sm", style = "width:100%;"),
                           br(), br(),
-                          p("Courbes:", textOutput("curve_count", inline = TRUE))
+                          p("Courbes:", textOutput("curve_count", inline = TRUE)),
+                          br()
+                          #,
+                          #h5("Statut sélection:"),
+                          #verbatimTextOutput("selection_status", placeholder = TRUE)
                    )
                  ),
                  br(),
                  fluidRow(
                    column(6, h5("Information"), verbatimTextOutput("fit_info")),
-                   column(6, h5("Coefficients"), verbatimTextOutput("coef_info")),
-                          br(),
-                  column(6, h5("List of knots"), verbatimTextOutput("knots_compact", placeholder = TRUE)
-                 ))
+                   column(6, h5("Coefficients"), verbatimTextOutput("coef_info"))
+                 )
         ),
 
         tabPanel("📊 Données",
@@ -240,8 +252,10 @@ ui <- fluidPage(
         tabPanel("📝 Code R",
                  br(),
                  h4("Code pour reproduire l'analyse:"),
-                 verbatimTextOutput("r_code")
-        ),
+                 verbatimTextOutput("r_code"),
+                 #htmlOutput("r_code_display"),
+                 ),
+
 
         tabPanel("🎯 Régions",
                  br(),
@@ -266,14 +280,21 @@ ui <- fluidPage(
 # SERVER ------------------------------------------------------------------
 
 server <- function(input, output, session) {
-
+  output$debug_output <- renderPrint({
+    cat("Debug - Dernières valeurs:\n")
+    cat("region_xmin:", input$region_xmin, "\n")
+    cat("region_xmax:", input$region_xmax, "\n")
+    cat("mode sélection:", values$selecting_region, "\n")
+    cat("nb régions:", length(values$regions), "\n")
+  })
+  #
   # ============ REACTIVE VALUES ============
   values <- reactiveValues(
     xtab = NULL,
     ytab = NULL,
     knots = NULL,
-    manual_knots = list(),
-    adding_knot = FALSE,
+    manual_knots = list(),  # ← Liste des nœuds ajoutés manuellement
+    adding_knot = FALSE,    # ← État du mode ajout
     fit = NULL,
     x_eval = NULL,
     y_eval = NULL,
@@ -284,18 +305,12 @@ server <- function(input, output, session) {
     selected_region_id = NULL,
     selecting_region = FALSE
   )
+  # ============ FONCTION DE MISE A JOUR DES CHAMPS ============
 
-  # ============ FONCTION SYMBOLE CONTRAINTE ============
-  get_sym <- function(val, symbols) {
-    if (is.null(val) || is.na(val)) return("✗")
-    val <- as.numeric(val)
-    if (!val %in% c(-1, 0, 1)) return("✗")
-    return(symbols[val + 2])
-  }
-
-  # ============ FONCTION MISE A JOUR CHAMPS ============
   update_region_fields <- function(xmin, xmax) {
-    if (is.null(xmin) || is.null(xmax) || is.na(xmin) || is.na(xmax)) return()
+    if (is.null(xmin) || is.null(xmax) || is.na(xmin) || is.na(xmax)) {
+      return()
+    }
     if (xmin >= xmax) {
       showNotification("X min doit être inférieur à X max", type = "warning")
       return()
@@ -303,7 +318,16 @@ server <- function(input, output, session) {
     updateNumericInput(session, "region_xmin", value = round(xmin, 3))
     updateNumericInput(session, "region_xmax", value = round(xmax, 3))
   }
+  # ============ DEBUG : Récupération des valeurs sélectionnées ============
 
+  debug_selection <- function(msg = "", xmin = NULL, xmax = NULL) {
+  # Affiche également dans l'interface si vous voulez
+    showNotification(
+      paste("Debug:", msg, "| xmin:", round(xmin, 4), "xmax:", round(xmax, 4)),
+      type = "message",
+      duration = 3
+    )
+  }
   # ============ GENERATION DES DONNEES ============
 
   observeEvent(input$test_data, {
@@ -356,6 +380,15 @@ server <- function(input, output, session) {
     })
   })
 
+  output$r_code_display <- renderUI({
+    code <- code_r()
+    HTML(paste0(
+      "<pre id='r_code_text' style='white-space: pre-wrap; background: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace;'>",
+      code,
+      "</pre>"
+    ))
+  })
+
   observeEvent(input$generate_custom, {
     tryCatch({
       n <- input$n_points
@@ -380,43 +413,56 @@ server <- function(input, output, session) {
   })
 
   # ============ NOEUDS ============
+  # ============ NOEUDS ============
 
+  # Initialisation automatique des nœuds
   observe({
     if (!is.null(values$xtab) && length(values$manual_knots) == 0) {
-      kn <- max(input$knots_count, 2)
+      kn <- max(input$knots_count,1)
       values$knots <- quantile(values$xtab, probs = seq(0, 1, length.out = kn + 1))
     }
   })
-
-  output$knots_compact <- renderPrint({
-    if (!is.null(values$knots) && length(values$knots) > 0) {
-      k <- round(values$knots, 3)
-      if (length(k) <= 8) {
-        cat(paste(k, collapse = ", "))
+  # Observer pour mettre à jour l'affichage quand les nœuds changent
+  observe({
+    # Forcer la mise à jour des outputs quand values$knots change
+    output$knot_count_display <- renderPrint({
+      if (!is.null(values$knots)) {
+        cat("Nœuds:", length(values$knots))
       } else {
-        cat(paste(c(head(k, 4), "...", tail(k, 4)), collapse = ", "))
+        cat("Aucun nœud")
       }
-    } else {
-      cat("(aucun)")
-    }
-  })
+    })
 
+    output$knots_list_display <- renderPrint({
+      if (!is.null(values$knots) && length(values$knots) > 0) {
+        knots_formatted <- round(values$knots, 4)
+        cat(paste(knots_formatted, collapse = ", "))
+      } else {
+        cat("Aucun nœud défini")
+      }
+    })
+  })
+  # Activer/désactiver le mode ajout de nœuds
   observeEvent(input$add_knot_mode, {
     values$adding_knot <- !values$adding_knot
     if (values$adding_knot) {
       showNotification("Mode ajout de nœuds: cliquez sur le graphique", type = "message")
-      updateActionButton(session, "add_knot_mode", label = "⏹ Arrêter")
+      updateActionButton(session, "add_knot_mode", label = "⏹ Arrêter nœuds")
     } else {
       updateActionButton(session, "add_knot_mode", label = "➕ Ajouter nœud")
     }
   })
 
+  # Ajouter un nœud par clic
   observeEvent(event_data("plotly_click", source = "plot"), {
     if (values$adding_knot) {
       click <- event_data("plotly_click", source = "plot")
       if (!is.null(click) && !is.null(values$xtab)) {
         x <- click$x
+
+        # Vérifier que le nœud est dans l'intervalle
         if (x > min(values$xtab) && x < max(values$xtab)) {
+          # Éviter les doublons
           if (!any(abs(values$knots - x) < 1e-6)) {
             values$manual_knots <- c(values$manual_knots, x)
             values$knots <- sort(c(values$knots, x))
@@ -431,13 +477,20 @@ server <- function(input, output, session) {
     }
   })
 
+  # Effacer les nœuds manuels
   observeEvent(input$clear_knots, {
     values$manual_knots <- list()
     if (!is.null(values$xtab)) {
-      kn <- max(input$knots_count, 2)
+      kn <- input$knots_count
       values$knots <- quantile(values$xtab, probs = seq(0, 1, length.out = kn + 1))
     }
     showNotification("Nœuds réinitialisés", type = "message")
+  })
+  observe({
+    if (!is.null(values$xtab)) {
+      kn <- input$knots_count
+      values$knots <- quantile(values$xtab, probs = seq(0, 1, length.out = kn + 1))
+    }
   })
 
   # ============ GESTION DE LA SELECTION ============
@@ -448,27 +501,46 @@ server <- function(input, output, session) {
       showNotification("Sélectionnez une région sur le graphique (rectangle)", type = "message")
       updateActionButton(session, "start_selection", label = "⏹ Arrêter")
     } else {
-      updateActionButton(session, "start_selection", label = "🎯 Sélectionner")
+      updateActionButton(session, "start_selection", label = " Sélectionner")
     }
   })
 
+  # === FONCTION PRINCIPALE : Sélection par rectangle ===
   observeEvent(event_data("plotly_selected", source = "plot"), {
+    # DEBUG : afficher l'événement brut
+    selected <- event_data("plotly_selected", source = "plot")
+    cat("\n=== EVENT DATA ===\n")
+    print(str(selected))
+    cat("==================\n")
+
     if (input$constraint_mode == "region" && values$selecting_region) {
-      selected <- event_data("plotly_selected", source = "plot")
       if (!is.null(selected) && nrow(selected) > 0) {
         x_vals <- selected$x
+        cat("x_vals:", x_vals, "\n")
+        cat("length:", length(x_vals), "\n")
+
         if (length(x_vals) >= 2) {
           xmin <- min(x_vals, na.rm = TRUE)
           xmax <- max(x_vals, na.rm = TRUE)
+
+          # DEBUG : afficher les valeurs calculées
+          debug_selection("Sélection rectangle", xmin, xmax)
+
+          # Mettre à jour les champs
           updateNumericInput(session, "region_xmin", value = round(xmin, 3))
           updateNumericInput(session, "region_xmax", value = round(xmax, 3))
+
           values$selecting_region <- FALSE
           updateActionButton(session, "start_selection", label = "🎯 Sélectionner")
           showNotification(
             paste("Région sélectionnée: [", round(xmin, 3), ", ", round(xmax, 3), "]"),
             type = "message"
           )
+        } else {
+          debug_selection("Pas assez de points", NULL, NULL)
         }
+      } else {
+        debug_selection("selected est NULL ou vide", NULL, NULL)
       }
     }
   })
@@ -520,18 +592,25 @@ server <- function(input, output, session) {
     showNotification("Régions effacées", type = "message")
   })
 
+  # Avec ignoreNULL = TRUE (par défaut, il ignore les NULL)
   observeEvent(input$delete_region, {
     id <- as.numeric(input$delete_region)
+
+    # Vérifier que id est valide
     if (is.na(id)) {
       showNotification("ID invalide", type = "warning")
       return()
     }
+
+    # Filtrer
     values$regions <- values$regions[!sapply(values$regions, function(r) r$id == id)]
+
     if (!is.null(values$selected_region_id) && values$selected_region_id == id) {
       values$selected_region_id <- NULL
     }
+
     showNotification(paste("Région", id, "supprimée"), type = "message")
-  }, ignoreNULL = TRUE)
+  }, ignoreNULL = TRUE)  # ← Clé : ignorer les NULL
 
   # ============ CONSTRUCTION DES CONTRAINTES ============
 
@@ -555,20 +634,27 @@ server <- function(input, output, session) {
     }
 
     if (input$constraint_mode == "uniform") {
+      # Contraintes uniformes
       monot <- safe_repeat(input$monot, kn)
       conv <- safe_repeat(input$conv, kn + 1)
       der3 <- safe_repeat(input$der3, kn)
     } else {
+      # Mode région - tout à 0 par défaut (aucune contrainte)
       monot <- rep(0, kn)
       conv <- rep(0, kn + 1)
       der3 <- rep(0, kn)
 
+      # Appliquer les régions
       for (region in values$regions) {
         for (i in 1:kn) {
           x1 <- values$knots[i]
           x2 <- values$knots[i + 1]
+          # Vérifier si l'intervalle est dans la région
           if (x2 > region$xmin && x1 < region$xmax) {
-            if (region$monot != 0) monot[i] <- region$monot
+            # Appliquer les contraintes de la région
+            if (region$monot != 0) {
+              monot[i] <- region$monot
+            }
             if (region$conv != 0) {
               conv[i] <- region$conv
               conv[i + 1] <- region$conv
@@ -586,128 +672,18 @@ server <- function(input, output, session) {
     list(monot = monot, conv = conv, der3 = der3)
   }
 
-  # ============ IMPORT CSV ============
-
-  observeEvent(input$load_csv, {
-    # Demander le fichier
-    file_path <- file.choose()
-    if (is.na(file_path)) return()
-
-    tryCatch({
-      # Lire le CSV
-      df <- read.csv(file_path, header = TRUE)
-
-      # Vérifier qu'il y a au moins 2 colonnes
-      if (ncol(df) < 2) {
-        showNotification("Le fichier doit avoir au moins 2 colonnes!", type = "error")
-        return()
-      }
-
-      # Prendre les deux premières colonnes
-      x_col <- df[, 1]
-      y_col <- df[, 2]
-
-      # Nettoyer les NA
-      valid <- !is.na(x_col) & !is.na(y_col)
-      x_col <- x_col[valid]
-      y_col <- y_col[valid]
-
-      if (length(x_col) < 3) {
-        showNotification("Pas assez de données (minimum 3 points)", type = "error")
-        return()
-      }
-
-      # Stocker les données
-      values$xtab <- as.vector(x_col)
-      values$ytab <- as.vector(y_col)
-      values$data_name <- basename(file_path)
-      values$fit <- NULL
-      values$curve_lines <- list()
-      values$regions <- list()
-
-      # Mettre à jour les bornes
-      updateNumericInput(session, "data_xmin", value = min(values$xtab))
-      updateNumericInput(session, "data_xmax", value = max(values$xtab))
-
-      # Réinitialiser les nœuds
-      values$manual_knots <- list()
-      kn <- max(input$knots_count, 2)
-      values$knots <- quantile(values$xtab, probs = seq(0, 1, length.out = kn + 1))
-
-      showNotification(paste("Fichier chargé:", basename(file_path),
-                             "-", length(x_col), "points"), type = "success")
-
-    }, error = function(e) {
-      showNotification(paste("Erreur de lecture:", e$message), type = "error")
-    })
-  })
-
-  # ============ IMPORT EXCEL ============
-
-  observeEvent(input$load_excel, {
-    # Vérifier que readxl est installé
-    if (!requireNamespace("readxl", quietly = TRUE)) {
-      showNotification("Installez 'readxl' pour lire les fichiers Excel: install.packages('readxl')",
-                       type = "error", duration = 10)
-      return()
-    }
-
-    # Demander le fichier
-    file_path <- file.choose()
-    if (is.na(file_path)) return()
-
-    tryCatch({
-      # Lire le Excel
-      df <- readxl::read_excel(file_path)
-      df <- as.data.frame(df)
-
-      if (ncol(df) < 2) {
-        showNotification("Le fichier doit avoir au moins 2 colonnes!", type = "error")
-        return()
-      }
-
-      x_col <- df[, 1]
-      y_col <- df[, 2]
-
-      valid <- !is.na(x_col) & !is.na(y_col)
-      x_col <- x_col[valid]
-      y_col <- y_col[valid]
-
-      if (length(x_col) < 3) {
-        showNotification("Pas assez de données (minimum 3 points)", type = "error")
-        return()
-      }
-
-      values$xtab <- as.vector(x_col)
-      values$ytab <- as.vector(y_col)
-      values$data_name <- basename(file_path)
-      values$fit <- NULL
-      values$curve_lines <- list()
-      values$regions <- list()
-
-      updateNumericInput(session, "data_xmin", value = min(values$xtab))
-      updateNumericInput(session, "data_xmax", value = max(values$xtab))
-
-      values$manual_knots <- list()
-      kn <- max(input$knots_count, 2)
-      values$knots <- quantile(values$xtab, probs = seq(0, 1, length.out = kn + 1))
-
-      showNotification(paste("Fichier chargé:", basename(file_path),
-                             "-", length(x_col), "points"), type = "success")
-
-    }, error = function(e) {
-      showNotification(paste("Erreur de lecture:", e$message), type = "error")
-    })
-  })
   # ============ REGRESSION ============
 
   observeEvent(input$run, {
-    req(values$xtab, values$ytab, values$knots)
 
+    req(values$xtab, values$ytab, values$knots)
+    # Vérifier qu'il y a au moins 2 nœuds
     if (length(values$knots) < 2) {
       showNotification("Il faut au moins 2 nœuds!", type = "error")
       return()
     }
+
+    # Vérifier que kn > 0
     if (length(values$knots) - 1 < 1) {
       showNotification("Il faut au moins 1 intervalle!", type = "error")
       return()
@@ -717,10 +693,9 @@ server <- function(input, output, session) {
       return()
     }
 
-    withProgress(message = "Regression...", {
+    withProgress(message = "Régression...", {
       constraints <- build_constraints()
       if (is.null(constraints)) return()
-
       fit <- tryCatch({
         quantile_spline(
           as.vector(values$xtab),
@@ -732,13 +707,13 @@ server <- function(input, output, session) {
           convcons = constraints$conv,
           der3cons = constraints$der3,
           solver = input$solver,
+          #verbose=verbose,
           callable = TRUE
         )
       }, error = function(e) {
         showNotification(paste("Erreur:", e$message), type = "error")
         NULL
       })
-
       if (!is.null(fit)) {
         x_eval <- seq(min(values$xtab), max(values$xtab), length.out = 300)
         y_eval <- fit(x_eval)
@@ -752,13 +727,14 @@ server <- function(input, output, session) {
     })
   })
 
+
   # ============ VISUALISATION ============
 
   output$spline_plot <- renderPlotly({
     req(values$xtab)
 
+    #  p <- plot_ly()
     p <- plot_ly(source = "plot")
-
     # Données
     p <- p %>% add_trace(
       x = values$xtab, y = values$ytab,
@@ -766,6 +742,7 @@ server <- function(input, output, session) {
       marker = list(color = "gray", size = 6, opacity = 0.5),
       name = "Données"
     )
+    # Dans output$spline_plot, ajoutez :
 
     # Nœuds
     if (!is.null(values$knots)) {
@@ -798,9 +775,9 @@ server <- function(input, output, session) {
           text = paste0(
             "Région ", region$id, "\n",
             "[", round(region$xmin, 3), ", ", round(region$xmax, 3), "]\n",
-            "M: ", get_sym(region$monot, c("↘", "✗", "↗")), "\n",
-            "C: ", get_sym(region$conv, c("∩", "✗", "∪")), "\n",
-            "D3: ", get_sym(region$der3, c("-", "✗", "+"))
+            "M: ", c("✗", "↗", "↘")[region$monot + 2], "\n",
+            "C: ", c("✗", "∪", "∩")[region$conv + 2], "\n",
+            "D3: ", c("✗", "+", "-")[region$der3 + 2]
           )
         )
       }
@@ -816,15 +793,30 @@ server <- function(input, output, session) {
       )
     }
 
-    # Annotation
+    # Nœuds
+    if (!is.null(values$knots)) {
+      y_range <- range(values$ytab)
+      y_pos <- y_range[2] - 0.1 * diff(y_range)
+      p <- p %>% add_trace(
+        x = values$knots, y = rep(y_pos, length(values$knots)),
+        type = "scatter", mode = "markers",
+        marker = list(color = "red", symbol = "triangle-down", size = 10),
+        name = "Nœuds"
+      )
+    }
+    # Ajouter une annotation sur le plot
     p <- p %>% layout(
       annotations = list(
-        x = 0.02, y = 0.98,
+        x = 0.02,
+        y = 0.98,
         text = paste("Nœuds:", length(values$knots)),
-        xref = "paper", yref = "paper",
+        xref = "paper",
+        yref = "paper",
         showarrow = FALSE,
         font = list(size = 12, color = "red")
-      ),
+      )
+    )
+    p <- p %>% layout(
       xaxis = list(title = "x"),
       yaxis = list(title = "y"),
       hovermode = "closest",
@@ -844,13 +836,26 @@ server <- function(input, output, session) {
   # ============ SELECTION D'UNE REGION PAR CLIC ============
 
   observeEvent(event_data("plotly_click", source = "plot"), {
+    click <- event_data("plotly_click", source = "plot")
+
+    # DEBUG : afficher le clic
+    if (!is.null(click)) {
+      cat("\n=== CLICK EVENT ===\n")
+      cat("x:", click$x, "\n")
+      cat("y:", click$y, "\n")
+      cat("==================\n")
+    }
+
     if (!values$selecting_region && input$constraint_mode == "region") {
-      click <- event_data("plotly_click", source = "plot")
       if (!is.null(click)) {
         x <- click$x
+        cat("Recherche région pour x =", x, "\n")
+
         for (region in values$regions) {
+          cat("  Vérification région", region$id, ": [", region$xmin, ", ", region$xmax, "]\n")
           if (x >= region$xmin && x <= region$xmax) {
             values$selected_region_id <- region$id
+            debug_selection("Clic sur région", region$xmin, region$xmax)
             update_region_fields(region$xmin, region$xmax)
             updateRadioButtons(session, "region_monot", selected = as.character(region$monot))
             updateRadioButtons(session, "region_conv", selected = as.character(region$conv))
@@ -886,10 +891,14 @@ server <- function(input, output, session) {
 
   output$curve_count <- renderText({ length(values$curve_lines) })
 
+  output$selection_status <- renderText({
+    if (values$selecting_region) "Mode sélection actif" else
+      if (!is.null(values$selected_region_id)) paste("Région sélectionnée:", values$selected_region_id) else
+        "Aucune sélection"
+  })
+
   output$regions_list_ui <- renderUI({
-    if (length(values$regions) == 0) {
-      return(p("Aucune région", style = "color: #999;"))
-    }
+    if (length(values$regions) == 0) return(p("Aucune région", style = "color: #999;"))
     tags$div(lapply(values$regions, function(r) {
       is_selected <- !is.null(values$selected_region_id) && values$selected_region_id == r$id
       tags$div(
@@ -903,11 +912,8 @@ server <- function(input, output, session) {
                               onclick = paste0("Shiny.setInputValue('delete_region', ", r$id, ")"))
         ),
         tags$div(style = "font-size: 12px; color: #555;",
-                 paste0(
-                   "M: ", get_sym(r$monot, c("↘", "✗", "↗")),
-                   " | C: ", get_sym(r$conv, c("∩", "✗", "∪")),
-                   " | D3: ", get_sym(r$der3, c("-", "✗", "+"))
-                 )
+                 paste0("M:", c("↘","✗","↗",)[r$monot+2], " | C:", c("∩","✗","∪")[r$conv+2],
+                        " | D3:", c("-","✗","+")[r$der3+2])
         )
       )
     }))
@@ -936,28 +942,30 @@ server <- function(input, output, session) {
   })
 
   output$regions_info <- renderPrint({
-    if (length(values$regions) == 0) {
-      cat("Aucune région")
-    } else {
+    if (length(values$regions) == 0) { cat("Aucune région") } else {
       for (r in values$regions) {
-        cat(r$id, ": [", round(r$xmin, 3), ", ", round(r$xmax, 3), "]  ",
-            "M=", get_sym(r$monot, c("↘", "✗", "↗")),
-            " C=", get_sym(r$conv, c("∩", "✗", "∪")),
-            " D3=", get_sym(r$der3, c("-", "✗", "+")), "\n", sep="")
+        cat(r$id, ": [", round(r$xmin, 3), ", ", round(r$xmax, 3), "]  M=",
+            c("✗","↗","↘")[r$monot+2], " C=", c("✗","∪","∩")[r$conv+2],
+            " D3=", c("✗","+","-")[r$der3+2], "\n")
       }
     }
   })
 
   # ============ CODE R ============
+    observeEvent(input$copy_code, {
+    runjs('
+    var text = document.getElementById("r_code_text").innerText;
+    navigator.clipboard.writeText(text).then(
+      function() { alert("Code copié!"); },
+      function(err) { alert("Erreur de copie: " + err); }
+    );
+  ')
+  })
 
   output$r_code <- renderText({
-    if (is.null(values$fit)) {
-      return("# Lancez d'abord une régression")
-    }
+    if (is.null(values$fit)) return("# Lancez d'abord une régression")
     constraints <- build_constraints()
-    if (is.null(constraints)) {
-      return("# Erreur: contraintes non définies")
-    }
+    if (is.null(constraints)) return("# Erreur: contraintes non définies")
     paste0(
       "library(BsplineQuantReg)\n\n",
       "x <- c(", paste(round(values$xtab, 4), collapse = ", "), ")\n",
@@ -978,6 +986,7 @@ server <- function(input, output, session) {
     )
   })
 
+
   # ============ ACTIONS ============
 
   observeEvent(input$apply_color, {
@@ -990,13 +999,9 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$clear_all, {
-    values$xtab <- NULL
-    values$ytab <- NULL
-    values$knots <- NULL
-    values$fit <- NULL
-    values$curve_lines <- list()
-    values$regions <- list()
-    values$region_id <- 0
+    values$xtab <- NULL; values$ytab <- NULL; values$knots <- NULL
+    values$fit <- NULL; values$curve_lines <- list()
+    values$regions <- list(); values$region_id <- 0
     values$selected_region_id <- NULL
     values$data_name <- "Aucune donnée"
     showNotification("Tout effacé", type = "message")
@@ -1016,6 +1021,6 @@ server <- function(input, output, session) {
     })
   })
 }
-
+1
 # Run app
 shinyApp(ui = ui, server = server)
