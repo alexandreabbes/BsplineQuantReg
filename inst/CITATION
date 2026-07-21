@@ -1,9 +1,8 @@
 # inst/CITATION
-# Citation file for BsplineQuantReg package
 
 citHeader("To cite the BsplineQuantReg package in publications, please use:")
 
-# 1. Main article (method description)
+# 1. Main article
 bibentry(
   bibtype = "Article",
   title = "Quantile Regression with Cubic Polynomial Splines under Shape Constraints with Applications",
@@ -40,12 +39,12 @@ bibentry(
   title = "BsplineQuantReg: Constrained Quantile Regression with B-Splines (Degrees 1 to 4)",
   author = c(person(given = "Alexandre", family = "Abbes")),
   year = "2026",
-  note = paste("R package version", utils::packageVersion("BsplineQuantReg")),
+  note = "R package version 0.2.0",
   url = "https://cran.r-project.org/package=BsplineQuantReg",
   textVersion = paste(
     "Abbes, A. (2026).",
     "BsplineQuantReg: Constrained Quantile Regression with B-Splines",
-    "(R package version", utils::packageVersion("BsplineQuantReg"), ").",
+    "(R package version 0.2.0).",
     "https://cran.r-project.org/package=BsplineQuantReg"
   )
 )
