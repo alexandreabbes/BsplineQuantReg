@@ -83,6 +83,9 @@ for (i in seq_along(tau_values)) {
 x_eval <- seq(-5, 5, length.out = 300)
 y_true <- true_logistic(x_eval)
 
+# Ajouter un espace en haut de la page pour le titre
+par(mfrow = c(2, 2), mar = c(4, 4, 4, 2), oma = c(0, 0, 2, 0))
+
 # ============================================================
 # Plot 1: Multiple quantiles
 # ============================================================
@@ -177,6 +180,11 @@ rect(0, -0.2, 5, 1.2, col = rgb(1, 0, 0, 0.1), border = NA)
 legend("topleft", legend = c("True", "Both constraints (tau=0.5)"),
        col = c("black", "purple"), lty = c(2, 1), lwd = 2, cex = 0.6)
 
+# Ajouter le titre global
+mtext(paste("Logistic Curve Regression Tests - Degree", degree),
+      side = 3, line = 0.5, outer = TRUE, cex = 1.2, font = 2)
+
+
 # ============================================================
 # Summary
 # ============================================================
@@ -193,6 +201,7 @@ cat("  Plot 2: Monotonicity only\n")
 cat("  Plot 3: Convexity only (convex left, concave right)\n")
 cat("  Plot 4: Both monotonicity + convexity\n")
 cat("\nDemo completed.\n")
+
 
 # Restore graphical parameters
 par(oldpar)

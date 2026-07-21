@@ -14,7 +14,7 @@ cat("========================================\n")
 cat("Demo: Convexity & Concavity Constraints\n")
 cat("========================================\n\n")
 
-if (exists("degree")){degree=3}
+if (!exists("degree")){degree=3}
 
 #set.seed(42)
 n_points <- 20
@@ -72,7 +72,9 @@ y_concave <- spline_eval(fit_concave, x_eval)
 y_partial <- spline_eval(fit_partial, x_eval)
 
 # Create plots - 2x2 layout with clean labels
-par(mfrow = c(2, 2), mar = c(4, 4, 3, 2))
+# Ajouter un espace en haut de la page pour le titre
+par(mfrow = c(2, 2), mar = c(4, 4, 4, 2), oma = c(0, 0, 2, 0))
+
 
 # Plot 1: Unconstrained
 plot(xtab, ytab, pch = 16,  col = "black",
@@ -108,6 +110,10 @@ text(0.15, -1.5, "Convex region", col = "red", cex = 0.7)
 text(-0.8, 1.5, "Unconstrained", col = "red", cex = 0.7)
 legend("bottomleft", legend = c("True", "Partial convex"),
        col = c("black", "purple"), lty = c(2, 1), lwd = 2, cex = 0.7)
+
+# Ajouter le titre global
+mtext(paste("Convexity Regression Tests - Degree", degree),
+      side = 3, line = 0.5, outer = TRUE, cex = 1.2, font = 2)
 
 
 par(oldpar)

@@ -1,51 +1,50 @@
-citHeader("To cite the ConstrainedQuantileSplines package in publications, please use:")
+# inst/CITATION
+# Citation file for BsplineQuantReg package
 
+citHeader("To cite the BsplineQuantReg package in publications, please use:")
 
-
+# 1. Main article (method description)
 bibentry(
   bibtype = "Article",
-  journal="zenodo",
-  title = "Quantile regression with cubic polynomial splines under shape constraints with applications",
-  author = c(person("Alexandre"," Abbes")),
-  year = "2025",
+  title = "Quantile Regression with Cubic Polynomial Splines under Shape Constraints with Applications",
+  author = c(person(given = "Alexandre", family = "Abbes")),
+  year = "2026",
+  journal = "Zenodo",
   doi = "10.5281/zenodo.17427913",
   url = "https://doi.org/10.5281/zenodo.17427913",
   textVersion = paste(
-    "Abbes, A. (2025).",
-    "Quantile regression with cubic polynomial splines under shape constraints with applications",
+    "Abbes, A. (2026).",
+    "Quantile Regression with Cubic Polynomial Splines under Shape Constraints with Applications.",
     "Zenodo. doi:10.5281/zenodo.17427913"
   )
 )
 
-
+# 2. Python package
 bibentry(
   bibtype = "Manual",
-  title = "BsplineQuantRegpy",
-  author = c(person("Alexandre"," Abbes")),
+  title = "BsplineQuantRegpy: Python Implementation",
+  author = c(person(given = "Alexandre", family = "Abbes")),
   year = "2026",
-  note = "Python version code of the R package BsplineQuantReg, with tk interface, spline degrees 1 to 4, handles multiple constraints",
-  url="https://pypi.org/search/?q=bsplinequantregpy",
-  url = "https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines",
+  note = "Python package with Tkinter interface, spline degrees 1 to 4, constraints of order 1 to 3",
+  url = "https://pypi.org/project/BsplineQuantRegpy/",
   textVersion = paste(
     "Abbes, A. (2026).",
-    "Python code for quantile regression with polynomial splines under shape constraints, with degree 1 to 4",
-    "https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines",
-    "https://pypi.org/search/?q=bsplinequantregpy"
+    "BsplineQuantRegpy: Python Implementation.",
+    "https://pypi.org/project/BsplineQuantRegpy/"
   )
 )
 
-
-
+# 3. R package (CRAN)
 bibentry(
   bibtype = "Manual",
-  title = "BsplineQuantReg: Constrained Quantile Regression with Cubic B-Splines",
+  title = "BsplineQuantReg: Constrained Quantile Regression with B-Splines (Degrees 1 to 4)",
   author = c(person(given = "Alexandre", family = "Abbes")),
   year = "2026",
   note = paste("R package version", utils::packageVersion("BsplineQuantReg")),
   url = "https://cran.r-project.org/package=BsplineQuantReg",
   textVersion = paste(
     "Abbes, A. (2026).",
-    "BsplineQuantReg: Constrained Quantile Regression with Cubic B-Splines",
+    "BsplineQuantReg: Constrained Quantile Regression with B-Splines",
     "(R package version", utils::packageVersion("BsplineQuantReg"), ").",
     "https://cran.r-project.org/package=BsplineQuantReg"
   )

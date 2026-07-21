@@ -165,7 +165,8 @@ cat(sprintf("                       derivative between 1945-1970: range [%.4f, %
 # ============================================================
 # Visualization
 # ============================================================
-par(mfrow = c(2, 2), mar = c(4, 4, 4, 3))
+# Ajouter un espace en haut de la page pour le titre
+par(mfrow = c(2, 2), mar = c(4, 4, 4, 2), oma = c(0, 0, 2, 0))
 
 # Plot 1: Unconstrained fit
 plot(years, temperature, pch = 16,  col = "black",
@@ -205,7 +206,7 @@ text(1985, 0.4, "Increasing", col = "darkgreen", cex = 0.7)
 grid()
 
 # Plot 4: Multiple quantiles with mixed constraints
-colors <- c("orange", "red", "darkred")
+colors <- c("orange", "darkgreen", "darkred")
 plot(years, temperature, pch = 16,  col = "black",
      xlab = "Year", ylab = "Temperature Anomaly (C)",
      main = "4. Quantile Regression with Mixed Constraints")
@@ -221,6 +222,11 @@ rect(1945, -0.8, 1970, 0.6, col = rgb(1, 0.5, 0, 0.1), border = NA)
 legend("topleft", legend = c("tau = 0.1", "tau = 0.5", "tau = 0.9"),
        col = colors, lty = c(2, 1, 2), lwd = 2, cex = 0.8)
 grid()
+
+
+# Ajouter le titre global
+mtext(paste("Global Temperature Anomaly Study 2 - Degree : ", degree),
+      side = 3, line = 0.5, outer = TRUE, cex = 1.2, font = 2)
 
 # ============================================================
 # Conclusion

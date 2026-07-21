@@ -45,7 +45,9 @@ y_inc3 <- spline_eval(fit_inc3, x_eval)
 y_inc1 <- spline_eval(fit_inc1, x_eval)
 y_dec <- spline_eval(fit_dec, x_eval)
 
-par(mfrow = c(2, 2))
+# Ajouter un espace en haut de la page pour le titre
+par(mfrow = c(2, 2), mar = c(4, 4, 4, 2), oma = c(0, 0, 2, 0))
+
 plot(xtab, ytab, pch = 16,  col = "black", main = "Data")
 plot(xtab, ytab, pch = 16,  col = "black", main = "Unconstrained")
 lines(x_eval, y_uncon, col = "red", lwd = 2)
@@ -59,6 +61,10 @@ legend("topleft", legend = c(paste("tau =", c(0.1,0.5,0.9))),
 
 plot(xtab, ytab, pch = 16,  col = "black", main = "Decreasing")
 lines(x_eval, y_dec, col = "green", lwd = 2)
+
+# Ajouter le titre global
+mtext(paste("Monotonicity Regression Tests - Degree", degree),
+      side = 3, line = 0.5, outer = TRUE, cex = 1.2, font = 2)
 
 
 par(oldpar)

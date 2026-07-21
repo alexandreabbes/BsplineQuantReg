@@ -116,7 +116,9 @@ cat(sprintf("  Full decreasing:    max derivative = %.4f (should be <= 0)\n",
 cat("\n")
 
 # Create plots
-par(mfrow = c(2, 2), mar = c(4, 4, 4, 2))
+
+# Ajouter un espace en haut de la page pour le titre
+par(mfrow = c(2, 2), mar = c(4, 4, 4, 2), oma = c(0, 0, 2, 0))
 
 # Plot 1: Partial increasing constraint
 plot(xtab, ytab, pch = 16,  col = "black",
@@ -156,6 +158,12 @@ lines(x_eval, y_uncon2, col = "red", lwd = 2)
 lines(x_eval, y_uncon3, col = "red", lwd = 2)
 abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
 grid()
+
+
+# Ajouter le titre global
+mtext(paste("Comprehensive Quantile Regression Tests - Degree", degree),
+      side = 3, line = 0.5, outer = TRUE, cex = 1.2, font = 2)
+
 
 cat("==============================================\n")
 cat("Demo completed. Check the plots for comparison.\n")
