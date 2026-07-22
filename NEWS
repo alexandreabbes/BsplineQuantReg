@@ -1,3 +1,8 @@
+Version=0.2.1 (07/2026)
+=============
+Fix a small bug preventing the regression when the number of knots is minimal
+(only the extremities of the intervall)
+
 Version=0.2.0 (07/2026)
 =============
 0) minor updates

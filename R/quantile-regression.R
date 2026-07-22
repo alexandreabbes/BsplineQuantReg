@@ -67,7 +67,7 @@ quantile_spline <- function(xtab, ytab, knot, tau,
                             solver = "CLARABEL",
                             weight = NULL,
                             verbose = FALSE,
-                            callable = FALSE) {
+                            callable = TRUE) {
 
   # Validate degree
   if (degree < 1 || degree > 4) {

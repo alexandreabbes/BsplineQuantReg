@@ -168,6 +168,7 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
   # For quartic splines, third derivative is affine on each interval
   # We impose sign constraints at knot
   if (any(der3cons != 0)) {
+    if (verbose) { cat(c("On applique les contraintes d'ordre 3:", der3cons,"\n"))}
     for (i in 1:(kn + 1)) {
       if (der3cons[i] != 0) {
         # Third derivative value at knot i
