@@ -2,6 +2,8 @@ Version=0.2.1 (07/2026)
 =============
 Fix a small bug preventing the regression when the number of knots is minimal
 (only the extremities of the intervall)
+Fix der3 variable in SplineQuarticQuant
+
 
 Version=0.2.0 (07/2026)
 =============

@@ -243,12 +243,10 @@ Spline_der_knot<-function(Bsbase,der=1)
 #'         for `degree`, `knot`, `coefficients`, and `status`
 #' @export
 make_spline <- function(result) {
-
   # Extract components
   coeff <- result$coefficients
   deg <- result$degree
   knots <- result$knot
-
   # Create the callable function
   spline_func <- function(x_values, Bvalues=NULL) {
     # Build the spline object structure expected by spline_eval
