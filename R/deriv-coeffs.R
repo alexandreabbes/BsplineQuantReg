@@ -140,13 +140,16 @@ bspline_to_deriv_coeffs_quart <- function(knot, degree = 4, x_values = 0) {
         a3 <- basis[j, nu, 2]
         a4 <- basis[j, nu, 1]
         # P'''(x) = 6*a3 + 24*a4*(x - t_k)
-        # At knot i (x = t_k): P'''(t_k) = 6*a3
+        # At left knot i (x = t_k): P'''(t_k) = 6*a3
         deriv3_knot[i, j] <- 6 * a3
       } else {
         # Last knot: use polynomial on last interval
+        #P'''(t_{kn+1}) = 6*a3 + 24*a4*(t_{kn+1} - t_k)
         nu <- degree + kn
+        h <- sn[nu + 1] - sn[nu]
         a3 <- basis[j, nu, 2]
-        deriv3_knot[i, j] <- 6 * a3
+        a4 <- basis[j, nu, 1]
+        deriv3_knot[i, j] <- 6 * a3+24*a4*h
       }
     }
   }
@@ -214,8 +217,8 @@ bspline_to_deriv_coeffs_quad <- function(tn, degree = 2, x_values = 0, verbose =
       a1 <- basis[j, nu, 2]
       a2 <- basis[j, nu, 1]
 
-      # First derivative: P'(u) = a1 + 2*a2*u
-      # Normalized: a1 + (2*a2*h)*u on [0,1]
+      # First derivative: P'(u) = a1 + 2*a2*u with u in [sn_nu,sn_{nu+1}]
+      # Normalized: a1 + (2*a2*h)*u on u in [0,1]
       deriv1_coeffs[nu - degree, j, ] <- c(2 * a2 * h, a1)
 
       # Second derivative: P''(u) = 2*a2 (constant)
@@ -239,7 +242,6 @@ bspline_to_deriv_coeffs_quad <- function(tn, degree = 2, x_values = 0, verbose =
 
 
 #' Derivative coefficients for linear B-spline to
-#'
 #' Computes normalized first derivative coefficients for linear B-splines.
 #' For linear splines, the derivative is constant on each interval.
 #'

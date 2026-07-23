@@ -13,9 +13,13 @@
 #' @param knot Knot vector or number of knots
 #' @param tau Quantile (between 0 and 1)
 #' @param monot Monotonicity constraint vector per interval:
-#'        1 = increasing, -1 = decreasing, 0 = unconstrained
+#'        1 = increasing, -1 = decreasing, 0 = unconstrained.
+#'        Although tcontsraints are set at knots; we apply them
+#'        on each intervall, at both extremities. kn+1 knots, kn consraints
+#'        taken into account.
 #' @param convcons Convexity constraint vector per interval:
-#'        1 = convex, -1 = concave, 0 = unconstrained
+#'        1 = convex, -1 = concave, 0 = unconstrained.
+#'        kn constraints are considered for kn+1 knots.
 #' @param solver CVXR solver to use (default = "OSQP")
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose logical; if TRUE, print progress messages
@@ -24,7 +28,7 @@
 SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
                                  monot = 0,
                                  convcons = 0,
-                                 solver = "OSQP",
+                                 solver = "GUROBI",
                                  weight = NULL,
                                  verbose = FALSE) {
 
@@ -57,7 +61,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
 
   # Handle constraints
   if (length(monot) == 1) {
-    monot <- rep(monot, kn)
+    monot <- rep(monot, kn+1)
   }
 
   if (length(convcons) == 1) {
@@ -94,7 +98,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
 
   constraints <- list()
 
-  # 1. Monotonicity constraints (Karlin-Studden on linear derivative)
+  # 1. Monotonicity constraints
   # Derivative is linear: P'(u) = a*u + b
   if (any(monot != 0)) {
     for (i in 1:kn) {
@@ -141,21 +145,26 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
   problem <- Problem(objective, constraints)
 
   result <- NULL
-  solvers_to_try <- c(solver, "OSQP", "ECOS", "SCS")
+  solvers_to_try <- c(solver, "GUROBI","CLARABEL","OSQP", "ECOS", "SCS")
 
   for (s in unique(solvers_to_try)) {
-    if (verbose) message("Trying solver:", s)
+    if (verbose) cat("Trying solver:", s, "\n")
+
+    # Use new CVXR syntax: psolve() for optimal value
     result <- tryCatch({
-      solve(problem, solver = toupper(s), verbose = FALSE)
+      # Solve the problem with new syntax
+      opt_val <- psolve(problem, solver = toupper(s), verbose = FALSE)
+
+      # Create a result list compatible with old expectations
+      list(
+        value = opt_val,
+        status = status(problem),
+        alpha_value = value(alpha)
+      )
     }, error = function(e) {
-      if (verbose) message("Failed:", e$message)
+      if (verbose) cat("Failed:", e$message, "\n")
       NULL
     })
-
-    if (!is.null(result) && !is.null(value(alpha))) {
-      if (verbose) message("Solver succeeded:", s)
-      break
-    }
   }
 
   if (is.null(result) || is.null(value(alpha))) {
@@ -163,7 +172,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
     return(NULL)
   }
 
-  alpha_val <- value(alpha) + y_mean
+  alpha_val <- result$alpha_value + y_mean
 
   if (verbose) {
     message("Status:", result$status)
@@ -191,7 +200,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
 SplineConstQuantRegBs2 <- function(xtab, ytab, knot, tau,
                                    monot = 0,
                                    convcons = 0,
-                                   solver = "OSQP",
+                                   solver = "GUROBI",
                                    weight = NULL,
                                    verbose = FALSE) {
   SplineQuadraticQuant(xtab, ytab, knot, tau,

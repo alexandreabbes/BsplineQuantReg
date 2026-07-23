@@ -20,7 +20,7 @@
 #' @export
 SplineLinearQuant <- function(xtab, ytab, knot, tau,
                               monot = 0,
-                              solver = "OSQP",
+                              solver = "GUROBI",
                               weight = NULL,
                               verbose = FALSE) {
 
@@ -103,29 +103,33 @@ SplineLinearQuant <- function(xtab, ytab, knot, tau,
   problem <- Problem(objective, constraints)
 
   result <- NULL
-  solvers_to_try <- c(solver, "OSQP", "ECOS", "SCS")
+  solvers_to_try <- c(solver,"CLARABEL", "GUROBI", "OSQP", "ECOS", "SCS")
 
   for (s in unique(solvers_to_try)) {
-    if (verbose) message("Trying solver:", s)
-    result <- tryCatch({
-      solve(problem, solver = toupper(s), verbose = FALSE)
-    }, error = function(e) {
-      if (verbose) message("Failed:", e$message)
-      NULL
-    })
+    if (verbose) cat("Trying solver:", s, "\n")
 
-    if (!is.null(result) && !is.null(value(alpha))) {
-      if (verbose) message("Solver succeeded:", s)
-      break
-    }
-  }
+    # Use new CVXR syntax: psolve() for optimal value
+    result <- tryCatch({
+      # Solve the problem with new syntax
+      opt_val <- psolve(problem, solver = toupper(s), verbose = FALSE)
+
+      # Create a result list compatible with old expectations
+      list(
+        value = opt_val,
+        status = status(problem),
+        alpha_value = value(alpha)
+      )
+    }, error = function(e) {
+      if (verbose) cat("Failed:", e$message, "\n")
+      NULL
+    })}
 
   if (is.null(result) || is.null(value(alpha))) {
     warning("Optimization did not converge with any solver")
     return(NULL)
   }
 
-  alpha_val <- value(alpha) + y_mean
+  alpha_val <- result$alpha_value + y_mean
 
   if (verbose) {
     message("Status:", result$status)
@@ -152,7 +156,7 @@ SplineLinearQuant <- function(xtab, ytab, knot, tau,
 #' @export
 SplineConstQuantRegBs1 <- function(xtab, ytab, knot, tau,
                                    monot = 0,
-                                   solver = "OSQP",
+                                   solver = "GUROBI",
                                    weight = NULL,
                                    verbose = FALSE) {
   SplineLinearQuant(xtab, ytab, knot, tau,

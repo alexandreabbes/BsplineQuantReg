@@ -1,8 +1,7 @@
-
 # Quartic Spline Quantile Regression with Shape Constraints
 # Based on the Python implementation in quantile_reg.py
 # Author: Alexandre Abbes
-
+# Updated for CVXR new syntax (psolve, value, status)
 
 #' Quantile regression with quartic splines and shape constraints
 #'
@@ -30,7 +29,7 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
                                monot = 0,
                                convcons = 0,
                                der3cons = 0,
-                               solver = "OSQP",
+                               solver = "CLARABEL",
                                weight = NULL,
                                verbose = FALSE) {
 
@@ -179,33 +178,43 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
     }
   }
 
-  # Solve the problem
+  # Solve the problem using new CVXR syntax
   problem <- Problem(objective, constraints)
 
   result <- NULL
-  solvers_to_try <- c(solver, "OSQP", "ECOS", "SCS")
+  solvers_to_try <- c(solver, "CLARABEL", "OSQP", "ECOS", "SCS")
 
   for (s in unique(solvers_to_try)) {
     if (verbose) cat("Trying solver:", s, "\n")
+
+    # Use new CVXR syntax: psolve() for optimal value
     result <- tryCatch({
-      solve(problem, solver = toupper(s), verbose = FALSE)
+      # Solve the problem with new syntax
+      opt_val <- psolve(problem, solver = toupper(s), verbose = FALSE)
+
+      # Create a result list compatible with old expectations
+      list(
+        value = opt_val,
+        status = status(problem),
+        alpha_value = value(alpha)
+      )
     }, error = function(e) {
       if (verbose) cat("Failed:", e$message, "\n")
       NULL
     })
 
-    if (!is.null(result) && !is.null(result$getValue(alpha))) {
+    if (!is.null(result) && !is.null(result$alpha_value)) {
       if (verbose) cat("Solver succeeded:", s, "\n")
       break
     }
   }
 
-  if (is.null(result) || is.null(result$getValue(alpha))) {
+  if (is.null(result) || is.null(result$alpha_value)) {
     warning("Optimization did not converge with any solver")
     return(NULL)
   }
 
-  alpha_val <- result$getValue(alpha) + y_mean
+  alpha_val <- result$alpha_value + y_mean
 
   if (verbose) {
     cat("Status:", result$status, "\n")
@@ -214,7 +223,7 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
 
   # Return results
   return(list(
-    coefficients = (alpha_val),
+    coefficients = alpha_val,
     degree = degree,
     knot = t(knot),
     y_mean = y_mean,
