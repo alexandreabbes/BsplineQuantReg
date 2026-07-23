@@ -62,6 +62,7 @@ spline_eval<-function(Bspline, x_values=NULL, Bvalues=NULL)
 #'
 #' @param Basis Object returned by \code{Bspline_base}
 #' @param x_values Vector of evaluation points
+#' @param verbose set to TRUE increases verbosity
 #' @return Matrix of basis function values (n_splines x length(x_values))
 #' @export
 
@@ -81,27 +82,29 @@ bs_direct<-function(Basis,x_values,verbose=FALSE)
     if (d>0){
       bb=Basis$base[,(d+1):(nsplines),] #only keep the effective pieces
     for (j in 1:nsplines) #go through splines of the base
-    { print(Basis)
-      print(c("coef",bb ,"knot",knot))
-    # In case of a single piece
-      if (kn==1){
+      {
+      if (kn==1){ # In case of a single piece
+        if (verbose){print("only one piece")}
         p=makpp(bb[j,],tn=knot)
+        if (verbose){print("function number",j,"is",p)}
         yvalues[j,]<-evalpp(p,x_values)}
-        else {p=makpp(bb[j,,],tn=knot)
+      else {
+        p=makpp(bb[j,,],tn=knot)
         yvalues[j,]<-evalpp(p,x_values)
-        }}
+        }
       }
-        if (d==0){
-         bb=Basis$base
+      }
+      if (d==0){
+        bb=Basis$base
         for (j in 1:nsplines)
-        {
+          {
           p=makpp(bb[j,],tn=knot)
           yvalues[j,]<-evalpp(p,x_values)
-        }
-        }
+          }
+      }
 
-  return(yvalues)
-}
+   return(yvalues)
+  }
 #' Evaluate a piecewise polynomial (PP) form
 #'
 #' Evaluates a piecewise polynomial function at given points.
