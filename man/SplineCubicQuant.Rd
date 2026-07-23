@@ -32,6 +32,9 @@ SplineCubicQuant(
 \item{convcons}{Convexity constraint vector per knot:
 1 = convex, -1 = concave, 0 = unconstrained. If scalar, repeated.}
 
+\item{der3cons}{Constraint on the 3rd derivative (on esach intervall:
+-1: négative, 0: no constraint, 1: positive constraint}
+
 \item{solver}{CVXR solver to use (default = "CLARABEL")}
 
 \item{weight}{Observation weights (default = 1 for all)}

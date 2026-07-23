@@ -170,13 +170,12 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
   solvers_to_try <- c(solver, "CLARABEL", "OSQP", "ECOS", "SCS")
 
   for (s in unique(solvers_to_try)) {
-    if (verbose) cat("Trying solver:", s, "\n")
+    if (verbose) {cat("Trying solver:", s, "\n")}
 
     # Use new CVXR syntax: psolve() for optimal value
     result <- tryCatch({
       # Solve the problem with new syntax
       opt_val <- psolve(problem, solver = toupper(s), verbose = FALSE)
-
       # Create a result list compatible with old expectations
       list(
         value = opt_val,
@@ -184,9 +183,9 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
         alpha_value = value(alpha)
       )
     }, error = function(e) {
-      if (verbose) cat("Failed:", e$message, "\n")
-      NULL
-    })
+      if (verbose) {cat("Failed:", e$message, "\n")}
+      NULL}
+    )}
 
   if (is.null(result) || is.null(value(alpha))) {
     warning("Optimisation did not converge with any available solver")
@@ -229,5 +228,6 @@ SplineConstQuantRegBs3<-function(xtab, ytab, knot, tau,
           convcons=convcons,
           der3cons=der3cons,
           solver = solver, weight = weight,
-          verbose=verbose)}
+          verbose=verbose)
+          }
 

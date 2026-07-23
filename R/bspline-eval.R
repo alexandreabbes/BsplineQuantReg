@@ -15,7 +15,7 @@
 #' @examples
 #'{ # Create and evaluate a spline
 #' # This function is also used when a Bspline object is rendered callable as a function
-#' # with make_spline()
+#' # with meake_spline()
 #' tn<-c(0,1,2,3,4,5)
 #' x_values<-seq(0,5,length=100)
 #' Bspline=list(degree=3, knot=tn,coefficients=runif(length(tn)+3-1))
@@ -65,7 +65,7 @@ spline_eval<-function(Bspline, x_values=NULL, Bvalues=NULL)
 #' @return Matrix of basis function values (n_splines x length(x_values))
 #' @export
 
-bs_direct<-function(Basis,x_values)
+bs_direct<-function(Basis,x_values,verbose=FALSE)
 {
   #Calcule les valeurs d'une base Bspline.
   #comme la fonction bs de R, mais en utilisant la
@@ -76,23 +76,29 @@ bs_direct<-function(Basis,x_values)
   kn=length(knot)-1
   d=Basis$degree
   nsplines=Basis$n_splines
+  if(verbose){print("La base est:\n",Basis)}
   yvalues=array(data=0,c(nsplines,n_values))
     if (d>0){
-      bb=Basis$base[,(d+1):(nsplines),]
-    for (j in 1:nsplines)
-    {
-    p=makpp(bb[j,,],tn=knot)
-    yvalues[j,]<-evalpp(p,x_values)
-    }}
-     if (d==0){
-       bb=Basis$base
-      for (j in 1:nsplines)
-    {
-      p=makpp(bb[j,],tn=knot)
-      yvalues[j,]<-evalpp(p,x_values)
-    }
-    }
-
+      bb=Basis$base[,(d+1):(nsplines),] #only keep the effective pieces
+    for (j in 1:nsplines) #go through splines of the base
+    { print(Basis)
+      print(c("coef",bb ,"knot",knot))
+    # In case of a single piece
+      if (kn==1){
+        p=makpp(bb[j,],tn=knot)
+        yvalues[j,]<-evalpp(p,x_values)}
+        else {p=makpp(bb[j,,],tn=knot)
+        yvalues[j,]<-evalpp(p,x_values)
+        }}
+      }
+        if (d==0){
+         bb=Basis$base
+        for (j in 1:nsplines)
+        {
+          p=makpp(bb[j,],tn=knot)
+          yvalues[j,]<-evalpp(p,x_values)
+        }
+        }
 
   return(yvalues)
 }
@@ -117,6 +123,9 @@ evalpp<-function(p,x_values){
   n_values=length(x_values)
 
   pval<-c()
+  if(kn==1){#Only one piece
+    pval<-poly_eval(coeff,x_values-tn[1])
+  }else{
   if (!is.null(dim(coeff))){
     for (i in 1:(kn))
   {
@@ -144,7 +153,7 @@ evalpp<-function(p,x_values){
   h=tn[kn+1]-tn[kn] # if the last knot is in x_values
   pval=c(pval,poly_eval(poly_loc,h))
 
-  }
+  }}
   return(pval)
 }
 
@@ -161,10 +170,13 @@ makpp<-function(coeff,tn){
   #coeff is an array of dim: kn,(d+1)
   #kn=length(tn)
   #this is independent from the notation convention order
-  if (!is.null(dim(coeff)))#if the degree is >0
+  #particular case one single piece : length(tn)=2
+  if (length(tn)==2){kn=(length(tn)-1)}
+  if ((length(tn)!=2) & (!is.null(dim(coeff)) ) )#if the degree is >0 or more than 1 piece
              {kn=dim(coeff)[1]
                o=dim(coeff)[2]}
-  if (is.null(dim(coeff))){kn<-length(coeff)}# case degree=0
+  if ((length(tn)!=2) & (is.null(dim(coeff)))){kn<-length(coeff)}# case degree=0
+
   if (length(tn) != (kn+1)){
     stop("length of coeff and number of knot do not match")
 
