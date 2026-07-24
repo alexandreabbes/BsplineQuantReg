@@ -73,7 +73,6 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
                                    solver = "CLARABEL", weight = NULL,
                                    verbose=FALSE)
 {
-
   if (is.null(weight)) {
     weight <- rep(1, length(xtab))
   }
@@ -190,14 +189,22 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
     }
     }
 
-
+  # Solve the problem
   problem <- Problem(objective, constraints)
 
   result <- NULL
-  solvers_to_try <- c(solver, "HIGHS", "CLARABEL", "OSQP",  "SCS","MOSEK")
+  fallback_result <- NULL
+  solvers_to_try <- c(solver, "CLARABEL", "OSQP", "ECOS", "SCS")
+  solvers_to_try <- unique(solvers_to_try)  # Supprimer les doublons
 
-  for (s in unique(solvers_to_try)) {
+  for (s in solvers_to_try) {
     if (verbose) cat("Trying solver:", s, "\n")
+
+    # Vérifier la disponibilité de ECOS
+    if (s == "ECOS" && !requireNamespace("ECOSolveR", quietly = TRUE)) {
+      if (verbose) cat("  ECOS not available (ECOSolveR missing)\n")
+      next
+    }
 
     result <- tryCatch({
       opt_val <- psolve(problem, solver = toupper(s), verbose = verbose)
@@ -207,26 +214,29 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
         alpha_value = value(alpha)
       )
     }, error = function(e) {
-      if (verbose) cat("Failed:", e$message, "\n")
+      if (verbose) cat("  Failed:", e$message, "\n")
       NULL
     })
 
-    # Vérifier si le solveur a réussi avec status "optimal"
+    # Vérifier si le solveur a réussi
     if (!is.null(result) && !is.null(result$alpha_value)) {
       if (result$status == "optimal") {
-        if (verbose) cat("Solver succeeded with optimal status:", s, "\n")
-        break
+        if (verbose) cat("  Solver succeeded with optimal status:", s, "\n")
+        break  # OK, on sort de la boucle
       } else if (result$status == "optimal_inaccurate") {
-        if (verbose) cat("Solver returned optimal_inaccurate:", s, "\n")
+        if (verbose) cat("  Solver returned optimal_inaccurate:", s, "\n")
+        fallback_result <- result
         # Continuer à essayer d'autres solveurs pour un meilleur résultat
-        # Mais garder ce résultat comme fallback
       } else {
-        if (verbose) cat("Solver returned non-optimal status:", result$status, "\n")
+        if (verbose) cat("  Solver returned non-optimal status:", result$status, "\n")
+        fallback_result <- result
       }
     }
   }
-  # Si aucun résultat optimal n'a été trouvé, utiliser le fallback
-  if (is.null(result) || !(result$status %in% c("optimal", "optimal_inaccurate"))) {
+
+  # Après la boucle, vérifier le résultat
+  if (is.null(result) || is.null(result$alpha_value)) {
+    # Utiliser le fallback si disponible
     if (!is.null(fallback_result)) {
       result <- fallback_result
       if (verbose) cat("Using fallback result with status:", result$status, "\n")
@@ -236,13 +246,20 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
     }
   }
 
-  alpha_val <- result$alpha_value+y_mean
-  result$y_mean<-y_mean
+  # Si le résultat est optimal_inaccurate, on peut quand même l'utiliser avec un avertissement
+  if (result$status == "optimal_inaccurate") {
+    warning("Solution may be inaccurate. Try another solver or adjust settings.")
+  }
+
+  alpha_val <- result$alpha_value + y_mean
+  result$y_mean <- y_mean
+
   if (verbose) {
     message(" Statut:", result$status, "\n",
             "Valeur objectif:", result$value, "\n",
-             "Coefficients alpha (range):", range(alpha_val), "\n")
-}
+            "Coefficients alpha (range):", range(alpha_val), "\n")
+  }
+
 
   return(list(
     coefficients = alpha_val,
