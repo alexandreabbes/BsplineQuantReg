@@ -64,7 +64,7 @@ quantile_spline <- function(xtab, ytab, knot, tau,
                             monot = 0,
                             convcons = 0,
                             der3cons = 0,
-                            solver = "CLARABEL",
+                            solver = "HIGHS",
                             weight = NULL,
                             verbose = FALSE,
                             callable = TRUE) {

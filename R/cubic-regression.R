@@ -194,7 +194,7 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
   problem <- Problem(objective, constraints)
 
   result <- NULL
-  solvers_to_try <- c(solver, "CLARABEL", "OSQP", "ECOS", "SCS")
+  solvers_to_try <- c(solver, "HIGHS", "CLARABEL", "OSQP",  "SCS","MOSEK")
 
   for (s in unique(solvers_to_try)) {
     if (verbose) cat("Trying solver:", s, "\n")
@@ -223,6 +223,16 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
       } else {
         if (verbose) cat("Solver returned non-optimal status:", result$status, "\n")
       }
+    }
+  }
+  # Si aucun résultat optimal n'a été trouvé, utiliser le fallback
+  if (is.null(result) || !(result$status %in% c("optimal", "optimal_inaccurate"))) {
+    if (!is.null(fallback_result)) {
+      result <- fallback_result
+      if (verbose) cat("Using fallback result with status:", result$status, "\n")
+    } else {
+      warning("Optimisation did not converge with any available solver")
+      return(NULL)
     }
   }
 

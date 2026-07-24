@@ -30,13 +30,16 @@
 
 spline_eval<-function(Bspline, x_values=NULL, Bvalues=NULL)
 {
-  if (inherits(x, "callable_spline")) {
+  if (is.function(Bspline) && inherits(Bspline, "callable_spline") ) {
+    # Already callable, retrieve the parameters
     Bspline<-get_parameters(Bspline)
   }
+  else{
 
   knot=Bspline$knot #vector of effective knots
   degree=Bspline$degree
   coeff=Bspline$coeff
+  }
   #Bvalues=bs(x_values,knot=knot,degree)  "can be used instead of the following lines
   #to accelerate the calculations
   if (is.null(x_values)){x_values<-knots}# values at knots by default
@@ -132,7 +135,7 @@ evalpp<-function(p,x_values){
     pval<-poly_eval(coeff,x_values-tn[1])
   }else{
   if (!is.null(dim(coeff))){#if the degree is not 0
-    if (x_values[1]<tn[1]){ message(" x values smaler than first knot, extrapolating")
+    if (x_values[1]<tn[1]){ message("Some x values smaler than first knot, extrapolating")
       #values before the first knot
       pre_k=x_values[(x_values<tn[i])]
       poly_loc<-coeff[1,] # extrapolate using the first piece
@@ -171,11 +174,11 @@ evalpp<-function(p,x_values){
   pval=c(pval,poly_eval(poly_loc,h))
 
   }
-  if (x_values[n_values]>tn[kn+1]){message("x values greater than last knot, extrapolating")
+  if (x_values[n_values]>tn[kn+1]){message("Some x values greater than last knot, extrapolating")
     # values after the last knot
     post_k=x_values[(x_values>tn[kn+1])]
     poly_loc<-coeff[kn,] # extrapolate using the last piece
-    h=post_k-tn[kn+1]
+    h=post_k-tn[kn]
     pval<-c(pval,poly_eval(poly_loc,h))
   }
   }
@@ -274,6 +277,8 @@ Spline_der_knot<-function(Bsbase,der=1)
   return(t(Der2_knot))
 }
 
+
+
 #' Create a callable spline object
 #'
 #' Transforms a list container 'result' from the regression result into a
@@ -285,12 +290,22 @@ Spline_der_knot<-function(Bsbase,der=1)
 #' @param Bspline A list containing at least (knot, coefficients, degree)
 #'        like the one returned by quantile_spline or one of the degree-specific functions.
 #'        If it already contains a 'spline' element, returns the object unchanged.
+#' @param verbose If TRUE : output the attributes of the Bspline
 #' @return The same list with an additional 'spline' element containing the
 #'         callable function. The function can be called as `Bspline(x)` and
 #'         has an optional `Bvalues` parameter to accelerate multiple evaluations
 #'         at the same x_values.
 #' @export
-make_spline <- function(Bspline) {
+make_spline <- function(Bspline,verbose=FALSE) {
+  if (is.function(Bspline) && inherits(Bspline, "callable_spline")) {
+    # Déjà une callable, l'utiliser directement
+    message("Already a callable spline object")
+
+    return( if (verbose){Bspline}
+      else{ invisible(Bspline)}
+    )
+  }else
+  {
   # Extract components
   coeff <- Bspline$coeff
   degree <- Bspline$degree
@@ -305,11 +320,9 @@ make_spline <- function(Bspline) {
       knot = knot,
       result=result
     )
-    class(spline_obj) <- "callable_spline"
     # Evaluate the spline
-    spline_eval(spline_obj, x_values, Bvalues=Bvalues)
+    spline_eval(Bspline, x_values, Bvalues=Bvalues)
   }
-
   # Attach parameters as attributes (accessible via attr())
   attr(spline_func, "degree") <- degree
   attr(spline_func, "knot") <- knot
@@ -320,8 +333,7 @@ make_spline <- function(Bspline) {
 
   # Set class for print method
   class(spline_func) <- c("callable_spline", "function")
-
-  return(spline_func)
+  return(spline_func)}
 }
 
 
@@ -340,7 +352,7 @@ get_parameters <- function(x) {
     coeff = attr(x, "coeff"),
     result = attr(x, "result")
   )
-}
+  }
 
 #' Print method for callable spline
 #'
@@ -348,7 +360,7 @@ get_parameters <- function(x) {
 #' @param ... Additional arguments
 #' @export
 print.callable_spline <- function(x, ...) {
-  cat("Callable Spline Object\n")
+  cat("callable_spline Object\n")
   cat("  Degree:", attr(x, "degree"), "\n")
   knot <- attr(x, "knot")
   coeff <- attr(x, "coeff")

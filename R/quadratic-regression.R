@@ -145,7 +145,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
   problem <- Problem(objective, constraints)
 
   result <- NULL
-  solvers_to_try <- c(solver, "GUROBI","CLARABEL","OSQP", "ECOS", "SCS")
+  solvers_to_try <- c(solver, "CLARABEL","OSQP", "ECOS", "SCS","MOSEK")
 
   for (s in unique(solvers_to_try)) {
     if (verbose) cat("Trying solver:", s, "\n")
@@ -199,7 +199,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
 SplineConstQuantRegBs2 <- function(xtab, ytab, knot, tau,
                                    monot = 0,
                                    convcons = 0,
-                                   solver = "GUROBI",
+                                   solver = "HIGHS",
                                    weight = NULL,
                                    verbose = FALSE) {
   SplineQuadraticQuant(xtab, ytab, knot, tau,

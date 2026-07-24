@@ -181,7 +181,7 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
   problem <- Problem(objective, constraints)
 
   result <- NULL
-  solvers_to_try <- c(solver, "CLARABEL", "OSQP", "ECOS", "SCS")
+  solvers_to_try <- c(solver, "HIGHS","CLARABEL","ECOS", "OSQP",  "SCS", "MOSEK")
 
   for (s in unique(solvers_to_try)) {
     if (verbose) cat("Trying solver:", s, "\n")
