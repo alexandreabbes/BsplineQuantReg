@@ -6,6 +6,7 @@
 #' Evaluates a spline (linear combination of B-splines) at given points.
 #'
 #' @param Bspline Spline object (list with coefficients on the Bspline basis, degree, extended knot)
+#' A Bspline can also be rendered callable witk make_spline(BSpline)
 #' @param x_values Vector of evaluation points. By default, evaluation is calculated
 #' at the knots
 #' @param Bvalues : the values of the Bspline basis evaluated at the values x
@@ -28,14 +29,10 @@
 #' @export
 
 spline_eval<-function(Bspline, x_values=NULL, Bvalues=NULL)
-  #Bspline has a new type R container,
-  #designed by its coefficients, the degree
-  #and the knot,
-  #It is independent from the polynomial notation order
 {
   knot=Bspline$knot #vector of effective knots
   degree=Bspline$degree
-  coeff=Bspline$coefficients
+  coeff=Bspline$coeff
   #Bvalues=bs(x_values,knot=knot,degree)  "can be used instead of the following lines
   #to accelerate the calculations
   if (is.null(x_values)){x_values<-knots}# values at knots by default
@@ -105,9 +102,9 @@ bs_direct<-function(Basis,x_values,verbose=FALSE)
 
    return(yvalues)
   }
-#' Evaluate a piecewise polynomial (PP) form
-#'
-#' Evaluates a piecewise polynomial function at given points.
+
+
+#' Evaluates a piecewise polynomial (PP form)  function at given points.
 #'
 #' @param p List with components \code{ext_knot} (ext_knot) and \code{coeff}
 #' @param x_values Vector of evaluation points
@@ -120,6 +117,7 @@ evalpp<-function(p,x_values){
   #This funciton is independent from the order convention
   #for polynomials
   #The x_values out of the knot give 0 in the corresponding yvalues
+
   tn=p$knot
   coeff=p$coefficients
   kn=length(tn)-1 #number of intervals
@@ -129,16 +127,25 @@ evalpp<-function(p,x_values){
   if(kn==1){#Only one piece
     pval<-poly_eval(coeff,x_values-tn[1])
   }else{
-  if (!is.null(dim(coeff))){
+  if (!is.null(dim(coeff))){#if the degree is not 0
+    if (x_values[1]<tn[1]){ message(" x values smaler than first knot, extrapolating")
+      #values before the first knot
+      pre_k=x_values[(x_values<tn[i])]
+      poly_loc<-coeff[1,] # extrapolate using the first piece
+      h=pre_k-tn[1]
+      pval<-poly_eval(poly_loc,h)
+      }
+
     for (i in 1:(kn))
-  {
+    {
     xval=x_values[(x_values>=tn[i]) & (x_values<tn[i+1])]
     poly_loc<-coeff[i,]
     # reverse our convention to match polyval convention
     #pval<-c(pval,polyval(p=rev(poly_loc),xval) )
     h=xval-tn[i]
     #shit to fit the local basis
-    pval<-c(pval,poly_eval(poly_loc,h))
+    yval<-poly_eval(poly_loc,h)
+    pval<-c(pval,yval)
     }}
   if (is.null(dim(coeff)))# if degree=0
     {
@@ -149,16 +156,29 @@ evalpp<-function(p,x_values){
     #pval<-c(pval,polyval(p=rev(poly_loc),xval) )
     h=xval-tn[i]
     #shit to fit the local basis
-    pval<-c(pval,poly_eval(poly_loc,h))
+    yval<-poly_eval(poly_loc,h)
+
+    pval<-c(pval,yval)
+
 }}
   xval=x_values[x_values==tn[kn+1]]
   if (length(xval)>0){
   h=tn[kn+1]-tn[kn] # if the last knot is in x_values
   pval=c(pval,poly_eval(poly_loc,h))
 
-  }}
+  }
+  if (x_values[n_values]>tn[kn+1]){message("x values greater than last knot, extrapolating")
+    # values after the last knot
+    post_k=x_values[(x_values>tn[kn+1])]
+    poly_loc<-coeff[kn,] # extrapolate using the last piece
+    h=post_k-tn[kn+1]
+    pval<-c(pval,poly_eval(poly_loc,h))
+  }
+  }
+
   return(pval)
 }
+
 
 #' Build a piecewise polynomial (PP) form
 #'
@@ -188,6 +208,8 @@ makpp<-function(coeff,tn){
     return(list(coefficients=(coeff),knot=tn))
   }
 }
+
+
 
 #' Visualize a B-spline functions basis
 #'
@@ -250,47 +272,70 @@ Spline_der_knot<-function(Bsbase,der=1)
 
 #' Create a callable spline object
 #'
-#' Transforms a spline regression result into a callable function that
-#' can be evaluated at any point, while preserving access to parameters.
+#' Transforms a list container 'result' from the regression result into a
+#' callable function that is the spline function with given knots and
+#' coefficients on the corresponding B-spline basis. It can be evaluated
+#' at any point of the knot range using the spline_eval() function,
+#' while preserving access to parameters.
 #'
-#' @param result A list returned by quantile_spline or one of the degree-specific functions
-#' @return A function that can be called as `result(x)` and has attributes
-#'         for `degree`, `knot`, `coefficients`, and `status`
+#' @param Bspline A list containing at least (knot, coefficients, degree)
+#'        like the one returned by quantile_spline or one of the degree-specific functions.
+#'        If it already contains a 'spline' element, returns the object unchanged.
+#' @return The same list with an additional 'spline' element containing the
+#'         callable function. The function can be called as `Bspline(x)` and
+#'         has an optional `Bvalues` parameter to accelerate multiple evaluations
+#'         at the same x_values.
 #' @export
-make_spline <- function(result) {
+make_spline <- function(Bspline) {
   # Extract components
-  coeff <- result$coefficients
-  deg <- result$degree
-  knots <- result$knot
+  coeff <- Bspline$coeff
+  degree <- Bspline$degree
+  knot <- Bspline$knot
+  result <- Bspline$result # keep other parameters
   # Create the callable function
   spline_func <- function(x_values, Bvalues=NULL) {
     # Build the spline object structure expected by spline_eval
     spline_obj <- list(
-      coefficients = coeff,
-      degree = deg,
-      knot = knots
+      coeff = coeff,
+      degree = degree,
+      knot = knot,
+      result=result
     )
-    class(spline_obj) <- "Bspline"
-
+    class(spline_obj) <- "callable_spline"
     # Evaluate the spline
     spline_eval(spline_obj, x_values, Bvalues=Bvalues)
   }
 
   # Attach parameters as attributes (accessible via attr())
-  attr(spline_func, "degree") <- deg
-  attr(spline_func, "knot") <- knots
-  attr(spline_func, "coefficients") <- coeff
-  attr(spline_func, "status") <- result$status
-  attr(spline_func, "value") <- result$value
-  attr(spline_func, "y_mean") <- result$y_mean
+  attr(spline_func, "degree") <- degree
+  attr(spline_func, "knot") <- knot
+  attr(spline_func, "coeff") <- coeff
 
-  # Store the full result as an attribute
+  # Store the full Bspline as an attribute
   attr(spline_func, "result") <- result
 
   # Set class for print method
   class(spline_func) <- c("callable_spline", "function")
 
   return(spline_func)
+}
+
+
+#' Get parameters from a callable spline
+#'
+#' @param x A callable spline object
+#' @return A list with degree, knots, coefficients, and Bspline object
+#' @export
+get_parameters <- function(x) {
+  if (!inherits(x, "callable_spline")) {
+    stop("Object is not a callable spline")
+  }
+  list(
+    degree = attr(x, "degree"),
+    knot = attr(x, "knot"),
+    coeff = attr(x, "coeff"),
+    result = attr(x, "result")
+  )
 }
 
 #' Print method for callable spline
@@ -301,9 +346,15 @@ make_spline <- function(result) {
 print.callable_spline <- function(x, ...) {
   cat("Callable Spline Object\n")
   cat("  Degree:", attr(x, "degree"), "\n")
-  cat("  Knots:", length(attr(x, "knot")), "knots\n")
-  cat("  Coefficients:", length(attr(x, "coefficients")), "\n")
-  cat("  Status:", attr(x, "status"), "\n")
-  cat("  Usage: my_spline(x) to evaluate\n")
-  invisible(x)
+  knot <- attr(x, "knot")
+  coeff <- attr(x, "coeff")
+  result <- attr(x, "result")
+  if (!is.null(knot)) {
+    cat("  Knots (", length(knot), "): ",knot,"\n")
+  } else {
+    cat("  Knots: NULL\n")
+  }
+  cat("  Coefficients (", length(coeff),"): ", coeff, "\n")
+  cat("for result, type get_parameter(spline)\n")
+    invisible(x)
 }

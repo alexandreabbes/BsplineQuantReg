@@ -123,7 +123,6 @@ print.quantile_spline <- function(x, ...) {
   cat("Quantile Spline Regression (degree", x$degree, ")\n")
   cat("Knots:", length(x$knot) - 1, "intervals\n")
   cat("Basis functions:", length(x$coefficients), "\n")
-  cat("Status:", x$status, "\n")
   cat("Objective value:", x$value, "\n")
   cat("Coefficients range: [", range(x$coefficients)[1], ",",
       range(x$coefficients)[2], "]\n")

@@ -111,7 +111,7 @@ SplineLinearQuant <- function(xtab, ytab, knot, tau,
     # Use new CVXR syntax: psolve() for optimal value
     result <- tryCatch({
       # Solve the problem with new syntax
-      opt_val <- psolve(problem, solver = toupper(s), verbose = FALSE)
+      opt_val <- psolve(problem, solver = toupper(s), verbose = verbose)
 
       # Create a result list compatible with old expectations
       list(
@@ -130,6 +130,7 @@ SplineLinearQuant <- function(xtab, ytab, knot, tau,
   }
 
   alpha_val <- result$alpha_value + y_mean
+  result$y_mean<-y_mean
 
   if (verbose) {
     message("Status:", result$status)
@@ -141,9 +142,7 @@ SplineLinearQuant <- function(xtab, ytab, knot, tau,
     coefficients = alpha_val,
     degree = degree,
     knot = knot,
-    y_mean = y_mean,
-    status = result$status,
-    value = result$value
+    result = result
   ))
 }
 

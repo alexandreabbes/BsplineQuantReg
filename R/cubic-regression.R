@@ -96,21 +96,17 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
     message("knot:", knot, "\n")
   }
 
-
   if (verbose) {
   message("Monotonicity constraints (Karlin):", monot, "\n")
   }
   boundary_knot <- range(knot)
   degree=3
   N=length(knot)+3-1
-
-  int_knot=knot[2:kn]
-
   # Calcul des coefficients normalises des derivees
   deriv_spline <- bspline_to_deriv_coeffs_cubic(knot, degree = 3,x_values=xtab,verbose=verbose)
-  deriv_coeffs <-deriv_spline$d1
-  deriv_coeffs2<-deriv_spline$d2
-  deriv_coeffs3<-deriv_spline$d3
+  deriv_coeffs <-deriv_spline$d1 # kn x N x 3
+  deriv_coeffs2<-deriv_spline$d2 # (kn+1) x N
+  deriv_coeffs3<-deriv_spline$d3 # kn x N
   B<-deriv_spline$d0
   B=t(B)
   y_mean <- mean(ytab)
@@ -148,6 +144,9 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
   }
 
   #"contraintes convexes
+  if (verbose){
+    message("Convexity constraints (Linear):", convcons, "\n")
+  }
   # eliminate the null (unconstrained) case
   if (any(convcons !=0)){
     if (length(convcons) == 1) {
@@ -157,14 +156,19 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
     # the second derivatives at the knot.
     constraints<-c(constraints,CV)
   }
+
 #3rd derivative constraints
+  if (verbose) {
+    message("3rd order derivative constraints (constant):", der3cons, "\n")}
   if (any(der3cons!=0)){
     if (length(der3cons)==1){der3cons<-rep(der3cons,kn)}
     print(der3cons)
-    for (j in (1:kn))
+    for (j in (1:kn)) # go through the intervals
       sig<-der3cons[j]
       if (sig!=0){
-        d3<-deriv_coeffs3[,j]%*%alpha
+        d3<-deriv_coeffs3[j,]%*%alpha
+        print(length(alpha))
+        print(dim(deriv_coeffs3))
         DER3<-apply_linear_constraint(d3,sig)
       constraints<-c(constraints,DER3)
   }}
@@ -179,7 +183,7 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
     # Use new CVXR syntax: psolve() for optimal value
     result <- tryCatch({
       # Solve the problem with new syntax
-      opt_val <- psolve(problem, solver = toupper(s), verbose = FALSE)
+      opt_val <- psolve(problem, solver = toupper(s), verbose = verbose)
       # Create a result list compatible with old expectations
       list(
         value = opt_val,
@@ -197,6 +201,7 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
   }
 
   alpha_val <- result$alpha_value+y_mean
+  result$y_mean<-y_mean
   if (verbose) {
     message(" Statut:", result$status, "\n",
             "Valeur objectif:", result$value, "\n",
@@ -204,12 +209,10 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
 }
 
   return(list(
-    #spline = spline_result,
     coefficients = alpha_val,
     degree=3,
-    #basis_matrix = B,
-    knot = knot,
-    int_knot = knot
+    knots=knot,
+    result=result
   ))
 }
 

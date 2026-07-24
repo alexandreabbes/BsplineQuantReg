@@ -4,9 +4,10 @@ Fix
 - Deprecated notation in CVXR
 - Small bug preventing the regression when the number of knots is minimal
 (only one piece)
-- Fix quantile_spline() :   callable=TRUE is now default value
-
-
+-  quantile_spline() :   callable=TRUE is now default value
+-  improve callable structure for bsplines : callable_spline type.
+-  eval_pp : add extroplating values out of the knots range
+-  Fix problem with der3 coeff in SplineCubicQuant
 
 Version=0.2.0 (07/2026)
 =============
