@@ -21,6 +21,7 @@ cat("==============================================\n\n")
 
 if (!exists("degree")){degree=3}
 
+
 # Generate synthetic data
 #set.seed(42)
 n_points <- 100
@@ -55,11 +56,11 @@ cat("Fitting models...\n")
 # Fit 1: Unconstrained (tau = 0.9, 0.5, 0.1)
 cat("  - Unconstrained (tau = 0.9, 0.5, 0.1)")
 res_uncon1 <- quantile_spline(xtab, ytab, knots, tau = 0.9,
-                                    monot = 0, convcons = 0,degree=degree, solver = "OSQP")
+                                    monot = 0, convcons = 0,degree=degree, solver = "HIGHS")
 res_uncon2 <- quantile_spline(xtab, ytab, knots, tau = 0.1,
-                                    monot = 0, convcons = 0,degree=degree, solver = "OSQP")
+                                    monot = 0, convcons = 0,degree=degree, solver = "HIGHS")
 res_uncon3 <- quantile_spline(xtab, ytab, knots, tau = 0.5,
-                                    monot = 0, convcons = 0,degree=degree, solver = "OSQP")
+                                    monot = 0, convcons = 0,degree=degree, solver = "HIGHS")
 
 cat(" done\n")
 
@@ -67,10 +68,10 @@ cat(" done\n")
 cat("  - Partial increasing (tau = 0.5, 0.1, intervals 1-7)...")
 res_croissant1 <- quantile_spline(xtab, ytab, knots, tau = 0.5,
                                         monot = monot_partial, convcons = 0,
-                                  degree=degree,solver = "OSQP")
+                                  degree=degree,solver = "HIGHS")
 res_croissant2 <- quantile_spline(xtab, ytab, knots, tau = 0.1,
                                          monot = monot_partial,degree=degree, convcons = 0,
-                                         solver = "OSQP")
+                                         solver = "HIGHS")
 cat(" done\n")
 
 # Fit 3: Full decreasing (tau = 0.5)
@@ -78,7 +79,7 @@ cat("  - Full decreasing (tau = 0.5)...")
 res_decroissant <- quantile_spline(xtab, ytab, knots, tau = 0.5,
                                           monot = -1, convcons = 0,
                                    degree=degree,
-                                          solver = "OSQP")
+                                          solver = "HIGHS")
 cat(" done\n")
 
 # Fit 4: Convexity constraint (tau = 0.5)
@@ -86,7 +87,7 @@ cat("  - Convexity constraint (tau = 0.5)...")
 res_convexe <- quantile_spline(xtab, ytab, knots, tau = 0.5,
                                       monot = 0, convcons = 1,
                                degree=degree,
-                                      solver = "OSQP")
+                                      solver = "HIGHS")
 cat(" done\n\n")
 
 # Evaluate all fits on a fine grid
