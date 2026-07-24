@@ -5,11 +5,11 @@
 #' @param degree Spline degree (default = 3)
 #' @param x_values Evaluation points for design matrix (0 = no evaluation)
 #' @param verbose boolean FALSE (default) or TRUE.
-#' @return A list containing: (kn intervals and N=kn+3 basis functions)
+#' @return A list containing (kn: Nb intervals, N=kn+3: Nb basis functions):
 #'   \item{d0}{Design matrix (if x_values provided)}
-#'   \item{d1}{First derivative coefficients [a3, a2, a1] for each interval: (kn x N x 3) array
-#'   \item{d2}{Second derivative values at knot : ((kn+1) x N ) matrix}
-#'   \\item(d3){Third derivative values at knots :(kn x N) matrix)}
+#'   \item{d1}{First derivative coefficients [a3, a2, a1] for each interval: (kn x N x 3) array}
+#'   \item{d2}{Second derivative values at knot: ((kn+1) x N) matrix}
+#'   \item{d3}{Third derivative values at knots: (kn x N) matrix}
 #' @export
 bspline_to_deriv_coeffs_cubic <- function(tn,degree = 3,x_values=0, verbose=FALSE) {
 

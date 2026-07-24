@@ -30,6 +30,10 @@
 
 spline_eval<-function(Bspline, x_values=NULL, Bvalues=NULL)
 {
+  if (inherits(x, "callable_spline")) {
+    Bspline<-get_parameters(Bspline)
+  }
+
   knot=Bspline$knot #vector of effective knots
   degree=Bspline$degree
   coeff=Bspline$coeff

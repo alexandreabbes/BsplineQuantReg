@@ -88,7 +88,7 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
   if (length(knot) == 1 && is.numeric(knot))
   {
     kn <- knot - 1
-    knot <- quantile(xtab, probs = seq(0, 1, length.out = kn + 1))
+    knot <- quantile(xtab, probs = (0:kn)/(kn))
   }
 
   kn <- length(knot) - 1
@@ -130,6 +130,10 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
     if (length(monot) == 1) {
       monot <- rep(monot, kn)
     }
+    if (length(monot)<(kn)){
+      message("Not enough monotonicity constraints, completing with 0")
+      monot<-c(monot,rep(0,kn-length(convcons))) }
+
     for (i in 1:(kn)) {
       if (monot[i] != 0) {
         z_vars[[i]] <- Variable(1, name = paste0("z", i))
@@ -144,13 +148,17 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
   }
 
   #"contraintes convexes
-  if (verbose){
-    message("Convexity constraints (Linear):", convcons, "\n")
-  }
+
   # eliminate the null (unconstrained) case
   if (any(convcons !=0)){
     if (length(convcons) == 1) {
-      convcons <- rep(convcons, (kn+1))}
+      convcons <- rep(convcons, (kn+1) )}
+    if (length(convcons)<(kn+1)){
+      message("Not enough convexity constraints, completing with 0")
+      convcons<-c(convcons,rep(0,kn+1-length(convcons))) }
+    if (verbose){
+      message("Convexity constraints (Linear):", convcons, "\n")
+      }
     CV<-list((convcons*(deriv_coeffs2 %*% alpha))>=0)
     # Very simple, only use the sign of
     # the second derivatives at the knot.
@@ -158,46 +166,64 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
   }
 
 #3rd derivative constraints
-  if (verbose) {
-    message("3rd order derivative constraints (constant):", der3cons, "\n")}
   if (any(der3cons!=0)){
-    if (length(der3cons)==1){der3cons<-rep(der3cons,kn)}
-    print(der3cons)
-    for (j in (1:kn)) # go through the intervals
-      sig<-der3cons[j]
-      if (sig!=0){
-        d3<-deriv_coeffs3[j,]%*%alpha
-        print(length(alpha))
-        print(dim(deriv_coeffs3))
-        DER3<-apply_linear_constraint(d3,sig)
-      constraints<-c(constraints,DER3)
-  }}
+    #if (dim(deriv_coeffs3)[2]!=N){
+      #prepare the values for matrix mult.      #calculation
+     # deriv_coeff3=t(deriv_coeffs3)}
+    if (length(der3cons) == 1){der3cons<-rep(der3cons,kn)}
+    if (length(der3cons) < kn ){
+      message("not enough 3rd order constraints, completing with 0")
+      der3cons=c(der3cons,rep(0,kn-length(der3cons))) }
+    if (verbose) {
+      message("3rd order derivative constraints (constant):", der3cons, "\n")}
+    for (j in 1:kn) {
+      sig <- der3cons[j]
+      if (sig != 0) {
+        # Utiliser sum() au lieu de vdot
+        d3 <- sum(deriv_coeffs3[j, ] * alpha)
+        DER3 <- apply_linear_constraint(d3, sig)
+        constraints <- c(constraints, DER3)
+        if (verbose) {
+          message("  Constraint on interval ", j, ": ", sig, " * d3 >= 0")
+        }
+      }
+    }
+    }
+
+
   problem <- Problem(objective, constraints)
 
   result <- NULL
   solvers_to_try <- c(solver, "CLARABEL", "OSQP", "ECOS", "SCS")
 
   for (s in unique(solvers_to_try)) {
-    if (verbose) {cat("Trying solver:", s, "\n")}
+    if (verbose) cat("Trying solver:", s, "\n")
 
-    # Use new CVXR syntax: psolve() for optimal value
     result <- tryCatch({
-      # Solve the problem with new syntax
       opt_val <- psolve(problem, solver = toupper(s), verbose = verbose)
-      # Create a result list compatible with old expectations
       list(
         value = opt_val,
         status = status(problem),
         alpha_value = value(alpha)
       )
     }, error = function(e) {
-      if (verbose) {cat("Failed:", e$message, "\n")}
-      NULL}
-    )}
+      if (verbose) cat("Failed:", e$message, "\n")
+      NULL
+    })
 
-  if (is.null(result) || is.null(value(alpha))) {
-    warning("Optimisation did not converge with any available solver")
-    return(NULL)
+    # Vérifier si le solveur a réussi avec status "optimal"
+    if (!is.null(result) && !is.null(result$alpha_value)) {
+      if (result$status == "optimal") {
+        if (verbose) cat("Solver succeeded with optimal status:", s, "\n")
+        break
+      } else if (result$status == "optimal_inaccurate") {
+        if (verbose) cat("Solver returned optimal_inaccurate:", s, "\n")
+        # Continuer à essayer d'autres solveurs pour un meilleur résultat
+        # Mais garder ce résultat comme fallback
+      } else {
+        if (verbose) cat("Solver returned non-optimal status:", result$status, "\n")
+      }
+    }
   }
 
   alpha_val <- result$alpha_value+y_mean
@@ -211,7 +237,7 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
   return(list(
     coefficients = alpha_val,
     degree=3,
-    knots=knot,
+    knot=knot,
     result=result
   ))
 }

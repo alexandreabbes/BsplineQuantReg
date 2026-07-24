@@ -167,7 +167,6 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
   # For quartic splines, third derivative is affine on each interval
   # We impose sign constraints at knot
   if (any(der3cons != 0)) {
-    if (verbose) { cat(c("On applique les contraintes d'ordre 3:", der3cons,"\n"))}
     for (i in 1:(kn + 1)) {
       if (der3cons[i] != 0) {
         # Third derivative value at knot i
@@ -187,7 +186,7 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
   for (s in unique(solvers_to_try)) {
     if (verbose) cat("Trying solver:", s, "\n")
 
-    # Use new CVXR syntax: psolve() for optimal value
+    # Use new CVXR syntax: psolve()
     result <- tryCatch({
       # Solve the problem with new syntax
       opt_val <- psolve(problem, solver = toupper(s), verbose = verbose)

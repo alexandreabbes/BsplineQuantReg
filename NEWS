@@ -8,6 +8,7 @@ Fix
 -  improve callable structure for bsplines : callable_spline type.
 -  eval_pp : add extroplating values out of the knots range
 -  Fix problem with der3 coeff in SplineCubicQuant
+-  Complete constraints if not enough
 
 Version=0.2.0 (07/2026)
 =============
