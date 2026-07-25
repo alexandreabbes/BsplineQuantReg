@@ -1,3 +1,8 @@
+Version=0.2.2 (07/2026)
+## Bug Fixes
+- adapt demos to new notations
+
+
 Version=0.2.1 (07/2026)
 =============
 ## Bug Fixes
@@ -19,7 +24,6 @@ Version=0.2.1 (07/2026)
 - Improved `make_spline` and 'spline_eval' function to handle both list and callable objects
 - Complete constraints if not enough are provided if degree=3
 - Update `print.callable_spline` method
--
 
 
 Version=0.2.0 (07/2026)
