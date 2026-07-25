@@ -13,10 +13,10 @@ This package is available on CRAN.
 If you use this package in your research, please cite:
 
 ```bibtex
-@Article{Abbes2026,
+@Article{Abbes2025,
   author  = {Alexandre Abbes},
   title   = {Constrained Quantile Regression with Cubic B-Splines under Shape Constraints},
-  year    = {2026},
+  year    = {2025},
   doi     = {10.5281/zenodo.17427913}
 }
 ```
@@ -57,16 +57,14 @@ devtools::install_github("alexandreabbes/BsplineQuantReg")
 On Linux systems, the packages `CVXR` and `CLARABEL` require the Rust compiler and Cargo package manager to be installed.
 
 #### Ubuntu/Debian:
-
 ```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-source ~/.cargo/env
+sudo apt-get install cargo rustc
 ```
 
-#### Fedora/RHEL:
+#### Fedora and other linux dist.
 
 ```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -
 source ~/.cargo/env
 ```
 

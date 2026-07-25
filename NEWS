@@ -7,16 +7,19 @@ Version=0.2.1 (07/2026)
 - eval_pp : add extroplating values out of the knots range
 - Fixed issues with `der3cons` vector lengths for different degrees
 - Fixed third derivative constraints for cubic splines
+- Fixed the demo
 
 ## Changes
 - Updated CVXR syntax, removed deprecated functions and cleaned up code
 - Improved solver selection logic with fallback mechanism
-- Stabilizing bsline_eval and eval_pp functions for 1 intervall case and extrapolation
-- quantile_spline() :   callable=TRUE is now default value
+- Stabilizing bspline_eval and eval_pp functions for unique interval case
+- Allow bspline_eval and eval_pp functions to extrapolate values outside the knots range
+- Quantile_spline() :   callable=TRUE is now default value
+- New classes as output of quantile_spline: callable_spline and non_callable_spline
 - Improved `make_spline` and 'spline_eval' function to handle both list and callable objects
 - Complete constraints if not enough are provided if degree=3
 - Update `print.callable_spline` method
-
+-
 
 
 Version=0.2.0 (07/2026)

@@ -111,8 +111,8 @@ change_polynomial_base_taylor <- function(coeffs_a, a, b)
 #'
 #' Removes leading zeros from a polynomial coefficient vector.
 #'
-#' @param p Polynomial coefficient vector(coef in decreasing order)
-#' @param verbose boolean FALSE (default) or TRUE.
+#' @param p Polynomial coefficient vector(coefficients are in decreasing order)
+#' @param verbose Boolean FALSE (default) or TRUE.
 #' @return Reduced vector (without leading zeros)
 #' @examples
 #' reduce_pol(c(0,0, 1, 1))

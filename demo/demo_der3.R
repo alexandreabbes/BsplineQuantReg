@@ -29,7 +29,7 @@ if (!exists("degree")) {
 
 cat("========================================\n")
 cat("Test: Third Derivative Constraints\n")
-cat(sprintf("Degree: %d (%s)\n", degree, ifelse(degree == 3, "Cubic", "Quartic")))
+cat(cat(sprintf(c("linear","quadratic","cubic","quartic")[degree])))
 cat("========================================\n\n")
 
 # ============================================================
@@ -153,7 +153,7 @@ d3_mixed <- compute_third_deriv(y_mixed, x_eval)
 
 # Verification
 cat("=== Verification of Third Derivative Constraints ===\n")
-cat(sprintf("Degree %d (%s):\n", degree, ifelse(degree == 3, "Cubic", "Quartic")))
+cat(sprintf(c("linear","quadratic","cubic","quartic")[degree]))
 cat(sprintf("  Positive:   min d3 = %.4f (should be >= 0)\n", min(d3_pos, na.rm = TRUE)))
 cat(sprintf("  Negative:   max d3 = %.4f (should be <= 0)\n", max(d3_neg, na.rm = TRUE)))
 cat(sprintf("  Mixed:      min d3 on first half = %.4f, max on second half = %.4f\n",
@@ -180,16 +180,16 @@ plot(x, y, pch = 16, cex = 0.4, col = "black",
      main = sprintf("Degree %d - Third Derivative Constraints", degree))
 lines(x_eval, y_true, col = "black", lwd = 2, lty = 2)
 lines(x_eval, y_uncon, col = "red", lwd = 1.5)
-lines(x_eval, y_pos, col = "blue", lwd = 1.5)
+lines(x_eval, y_pos, col = "yellow", lwd = 1.5)
 lines(x_eval, y_neg, col = "darkgreen", lwd = 1.5)
-lines(x_eval, y_mixed, col = "purple", lwd = 1.5)
-abline(v = knots, col = "blue", lty = 3, lwd = 0.5)
+lines(x_eval, y_mixed, col = "black", lwd = 1.5)
+abline(v = knots, col = "yellow", lty = 3, lwd = 0.5)
 legend("top", legend = c("True", "Unconstrained", "Positive", "Negative", "Mixed"),
-       col = c("black", "red", "blue", "darkgreen", "purple"),
+       col = c("black", "red", "yellow", "darkgreen", "black"),
        lty = c(2, 1, 1, 1, 1), lwd = 2, cex = 0.5)
 
 # Plot 2: Third derivatives - Positive constraint
-plot(x_eval, d3_pos, type = "l", col = "blue", lwd = 2,
+plot(x_eval, d3_pos, type = "l", col = "yellow", lwd = 2,
      xlab = "x", ylab = "Third Derivative",
      main = sprintf("Degree %d - Third Derivatives (Positive)", degree))
 abline(h = 0, col = "red", lty = 2)
@@ -203,12 +203,12 @@ abline(h = 0, col = "red", lty = 2)
 grid()
 
 # Plot 4: Third derivatives - Mixed constraint
-plot(x_eval, d3_mixed, type = "l", col = "purple", lwd = 2,
+plot(x_eval, d3_mixed, type = "l", col = "black", lwd = 2,
      xlab = "x", ylab = "Third Derivative",
      main = sprintf("Degree %d - Third Derivatives (Mixed)", degree))
 abline(h = 0, col = "red", lty = 2)
 abline(v = 0.5, col = "orange", lty = 3, lwd = 2)
-text(0.25, max(d3_mixed, na.rm = TRUE) * 0.8, "Positive", col = "blue")
+text(0.25, max(d3_mixed, na.rm = TRUE) * 0.8, "Positive", col = "yellow")
 text(0.75, min(d3_mixed, na.rm = TRUE) * 0.8, "Negative", col = "darkgreen")
 grid()
 
@@ -223,7 +223,7 @@ cat("\n========================================\n")
 cat("Summary\n")
 cat("========================================\n")
 cat(sprintf("Degree %d (%s) third derivative constraints:\n",
-            degree, ifelse(degree == 3, "Cubic", "Quartic")))
+            c("linear","quadratic","cubic","quartic")[degree]))
 if (degree == 3) {
   cat("  - der3cons is applied per interval (length = kn)\n")
 } else {

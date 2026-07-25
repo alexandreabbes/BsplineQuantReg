@@ -12,8 +12,8 @@
 #' @param convcons Convexity constraint vector per knot:
 #'        1 = convex, -1 = concave, 0 = unconstrained. If scalar, repeated.
 #' @param der3cons Constraint on the 3rd derivative (on esach intervall:
-#'        -1: négative, 0: no constraint, 1: positive constraint
-#' @param solver CVXR solver to use (default = "CLARABEL")
+#'        -1: negative, 0: no constraint, 1: positive constraint
+#' @param solver 'CVXR' solver to use (default = 'CLARABEL')
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list containing:
@@ -37,26 +37,26 @@
 #' fit_convex <- SplineConstQuantRegBs3(x, y, knot, tau=0.5, convcons=1)
 #'
 #' @seealso
-#' Related R packages:
+#' Related 'R' packages:
 #' \itemize{
 #'   \item \code{quantreg} - Quantile regression with linear programming
 #'   \item \code{cobs} - Constrained B-sines (linear and quadratic only)
 #' }
-#'
 #' Other implementations:
 #' \itemize{
 #'   \item MATLAB/Python versions: \url{https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines}
+#'   \item Python package : https://pypi.org/project/BsplineQuantRegpy/
 #' }
 #' @references
 #' \itemize{
 #'   \item Abbes, A. (2025). \emph{Quantile regression with cubic polynomial splines under shape constraints with applications}
 #'         . Zenodo.
-#'         \doi{10.5281/zenodo.16999784}
+#'         \doi{10.5281/zenodo.17427913}
 #'   \item de Boor, C. (1978). \emph{A Practical Guide to Splines}. Springer-Verlag.
 #'         \doi{10.1007/978-1-4612-6333-3}
 #'   \item Karlin, S., & Studden, W. J. (1966). \emph{Tchebycheff Systems: With
 #'         Applications in Analysis and Statistics}. Interscience.
-#'   \item Koenker, R., & Bassett, G. (1978). Regression Quantiles.
+#'   \item Koenker, R. G. (1978). Regression Quantiles.
 #'         \emph{Econometrica}, 46(1), 33-50. \doi{10.2307/1913643}
 #'   \item Koenker, R. (2025). quantreg: Quantile Regression. R package version 5.99.
 #'         \url{https://CRAN.R-project.org/package=quantreg}

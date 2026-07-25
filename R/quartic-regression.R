@@ -1,7 +1,7 @@
 # Quartic Spline Quantile Regression with Shape Constraints
 # Based on the Python implementation in quantile_reg.py
 # Author: Alexandre Abbes
-# Updated for CVXR new syntax (psolve, value, status)
+# Updated for 'CVXR' new syntax (psolve, value, status)
 
 #' Quantile regression with quartic splines and shape constraints
 #'
@@ -20,7 +20,7 @@
 #'        1 = convex, -1 = concave, 0 = unconstrained
 #' @param der3cons Third derivative constraint vector at knot:
 #'        1 = positive third derivative, -1 = negative, 0 = unconstrained
-#' @param solver CVXR solver to use (default = "OSQP")
+#' @param solver 'CVXR' solver to use (default = "OSQP")
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose Logical; if TRUE, print progress messages
 #' @return A list containing coefficients, degree, and knot
@@ -177,7 +177,7 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
     }
   }
 
-  # Solve the problem using new CVXR syntax
+  # Solve the problem using new 'CVXR' syntax
   problem <- Problem(objective, constraints)
 
   result <- NULL
@@ -186,7 +186,7 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
   for (s in unique(solvers_to_try)) {
     if (verbose) cat("Trying solver:", s, "\n")
 
-    # Use new CVXR syntax: psolve()
+    # Use new 'CVXR' syntax: psolve()
     result <- tryCatch({
       # Solve the problem with new syntax
       opt_val <- psolve(problem, solver = toupper(s), verbose = verbose)

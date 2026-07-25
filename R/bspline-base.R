@@ -11,7 +11,6 @@
 #' @param o Spline order (degree + 1)
 #' @return (Side function) A Vector of coefficients [alpha, beta] representing (alpha*t + beta)
 #' @keywords internal
-
 Omega<-function(s,j,o)#t: knot in the base t-t[j]
 
 {
@@ -30,9 +29,10 @@ Omega<-function(s,j,o)#t: knot in the base t-t[j]
 #' Uses De Boor's recursion formula.
 #' @param sn Extended knot vector (including endpoint repetitions)
 #' This means if t0..tkn it the set of knot
-#' then sn should be given as a vector with  "degree" times t_0 and t_kn at the begining
+#' then sn should be given as a vector with  "degree" times t_0 and t_kn
+#' at the beginning
 #'  and the ends.  its length is number of intervals+1+2*degree.
-#' @param degree B-spline degree (default = 3 for cubic)
+#' @param degree 'B-spline' degree (default = 3 for cubic)
 #' @param der Derivative order (0 = original basis)
 #' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list containing:
@@ -54,12 +54,15 @@ Omega<-function(s,j,o)#t: knot in the base t-t[j]
 #' matplot(x,t(y))
 #' #or simple:
 #' #view_basis(basis)
-#'
 #' @export
-
 Bspline_base<-function(sn,degree=3,der=NULL,verbose=FALSE)
-{
-  tn=sn[(degree+1):(length(sn)-degree)] #effective knot partition
+{ if (verbose) {message("Constructing the B-spline basis, \n Degree = ", degree, " \n Extended knots partition: ", sn)}
+
+  tn <- tryCatch({
+    sn[(degree + 1):(length(sn) - degree)]
+  }, error = function(e) {
+    stop("Error extracting knots: ", e$message)
+  }) #effective knot partition
   kn=length(tn)-1 # tn is the list of knot without the extended partition.
   n_ext_intervals<-kn+2*degree #Nb extended intervals
   n_splines<-kn+degree
@@ -137,8 +140,6 @@ Bspline_base<-function(sn,degree=3,der=NULL,verbose=FALSE)
 #' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list similar to \code{Bspline_base} for the derivative basis
 #' @export
-
-
 Bspline_deriv<-function(bspline,der=2,verbose=FALSE){
   #computes the derivative fo a Bspline basis
   if (is.null(der)){der<-0}

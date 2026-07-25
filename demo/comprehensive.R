@@ -24,12 +24,16 @@ if (!exists("degree")){degree=3}
 
 # Generate synthetic data
 #set.seed(42)
-n_points <- 100
+n_points <- 30
 xtab <- seq(0, 1, length.out = n_points + 1)  # 51 points from 0 to 1
 
 # Data: increasing trend with oscillation + noise
 # y = 2x + 0.5*sin(6 pi x) + noise
 ytab <- 2 * xtab + 0.5 * sin(6 * pi * xtab) + 0.2 * rnorm(n_points + 1)
+
+x_eval <- seq(0, 1, length.out = 200)
+y_true <-  2 * x_eval + 0.5 * sin(6 * pi * x_eval)
+
 
 # Number of intervals
 kn <- 12
@@ -91,7 +95,7 @@ res_convexe <- quantile_spline(xtab, ytab, knots, tau = 0.5,
 cat(" done\n\n")
 
 # Evaluate all fits on a fine grid
-x_eval <- seq(0, 1, length.out = 200)
+
 y_uncon1 <- spline_eval(res_uncon1, x_eval)
 y_uncon2 <- spline_eval(res_uncon2, x_eval)
 y_uncon3 <- spline_eval(res_uncon3, x_eval)
@@ -128,6 +132,8 @@ plot(xtab, ytab, pch = 16,  col = "black",
 lines(x_eval, y_croiss1, col = "blue", lwd = 2)
 lines(x_eval, y_croiss2, col = "blue", lwd = 2)
 abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
+legend("topleft",c("true","fitted"),col = c("black", "blue"),lwd = 2)
+lines(x_eval, y_true, col = "black", lwd = 1, )
 # Highlight the constrained region
 abline(v = knots[n_constrained + 1], col = "red", lty = 2, lwd = 2)
 text(knots[n_constrained + 1] + 0.02, max(ytab) - 0.2,
@@ -140,6 +146,8 @@ plot(xtab, ytab, pch = 16,  col = "black",
      main = "Full Decreasing Constraint\n(everywhere)")
 lines(x_eval, y_decroiss, col = "darkgreen", lwd = 2)
 abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
+legend("topleft",c("true","fitted"),col = c("black", "darkgreen"),lwd = 2)
+lines(x_eval, y_true, col = "black", lwd = 1, )
 grid()
 
 # Plot 3: Convexity constraint
@@ -147,6 +155,8 @@ plot(xtab, ytab, pch = 16,  col = "black",
      xlab = "x", ylab = "y",
      main = "Convexity Constraint\n(second derivative >= 0)")
 lines(x_eval, y_convexe, col = "purple", lwd = 2)
+legend("topleft",c("true","fitted"),lwd = 2,col=c("black","purple"))
+lines(x_eval, y_true, col = "black", lwd = 1, )
 abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
 grid()
 
@@ -154,6 +164,8 @@ grid()
 plot(xtab, ytab, pch = 16,  col = "black",
      xlab = "x", ylab = "y",
      main = "Unconstrained\n(tau = 0.9, , 0.5, 0.1)")
+legend("topleft",c("true","fitted"),col=c("black","red"),lwd = 2)
+lines(x_eval, y_true, col = "black", lwd = 1, )
 lines(x_eval, y_uncon1, col = "red", lwd = 2)
 lines(x_eval, y_uncon2, col = "red", lwd = 2)
 lines(x_eval, y_uncon3, col = "red", lwd = 2)

@@ -12,10 +12,11 @@ Bspline_base(sn, degree = 3, der = NULL, verbose = FALSE)
 \arguments{
 \item{sn}{Extended knot vector (including endpoint repetitions)
 This means if t0..tkn it the set of knot
-then sn should be given as a vector with  "degree" times t_0 and t_kn at the begining
+then sn should be given as a vector with  "degree" times t_0 and t_kn
+at the beginning
  and the ends.  its length is number of intervals+1+2*degree.}
 
-\item{degree}{B-spline degree (default = 3 for cubic)}
+\item{degree}{'B-spline' degree (default = 3 for cubic)}
 
 \item{der}{Derivative order (0 = original basis)}
 
@@ -48,5 +49,4 @@ y=bs_direct(basis,x)
 matplot(x,t(y))
 #or simple:
 #view_basis(basis)
-
 }

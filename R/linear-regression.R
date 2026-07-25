@@ -20,7 +20,7 @@
 #' @export
 SplineLinearQuant <- function(xtab, ytab, knot, tau,
                               monot = 0,
-                              solver = "GUROBI",
+                              solver = "HIGHS",
                               weight = NULL,
                               verbose = FALSE) {
 

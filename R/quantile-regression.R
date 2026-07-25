@@ -21,9 +21,9 @@
 #'        For degree 2: not available (third derivative = 0)
 #'        For degree 3: per interval (1 = positive, -1 = negative)
 #'        For degree 4: per knot (1 = positive, -1 = negative)
-#' @param solver CVXR solver to use (default = "CLARABEL")
+#' @param solver 'CVXR' solver to use (default = 'CLARABEL')
 #' @param callable render the final container object callable:
-#'  y=Bspline(x) or y=Bspline(x,Bvalues) for evaluation at x
+#'  'y=Bspline(x)' or 'y=Bspline(x,Bvalues)' for evaluation at x
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose logical; if TRUE, print progress messages
 #' @return A list containing coefficients, degree, and knots
@@ -108,23 +108,23 @@ quantile_spline <- function(xtab, ytab, knot, tau=0.5,
 
   # Return callable object if requested
   if (callable) {
-    return(make_spline(result))
+    result=make_spline(result)
+  }else{
+    class(result)<-c("non_callable_spline",class(result))
   }
-
   return(result)
 }
 
-#' Print method for quantile_spline results
+
+#' Print method for non_callable_spline results
 #'
-#' @param x Result object from quantile_spline
+#' @param x Result object from quantile_spline when callable=FALSE
 #' @param ... Additional arguments
 #' @export
-print.quantile_spline <- function(x, ...) {
-  cat("Quantile Spline Regression (degree", x$degree, ")\n")
-  cat("Knots:", length(x$knot) - 1, "intervals\n")
-  cat("Basis functions:", length(x$coefficients), "\n")
-  cat("Objective value:", x$value, "\n")
-  cat("Coefficients range: [", range(x$coefficients)[1], ",",
-      range(x$coefficients)[2], "]\n")
+print.non_callable_spline <- function(x, ...) {
+  cat("Non callable Spline List \n")
+  cat("Degree: ", x$degree, "\n")
+  cat("Knots (", length(x$knot), ") : [",x$knot,"]", "\n")
+  cat("Coefficients (dim(Basis)=",length(x$coeff),") :", x$coeff,"\n")
   invisible(x)
 }

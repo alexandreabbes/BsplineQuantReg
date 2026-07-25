@@ -1,7 +1,7 @@
 #' Apply Karlin-Studden constraints for a cubic polynomial
 #'
 #' For a cubic polynomial p(u) = a*u^3 + b*u^2 + c*u + d on [0,1],
-#' this function applies the Karlin-Studden SOCP constraints
+#' this function applies the 'Karlin-Studden SOCP constraints'
 #' to ensure p(u) >= 0 or p(u) <= 0 on [0,1].
 #'
 #' @param p3 Coefficient of u^3
@@ -11,7 +11,7 @@
 #' @param z0 Auxiliary SOCP variable for cubic
 #' @param z1 Auxiliary SOCP variable for cubic
 #' @param sign Sign of the constraint (+1 for >= 0, -1 for <= 0)
-#' @return List of CVXR constraints
+#' @return List of 'CVXR' constraints
 #' @keywords internal
 apply_karlin_cubic <- function(p3, p2, p1, p0, z0, z1, sign = 1) {
   constraints <- list()
@@ -78,7 +78,7 @@ apply_karlin_cubic <- function(p3, p2, p1, p0, z0, z1, sign = 1) {
 #' @param p0 Constant term
 #' @param z0 Auxiliary SOCP variable
 #' @param sign Sign of the constraint (+1 for >= 0, -1 for <= 0)
-#' @return List of CVXR constraints
+#' @return List of 'CVXR' constraints
 #' @keywords internal*
 
 apply_karlin_quadratic <- function(p2, p1, p0, z0, sign = 1)
@@ -116,7 +116,7 @@ apply_karlin_quadratic <- function(p2, p1, p0, z0, sign = 1)
 #'
 #' @param const_value Value of the third derivative at a knot
 #' @param sign Sign of the constraint (+1 for >= 0, -1 for <= 0)
-#' @return List of CVXR constraints
+#' @return List of 'CVXR' constraints
 #' @keywords internal
 apply_linear_constraint <- function(const_value, sign = 1) {
   constraints <- list()

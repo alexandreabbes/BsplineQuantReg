@@ -14,13 +14,13 @@
 #' @param tau Quantile (between 0 and 1)
 #' @param monot Monotonicity constraint vector per interval:
 #'        1 = increasing, -1 = decreasing, 0 = unconstrained.
-#'        Although tcontsraints are set at knots; we apply them
-#'        on each intervall, at both extremities. kn+1 knots, kn consraints
-#'        taken into account.
+#'        Although constraints are set at knots; we apply them
+#'        on each interval, at both extremities.
+#'        kn+1 knots, kn constraints taken into account.
 #' @param convcons Convexity constraint vector per interval:
 #'        1 = convex, -1 = concave, 0 = unconstrained.
 #'        kn constraints are considered for kn+1 knots.
-#' @param solver CVXR solver to use (default = "OSQP")
+#' @param solver 'CVXR' solver to use (default = 'CLARABEL')
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose logical; if TRUE, print progress messages
 #' @return A list containing coefficients, degree, and knots
@@ -151,7 +151,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
   for (s in unique(solvers_to_try)) {
     if (verbose) cat("Trying solver:", s, "\n")
 
-    # Use new CVXR syntax: psolve() for optimal value
+    # Use new 'CVXR' syntax: psolve() for optimal value
     result <- tryCatch({
       # Solve the problem with new syntax
       opt_val <- psolve(problem, solver = toupper(s), verbose = verbose)
