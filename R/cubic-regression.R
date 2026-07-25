@@ -194,7 +194,7 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
 
   result <- NULL
   fallback_result <- NULL
-  solvers_to_try <- c(solver, "CLARABEL", "OSQP", "ECOS", "SCS")
+  solvers_to_try <- c(solver, "CLARABEL", "HIGHS", "OSQP", "SCS", "ECOS")
   solvers_to_try <- unique(solvers_to_try)  # Supprimer les doublons
 
   for (s in solvers_to_try) {
@@ -262,7 +262,7 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
 
 
   return(list(
-    coefficients = alpha_val,
+    coeff = alpha_val,
     degree=3,
     knot=knot,
     result=result

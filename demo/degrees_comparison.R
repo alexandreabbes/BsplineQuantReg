@@ -30,47 +30,46 @@ true_function <- function(x) {
 y <- true_function(x) + 0.7 * rnorm(n)
 
 # Knots
-knots <- quantile(x, probs = seq(0, 1, length.out = 10))
+knot <- quantile(x, probs = seq(0, 1, length.out = 10))
 
 cat(sprintf("Number of points: %d\n", n))
-cat(sprintf("Number of knots: %d\n", length(knots)))
+cat(sprintf("Number of knot: %d\n", length(knot)))
 cat(sprintf("Tau: 0.5 (median)\n\n"))
 
 # Fit all degrees with increasing constraint
 cat("Fitting models with increasing constraint...\n")
 
-fit1 <- quantile_spline(x, y, knots, tau = 0.5, degree = 1,
+fit1 <- quantile_spline(x, y, knot, tau = 0.5, degree = 1,
                         monot = 1, verbose = FALSE, callable = TRUE)
 cat("  Degree 1 (linear)... done\n")
 
-fit2 <- quantile_spline(x, y, knots, tau = 0.5, degree = 2,
-                        monot = 1, verbose = FALSE, callable = TRUE)
+fit2 <- quantile_spline(x, y, knot, tau = 0.5, degree = 2, monot = 1, verbose = FALSE, callable = TRUE)
 cat("  Degree 2 (quadratic)... done\n")
 
-fit3 <- quantile_spline(x, y, knots, tau = 0.5, degree = 3,
+fit3 <- quantile_spline(x, y, knot, tau = 0.5, degree = 3,
                         monot = 1, verbose = FALSE, callable = TRUE)
 cat("  Degree 3 (cubic)... done\n")
 
-fit4 <- quantile_spline(x, y, knots, tau = 0.5, degree = 4,
+fit4 <- quantile_spline(x, y, knot, tau = 0.5, degree = 4,
                         monot = 1, verbose = FALSE, callable = TRUE)
 cat("  Degree 4 (quartic)... done\n")
 
 # Fit all degrees with convexity constraint
 cat("\nFitting models with convexity constraint...\n")
 
-fit1_conv <- quantile_spline(x, y, knots, tau = 0.5, degree = 1,
+fit1_conv <- quantile_spline(x, y, knot, tau = 0.5, degree = 1,
                              convcons = 1, verbose = FALSE, callable = TRUE)
 cat("  Degree 1 (linear)... done\n")
 
-fit2_conv <- quantile_spline(x, y, knots, tau = 0.5, degree = 2,
+fit2_conv <- quantile_spline(x, y, knot, tau = 0.5, degree = 2,
                              convcons = 1, verbose = FALSE, callable = TRUE)
 cat("  Degree 2 (quadratic)... done\n")
 
-fit3_conv <- quantile_spline(x, y, knots, tau = 0.5, degree = 3,
+fit3_conv <- quantile_spline(x, y, knot, tau = 0.5, degree = 3,
                              convcons = 1, verbose = FALSE, callable = TRUE)
 cat("  Degree 3 (cubic)... done\n")
 
-fit4_conv <- quantile_spline(x, y, knots, tau = 0.5, degree = 4,
+fit4_conv <- quantile_spline(x, y, knot, tau = 0.5, degree = 4,
                              convcons = 1, verbose = FALSE, callable = TRUE)
 cat("  Degree 4 (quartic)... done\n")
 
@@ -107,7 +106,7 @@ legend("topleft", legend = c("True", degree_labels),
        col = c("black", colors), lty = c(2, rep(1, 4)),
        lwd = 2, cex = 0.7)
 
-abline(v = knots, col = "blue", lty = 3, lwd = 0.5)
+abline(v = knot, col = "blue", lty = 3, lwd = 0.5)
 
 # ============ PLOT 2: Convexity constraint ============
 plot(x, y, pch = 16, cex = 0.4, col = "gray",
@@ -124,16 +123,16 @@ legend("topleft", legend = c("True", degree_labels),
        col = c("black", colors), lty = c(2, rep(1, 4)),
        lwd = 2, cex = 0.7)
 
-abline(v = knots, col = "blue", lty = 3, lwd = 0.5)
+abline(v = knot, col = "blue", lty = 3, lwd = 0.5)
 
 # ============ PLOT 3: Comparison of degrees (unconstrained) ============
-fit1_uncon <- quantile_spline(x, y, knots, tau = 0.5, degree = 1,
+fit1_uncon <- quantile_spline(x, y, knot, tau = 0.5, degree = 1,
                               verbose = FALSE, callable = TRUE)
-fit2_uncon <- quantile_spline(x, y, knots, tau = 0.5, degree = 2,
+fit2_uncon <- quantile_spline(x, y, knot, tau = 0.5, degree = 2,
                               verbose = FALSE, callable = TRUE)
-fit3_uncon <- quantile_spline(x, y, knots, tau = 0.5, degree = 3,
+fit3_uncon <- quantile_spline(x, y, knot, tau = 0.5, degree = 3,
                               verbose = FALSE, callable = TRUE)
-fit4_uncon <- quantile_spline(x, y, knots, tau = 0.5, degree = 4,
+fit4_uncon <- quantile_spline(x, y, knot, tau = 0.5, degree = 4,
                               verbose = FALSE, callable = TRUE)
 
 y1_uncon <- fit1_uncon(x_eval)
@@ -155,7 +154,7 @@ legend("topleft", legend = c("True", degree_labels),
        col = c("black", colors), lty = c(2, rep(1, 4)),
        lwd = 2, cex = 0.7)
 
-abline(v = knots, col = "blue", lty = 3, lwd = 0.5)
+abline(v = knot, col = "blue", lty = 3, lwd = 0.5)
 
 # ============ PLOT 4: Convergence with degree (increasing constraint) ============
 # Show all four fits together
@@ -173,7 +172,7 @@ legend("topleft", legend = c("True", degree_labels),
        col = c("black", colors), lty = c(2, 2, 3, 1, 4),
        lwd = 2, cex = 0.6)
 
-abline(v = knots, col = "blue", lty = 3, lwd = 0.5)
+abline(v = knot, col = "blue", lty = 3, lwd = 0.5)
 
 # ============ SUMMARY ============
 cat("\n========================================\n")

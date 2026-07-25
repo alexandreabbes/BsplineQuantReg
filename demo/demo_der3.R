@@ -36,21 +36,20 @@ cat("========================================\n\n")
 # 2. Generate highly perturbated data
 # ============================================================
 
-set.seed(123)
-n <- 150
+#set.seed(123)
+n <- 30
 x <- seq(0, 1, length.out = n)
 
 # Function with multiple changes in curvature
 true_function <- function(x) {
-  3 * x^3 - 2 * x^2 + 0.5 * sin(8 * pi * x) + 0.2 * cos(12 * pi * x)
-}
+  8*(x-0.5)^3}
 
 # Add significant noise
-noise_sd <- 0.3
+noise_sd <- 0.4
 y <- true_function(x) + noise_sd * rnorm(n)
 
 # Knots (more knots for flexibility)
-kn <- 12
+kn <- 3
 knots <- quantile(x, probs = seq(0, 1, length.out = kn + 1))
 
 cat(sprintf("Number of points: %d\n", n))
@@ -176,7 +175,7 @@ cat(sprintf("  Mixed:    %s (first half >= 0, second half <= 0)\n",
 oldpar <- par(mfrow = c(2, 2), mar = c(4, 4, 4, 2))
 
 # Plot 1: All fits
-plot(x, y, pch = 16, cex = 0.4, col = "gray",
+plot(x, y, pch = 16, cex = 0.4, col = "black",
      xlab = "x", ylab = "y",
      main = sprintf("Degree %d - Third Derivative Constraints", degree))
 lines(x_eval, y_true, col = "black", lwd = 2, lty = 2)
@@ -185,9 +184,9 @@ lines(x_eval, y_pos, col = "blue", lwd = 1.5)
 lines(x_eval, y_neg, col = "darkgreen", lwd = 1.5)
 lines(x_eval, y_mixed, col = "purple", lwd = 1.5)
 abline(v = knots, col = "blue", lty = 3, lwd = 0.5)
-legend("topleft", legend = c("True", "Unconstrained", "Positive", "Negative", "Mixed"),
+legend("top", legend = c("True", "Unconstrained", "Positive", "Negative", "Mixed"),
        col = c("black", "red", "blue", "darkgreen", "purple"),
-       lty = c(2, 1, 1, 1, 1), lwd = 2, cex = 0.7)
+       lty = c(2, 1, 1, 1, 1), lwd = 2, cex = 0.5)
 
 # Plot 2: Third derivatives - Positive constraint
 plot(x_eval, d3_pos, type = "l", col = "blue", lwd = 2,

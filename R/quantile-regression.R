@@ -59,12 +59,12 @@
 #' \code{\link{SplineLinearQuant}}, \code{\link{SplineQuadraticQuant}},
 #' \code{\link{SplineCubicQuant}}, \code{\link{SplineQuarticQuant}}
 #' @export
-quantile_spline <- function(xtab, ytab, knot, tau,
+quantile_spline <- function(xtab, ytab, knot, tau=0.5,
                             degree = 3,
                             monot = 0,
                             convcons = 0,
                             der3cons = 0,
-                            solver = "HIGHS",
+                            solver = "CLARABEL",
                             weight = NULL,
                             verbose = FALSE,
                             callable = TRUE) {
@@ -76,20 +76,20 @@ quantile_spline <- function(xtab, ytab, knot, tau,
 
   # Dispatch to the appropriate function based on degree
   if (degree == 1) {
-    result <- SplineLinearQuant(xtab, ytab, knot, tau,
+    result <- SplineLinearQuant(xtab, ytab, knot, tau=tau,
                                 monot = monot,
                                 solver = solver,
                                 weight = weight,
                                 verbose = verbose)
   } else if (degree == 2) {
-    result <- SplineQuadraticQuant(xtab, ytab, knot, tau,
+    result <- SplineQuadraticQuant(xtab, ytab, knot, tau=tau,
                                    monot = monot,
                                    convcons = convcons,
                                    solver = solver,
                                    weight = weight,
                                    verbose = verbose)
   } else if (degree == 3) {
-    result <- SplineCubicQuant(xtab, ytab, knot, tau,
+    result <- SplineCubicQuant(xtab, ytab, knot, tau=tau,
                                monot = monot,
                                convcons = convcons,
                                der3cons = der3cons,
@@ -97,7 +97,7 @@ quantile_spline <- function(xtab, ytab, knot, tau,
                                weight = weight,
                                verbose = verbose)
   } else if (degree == 4) {
-    result <- SplineQuarticQuant(xtab, ytab, knot, tau,
+    result <- SplineQuarticQuant(xtab, ytab, knot, tau=tau,
                                  monot = monot,
                                  convcons = convcons,
                                  der3cons = der3cons,

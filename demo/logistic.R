@@ -75,8 +75,8 @@ cat("Fitting multiple quantiles...\n")
 for (i in seq_along(tau_values)) {
   tau <- tau_values[i]
   cat(sprintf("  tau = %.2f...\n", tau))
-  fits[[i]] <- quantile_spline(degree=degree,x, y, knots, tau = tau,
-                                      monot = 0, convcons = 0)
+  fits[[i]] <- quantile_spline(x, y, knots, tau,
+                                      monot = 0, convcons = 0, degree=degree)
 }
 
 # Evaluation grid
@@ -109,8 +109,8 @@ legend("topleft", legend = c("True", paste("tau =", tau_values)),
 # Plot 2: Monotonicity constraint (increasing)
 # ============================================================
 cat("\n=== Fitting with monotonicity constraint ===\n")
-fit_monot <- quantile_spline(degree=degree,x, y, knots, tau = 0.5,
-                                    monot = 1, convcons = 0)
+fit_monot <- quantile_spline(x, y, knots, tau = 0.5,
+                                    monot = 1, convcons = 0, degree=degree)
 y_monot <- spline_eval(fit_monot, x_eval)
 
 plot(x, y, pch = 16,  col = "black",
@@ -136,8 +136,8 @@ legend("topleft", legend = c("True", "Monotonic (tau=0.5)"),
 # Plot 3: Convexity constraint (convex left, concave right)
 # ============================================================
 cat("\n=== Fitting with convexity/concavity constraint ===\n")
-fit_conv <- quantile_spline(degree=degree,x, y, knots, tau = 0.5,
-                                   monot = 0, convcons = convex)
+fit_conv <- quantile_spline(x, y, knots, tau = 0.5,
+                                   monot = 0, convcons = convex,degree=degree)
 y_conv <- spline_eval(fit_conv, x_eval)
 
 plot(x, y, pch = 16,  col = "black",
@@ -161,8 +161,8 @@ legend("topleft", legend = c("True", "Convex/Concave (tau=0.5)"),
 # Plot 4: Combined monotonicity + convexity
 # ============================================================
 cat("\n=== Fitting with monotonicity + convexity ===\n")
-fit_both <- quantile_spline(degree=degree,x, y, knots, tau = 0.5,
-                                   monot = 1, convcons = convex)
+fit_both <- quantile_spline(x, y, knots, tau = 0.5,
+                                   monot = 1, convcons = convex,degree=degree)
 y_both <- spline_eval(fit_both, x_eval)
 
 plot(x, y, pch = 16,  col = "black",

@@ -1,14 +1,23 @@
 Version=0.2.1 (07/2026)
 =============
-Fix
+## Bug Fixes
 - Deprecated notation in CVXR
 - Small bug preventing the regression when the number of knots is minimal
 (only one piece)
--  quantile_spline() :   callable=TRUE is now default value
--  improve callable structure for bsplines : callable_spline type.
--  eval_pp : add extroplating values out of the knots range
--  Fix problem with der3 coeff in SplineCubicQuant
--  Complete constraints if not enough
+- eval_pp : add extroplating values out of the knots range
+- Fixed issues with `der3cons` vector lengths for different degrees
+- Fixed third derivative constraints for cubic splines
+
+## Changes
+- Updated CVXR syntax, removed deprecated functions and cleaned up code
+- Improved solver selection logic with fallback mechanism
+- Stabilizing bsline_eval and eval_pp functions for 1 intervall case and extrapolation
+- quantile_spline() :   callable=TRUE is now default value
+- Improved `make_spline` and 'spline_eval' function to handle both list and callable objects
+- Complete constraints if not enough are provided if degree=3
+- Update `print.callable_spline` method
+
+
 
 Version=0.2.0 (07/2026)
 =============

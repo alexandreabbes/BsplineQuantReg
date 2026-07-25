@@ -28,7 +28,7 @@
 SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
                                  monot = 0,
                                  convcons = 0,
-                                 solver = "GUROBI",
+                                 solver = "CLARABEL",
                                  weight = NULL,
                                  verbose = FALSE) {
 
@@ -69,8 +69,8 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
   }
 
   if (verbose) {
-    message("Monotonicity constraints:", paste(monot, collapse = " "))
-    message("Convexity constraints:", paste(convcons, collapse = " "))
+    message("Monotonicity constraints:", paste(monot, collapse = ","))
+    message("Convexity constraints:", paste(convcons, collapse = ","))
   }
 
   # Build B-spline basis and derivative coefficients
@@ -109,8 +109,8 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
         b_coef <- sum(alpha * deriv1_coeffs[i, , 2])
 
         # Apply sign of monotonicity
-        s <- sign(monot[i])
-
+        s <- monot[i]
+        if (verbose){message("applying monotonicity ",s," on intervall No", i, "[", knot[i],",",knot[i+1],"]" )}
         if (s > 0) {
           # P'(u) >= 0 on [0,1] for linear: min(P'(0), P'(1)) >= 0
           constraints <- c(constraints, list(b_coef >= 0))
@@ -130,6 +130,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
     for (i in 1:kn) {
       if (convcons[i] != 0) {
         # Second derivative value on interval i
+        if (verbose){message("applying convexity ",convcons[i]," at knot No", i, ":", knot[i] )}
         s2_val <- sum(alpha * deriv2_coeffs[i, ])
 
         if (convcons[i] > 0) {
@@ -145,7 +146,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
   problem <- Problem(objective, constraints)
 
   result <- NULL
-  solvers_to_try <- c(solver, "CLARABEL","OSQP", "ECOS", "SCS","MOSEK")
+  solvers_to_try <- c(solver, "CLARABEL","HIGHS", "OSQP", "ECOS", "SCS")
 
   for (s in unique(solvers_to_try)) {
     if (verbose) cat("Trying solver:", s, "\n")
@@ -199,7 +200,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
 SplineConstQuantRegBs2 <- function(xtab, ytab, knot, tau,
                                    monot = 0,
                                    convcons = 0,
-                                   solver = "HIGHS",
+                                   solver = "CLARABEL",
                                    weight = NULL,
                                    verbose = FALSE) {
   SplineQuadraticQuant(xtab, ytab, knot, tau,

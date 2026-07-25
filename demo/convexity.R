@@ -37,18 +37,18 @@ cat(sprintf("Number of intervals: %d\n\n", kn))
 # Fit models
 cat("Fitting models...\n")
 cat("  - Unconstrained...")
-fit_uncon <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
-                                    monot = 0, convcons = 0)
+fit_uncon <- quantile_spline(xtab, ytab, knots, tau = 0.5,
+                                    monot = 0, convcons = 0,degree=degree)
 cat(" done\n")
 
 cat("  - Convexity constraint (everywhere)...")
-fit_convex <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
-                                     monot = 0, convcons = 1)
+fit_convex <- quantile_spline(xtab, ytab, knots, tau = 0.5,
+                                     monot = 0, convcons = 1,degree=degree)
 cat(" done\n")
 
 cat("  - Concavity constraint (everywhere)...")
-fit_concave <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
-                                      monot = 0, convcons = -1)
+fit_concave <- quantile_spline(xtab, ytab, knots, tau = 0.5,
+                                      monot = 0, convcons = -1,degree=degree,)
 cat(" done\n")
 
 # Partial convexity (only on right half, x >= 0)
@@ -59,8 +59,8 @@ for (i in 1:(kn + 1)) {
   }
 }
 cat("  - Partial convexity (x >= 0 only)...")
-fit_partial <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
-                                      monot = 0, convcons = convcons_partial)
+fit_partial <- quantile_spline(xtab, ytab, knots, tau = 0.5,
+                                      monot = 0, convcons = convcons_partial,degree=degree)
 cat(" done\n\n")
 
 # Evaluation
@@ -106,8 +106,8 @@ plot(xtab, ytab, pch = 16,  col = "black",
 lines(x_eval, y_true, col = "black", lwd = 2, lty = 2)
 lines(x_eval, y_partial, col = "purple", lwd = 2)
 abline(v = 0, col = "red", lty = 2, lwd = 1.5)
-text(0.15, -1.5, "Convex region", col = "red", cex = 0.7)
-text(-0.8, 1.5, "Unconstrained", col = "red", cex = 0.7)
+text(0.8, -0.5, "Convex region", col = "red", cex = 0.7)
+text(-0.8, 0.5, "Unconstrained", col = "red", cex = 0.7)
 legend("bottomleft", legend = c("True", "Partial convex"),
        col = c("black", "purple"), lty = c(2, 1), lwd = 2, cex = 0.7)
 
