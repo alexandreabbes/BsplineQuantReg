@@ -49,21 +49,23 @@ y_dec <- spline_eval(fit_dec, x_eval)
 par(mfrow = c(2, 2), mar = c(4, 4, 4, 2), oma = c(0, 0, 2, 0))
 
 plot(xtab, ytab, pch = 16,  col = "black", main = "Data")
+
 plot(xtab, ytab, pch = 16,  col = "black", main = "Unconstrained")
 lines(x_eval, y_uncon, col = "red", lwd = 2)
+
+
 plot(xtab, ytab, pch = 16,  col = "black", main = "Increasing")
 lines(x_eval, y_inc1,col='yellow', lwd = 2)
 lines(x_eval, y_inc2,col='red', lwd = 2)
-lines(x_eval, y_inc3,col='brown', lwd = 2)
+lines(x_eval, y_inc3,col='black', lwd = 2)
 legend("topleft", legend = c(paste("tau =", c(0.1,0.5,0.9))),
-       col = colors, lty = c(rep(1, 3)),
-       lwd = 1.5, cex = 0.6)
+       col = c('yellow',"red","black"), lty = c(3, 1), lwd = 1.5, cex = 0.6)
 
 plot(xtab, ytab, pch = 16,  col = "black", main = "Decreasing")
 lines(x_eval, y_dec, col = "green", lwd = 2)
 
 # Ajouter le titre global
-mtext(paste("Monotonicity Regression Tests - Degree", degree),
+mtext(paste("Basis Monotonicity Regression Tests - Degree", degree),
       side = 3, line = 0.5, outer = TRUE, cex = 1.2, font = 2)
 
 

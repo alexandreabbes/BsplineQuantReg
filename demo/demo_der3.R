@@ -223,7 +223,7 @@ cat("\n========================================\n")
 cat("Summary\n")
 cat("========================================\n")
 cat(sprintf("Degree %d (%s) third derivative constraints:\n",
-            c("linear","quadratic","cubic","quartic")[degree]))
+            degree,c("linear","quadratic","cubic","quartic")[degree]))
 if (degree == 3) {
   cat("  - der3cons is applied per interval (length = kn)\n")
 } else {

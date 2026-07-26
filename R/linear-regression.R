@@ -20,7 +20,7 @@
 #' @export
 SplineLinearQuant <- function(xtab, ytab, knot, tau,
                               monot = 0,
-                              solver = "HIGHS",
+                              solver = "CLARABEL",
                               weight = NULL,
                               verbose = FALSE) {
 
@@ -155,7 +155,7 @@ SplineLinearQuant <- function(xtab, ytab, knot, tau,
 #' @export
 SplineConstQuantRegBs1 <- function(xtab, ytab, knot, tau,
                                    monot = 0,
-                                   solver = "HIGHS",
+                                   solver = "CLARABEL",
                                    weight = NULL,
                                    verbose = FALSE) {
   SplineLinearQuant(xtab, ytab, knot, tau,
