@@ -222,7 +222,7 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
 
   # Return results
   return(list(
-    coefficients = alpha_val,
+    coeff = alpha_val,
     degree = degree,
     knot = t(knot),
     result<-result

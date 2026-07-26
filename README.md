@@ -32,6 +32,10 @@ If you use this package in your research, please cite:
 - Partial constraints (per interval or per knot)
 - Polynomial coefficient export
 
+## Graphical Interface (shiny)
+https://github.com/alexandreabbes/BsplineQuantRegGui
+
+
 ## Installation
 
 ### From CRAN (stable, recommended)
@@ -113,7 +117,6 @@ Python version: https://pypi.org/project/BsplineQuantRegpy/
 
 - Optimize the B-spline basis computation
 - Improve the API based on user feedback
-- Add a graphical User interface (GUI)
 
 ## Getting Started
 

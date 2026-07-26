@@ -107,24 +107,11 @@ quantile_spline <- function(xtab, ytab, knot, tau=0.5,
   }
 
   # Return callable object if requested
-  if (callable) {
-    result=make_spline(result)
-  }else{
-    class(result)<-c("non_callable_spline",class(result))
-  }
+
+    result=make_spline(result,callable=callable)
+
   return(result)
 }
 
 
-#' Print method for non_callable_spline results
-#'
-#' @param x Result object from quantile_spline when callable=FALSE
-#' @param ... Additional arguments
-#' @export
-print.non_callable_spline <- function(x, ...) {
-  cat("Non callable Spline List \n")
-  cat("Degree: ", x$degree, "\n")
-  cat("Knots (", length(x$knot), ") : [",x$knot,"]", "\n")
-  cat("Coefficients (dim(Basis)=",length(x$coeff),") :", x$coeff,"\n")
-  invisible(x)
-}
+

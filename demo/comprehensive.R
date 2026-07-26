@@ -60,11 +60,11 @@ cat("Fitting models...\n")
 # Fit 1: Unconstrained (tau = 0.9, 0.5, 0.1)
 cat("  - Unconstrained (tau = 0.9, 0.5, 0.1)")
 res_uncon1 <- quantile_spline(xtab, ytab, knots, tau = 0.9,
-                                    monot = 0, convcons = 0,degree=degree, solver = "HIGHS")
+                                    monot = 0, convcons = 0,degree=degree )
 res_uncon2 <- quantile_spline(xtab, ytab, knots, tau = 0.1,
-                                    monot = 0, convcons = 0,degree=degree, solver = "HIGHS")
+                                    monot = 0, convcons = 0,degree=degree)
 res_uncon3 <- quantile_spline(xtab, ytab, knots, tau = 0.5,
-                                    monot = 0, convcons = 0,degree=degree, solver = "HIGHS")
+                                    monot = 0, convcons = 0,degree=degree)
 
 cat(" done\n")
 
@@ -72,10 +72,9 @@ cat(" done\n")
 cat("  - Partial increasing (tau = 0.5, 0.1, intervals 1-7)...")
 res_croissant1 <- quantile_spline(xtab, ytab, knots, tau = 0.5,
                                         monot = monot_partial, convcons = 0,
-                                  degree=degree,solver = "HIGHS")
+                                  degree=degree)
 res_croissant2 <- quantile_spline(xtab, ytab, knots, tau = 0.1,
-                                         monot = monot_partial,degree=degree, convcons = 0,
-                                         solver = "HIGHS")
+                                         monot = monot_partial,degree=degree, convcons = 0)
 cat(" done\n")
 
 # Fit 3: Full decreasing (tau = 0.5)
@@ -172,7 +171,7 @@ lines(x_eval, y_uncon3, col = "red", lwd = 2)
 abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
 grid()
 
-
+#unlink("/home/abbes/R/x86_64-pc-linux-gnu-library/4.6/BsplineQuantReg", recursive = TRUE)
 # Ajouter le titre global
 mtext(paste("Comprehensive Quantile Regression Tests - Degree", degree),
       side = 3, line = 0.5, outer = TRUE, cex = 1.2, font = 2)

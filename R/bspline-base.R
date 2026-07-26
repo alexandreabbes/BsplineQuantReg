@@ -36,9 +36,11 @@ Omega<-function(s,j,o)#t: knot in the base t-t[j]
 #' @param der Derivative order (0 = original basis)
 #' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list containing:
-#'   \item{base}{Coefficients in the local bases, in the form of an 3-d array [j,nu,coeff], j : the number of the spline in the basis,
-#'   nu: the number of the interval in the extended notation, coeff : the coefficients in decreasing order
-#'   convention on the local bases (t-s_nu)^l, l=3..1
+#'   \item{base}{Coefficients in the local bases, in the form of an 3-d array [j,nu,coeff],
+#'    j : the number of the spline in the basis,
+#'   nu: the number of the interval in the extended notation,
+#'   coeff : the coefficients in decreasing order
+#'   Decresing (matlab) convention on the local bases (t-s_nu)^l, l=3.2.1
 #'   base[j,,] is a matrix of piecewise polynomial function compatible with the pp-form.}
 #'   \item{base0}{Coefficients in canonical basis (centered at 0) (1, t, t^2, t^3) centered at the interval origin.}
 #'   \item{ext_knot}{Extended knot vector}
@@ -55,6 +57,8 @@ Omega<-function(s,j,o)#t: knot in the base t-t[j]
 #' #or simple:
 #' #view_basis(basis)
 #' @export
+#'
+#'
 Bspline_base<-function(sn,degree=3,der=NULL,verbose=FALSE)
 { if (verbose) {message("Constructing the B-spline basis, \n Degree = ", degree, " \n Extended knots partition: ", sn)}
 
@@ -130,7 +134,6 @@ Bspline_base<-function(sn,degree=3,der=NULL,verbose=FALSE)
 }
 
 
-
 #' Differentiate a B-spline basis
 #'
 #' Computes the basis of order \code{der} derivatives of a B-spline basis.
@@ -169,3 +172,66 @@ Bspline_deriv<-function(bspline,der=2,verbose=FALSE){
 
   return(list(base =Bn_der, base0=B0_der, ext_knot = ext_knot, knot=bspline$knot, degree = degree_der, n_splines = (n_splines) ) )
 }
+
+
+#' Convert a B-spline to Piecewise Polynomial (PP) form
+#'
+#' Transforms a B-spline object (callable or non-callable) into a piecewise
+#' polynomial representation. The resulting PP object contains the polynomial
+#' coefficients for each interval between knots.
+#'
+#' @param Bspline A B-spline object (list, non_callable_spline, or callable_spline)
+#'        containing at least 'coeff', 'degree', and 'knot'.
+#' @param Bsbasis Optional pre-computed B-spline basis object from Bspline_base().
+#'        If NULL, the basis is computed automatically.
+#' @param callable Logical; if TRUE, returns a callable function for evaluation.
+#'        If FALSE (default), returns a non_callable_pp object. If a callable spline is given
+#'        as input, then by default is return a callable pp.
+#' @param verbose Logical; if TRUE, print progress messages.
+#'
+#' @return A PP object (piecewise polynomial) with class:
+#'         - "callable_pp" if callable = TRUE
+#'         - "non_callable_pp" if callable = FALSE
+#'         The object can be evaluated with evalpp() or directly if callable.
+#'
+#' @examples
+#' \dontrun{
+#' # Create a B-spline
+#' sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
+#' basis <- Bspline_base(sn, degree = 3)
+#' basis$coeff <- runif(basis$n_splines)
+#'
+#' # Convert to PP (non-callable)
+#' pp <- Bsplinetopp(basis, callable = FALSE)
+#' y <- evalpp(pp, seq(0, 5, length.out = 100))
+#'
+#' # Convert to PP (callable)
+#' pp_call <- Bsplinetopp(basis, callable = TRUE)
+#' y <- pp_call(seq(0, 5, length.out = 100))
+#' }
+#'
+#' @seealso \code{\link{makpp}}, \code{\link{evalpp}}, \code{\link{Bspline_base}}
+#' @export
+
+Bsplinetopp <- function(Bspline,Bsbasis=NULL,callable=FALSE,verbose=FALSE) {
+  #Convert a B-spline to a PP-polynomial
+  if (inherits(Bspline,"callable_spline")){
+    Bspline=get_parameters(Bspline)
+    callable=TRUE}
+    coeff=Bspline$coeff
+    degree=Bspline$degree
+    tn<-Bspline$knot
+    sn<-c(rep(tn[1],degree),tn, rep( rev(tn)[1],degree )) #extended knots
+  if (!is.null(Bspline$base)){BB<-Bspline$base}
+  if (is.null(Bsbasis) && is.null(Bspline$base)) {
+    Bsbasis<-Bspline_base(sn,degree=degree,verbose=verbose)
+    BB<-Bsbasis$base
+  }
+    PP<-array( 0 , dim=c(length(tn)-1, degree+1) )
+    for (nu in 1:(length(tn)-1)){
+      PP[nu, ]<-t(BB[ , nu+degree ,  ])%*%coeff
+    }
+    PP<-makpp(PP,tn,callable=callable)
+  }
+
+
