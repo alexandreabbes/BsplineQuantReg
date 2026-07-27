@@ -183,7 +183,12 @@ lines(x_eval, y_uncon, col = "red", lwd = 1.5)
 lines(x_eval, y_pos, col = "yellow", lwd = 1.5)
 lines(x_eval, y_neg, col = "darkgreen", lwd = 1.5)
 lines(x_eval, y_mixed, col = "black", lwd = 1.5)
-abline(v = knots, col = "yellow", lty = 3, lwd = 0.5)
+abline(v = knotlegend("topleft",
+       legend = c(paste("tau =", c(0.1, 0.5, 0.9))),
+       col = colors[1:3],  # ou colors pour les 3 couleurs
+       lty = c(3, 1, 2),   # ou rep(1, 3)
+       lwd = 1.5,
+       cex = 0.6)s, col = "yellow", lty = 3, lwd = 0.5)
 legend("top", legend = c("True", "Unconstrained", "Positive", "Negative", "Mixed"),
        col = c("black", "red", "yellow", "darkgreen", "black"),
        lty = c(2, 1, 1, 1, 1), lwd = 2, cex = 0.5)
