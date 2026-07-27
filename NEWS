@@ -1,13 +1,17 @@
 Version=0.2.2 (07/2026)
+
 ## Bug Fixes
 - adapt demos to new notations
--
+- derivatve of spline: fix bs-directuntil order 0
+- add a new class "bspline_basis" including parameter order_deriv
+
 ## Changes
 - add an option to 'makepp' function to render PP polynomial callable
 - add the printable method for the new class "callable_pp"
 and "non_callable_pp"
 - modify 'makespline' function with a flag the chose callable
 or non-callable output
+
 
 Version=0.2.1 (07/2026)
 =============

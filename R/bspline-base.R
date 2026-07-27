@@ -123,21 +123,19 @@ Bspline_base<-function(sn,degree=3,der=0,verbose=FALSE)
   BaseL=Bn[(degree+1),,,] #Local basis (x-t_nu)^i at knot nu
   Base0=round(Base0,10)
   BaseL=round(BaseL,10)
+  basis<-list(base =BaseL ,
+              base0=Base0,
+              ext_knot = sn,
+              knot=tn,
+              degree = degree,
+              n_splines = (n_splines),
+              deriv_order=0 )
+  class(basis)<-c('bspline_basis',class(basis))
+  if (der==0){
+    return(basis)
+  }else
+  {return(Bspline_base_deriv(basis,der))}
 
-  if (der!=0){
-    Base0=Bspline_deriv(Base0,der = der)
-    BaseL=Bspline_deriv(BaseL,der=der)
-  }
-basis<-list(base =BaseL ,
-            base0=Base0,
-            ext_knot = sn,
-            knot=tn,
-            degree = degree,
-            n_splines = (n_splines),
-            deriv_order=der )
-class(basis)<-c('bspline_basis',class(basis))
-  return(basis)
-  #  return (B)
 }
 
 
@@ -145,18 +143,21 @@ class(basis)<-c('bspline_basis',class(basis))
 #'
 #' Computes the basis of order \code{der} derivatives of a B-spline basis.
 #'
-#' @param bspline Object returned by \code{Bspline_base}
+#' @param Bsbasis Object returned by \code{Bspline_base} or an equivalent
+#'  coherent list with enough parameters.
 #' @param der Derivative order
 #' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list similar to \code{Bspline_base} for the derivative basis
 #' @export
-Bspline_base_deriv<-function(Bsbasis,der=2,verbose=FALSE){
+Bspline_base_deriv<-function(Bsbasis,der=1,verbose=FALSE){
   #computes the derivative for a Bspline basis
   if (is.null(der)){der<-0}
   Bn=Bsbasis$base
   B0=Bsbasis$base0
+
   n_splines=Bsbasis$n_splines
   ext_knot=Bsbasis$ext_knot
+  der0<-Bsbasis$deriv_order
 
   degree=Bsbasis$degree
   degree_der=max(degree-der,0)
@@ -164,6 +165,9 @@ Bspline_base_deriv<-function(Bsbasis,der=2,verbose=FALSE){
   Bn_der=array(dim=c(n_splines,NS,max((degree_der+1),1) ),0)
 
   B0_der=array(dim=dim(Bn_der),0)
+
+  if (der<=degree){
+    #otherwise no work is needed, only zeros
 
   for (j in 1:n_splines){
     for (nu in (degree+1):NS){
@@ -175,14 +179,15 @@ Bspline_base_deriv<-function(Bsbasis,der=2,verbose=FALSE){
         B0_der[j,nu,]=q
       }
     }
-  }
+  }}
+
   D_basis<-list(base =Bn_der,
               base0=B0_der,
               ext_knot = ext_knot,
               knot=Bsbasis$knot,
               degree = degree_der,
               n_splines = (n_splines),
-              deriv_order=der)
+              deriv_order=der+der0)
   class(D_basis)<-c('bspline_basis',class(D_basis))
   return(D_basis)
 }

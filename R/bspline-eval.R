@@ -107,14 +107,16 @@ bs_direct<-function(Basis,x_values=NULL,verbose=FALSE)
   d=Basis$degree
   diff<-Basis$deriv_order
   nsplines=Basis$n_splines
-  if(verbose){message(c("Noeuds:  ", paste(knot, collapse=" , ") ,
-                        "\n degré de la base: ",d,
-                        "\n Nb splines dans la base : ",nsplines
+  base=Basis$base
+  if(verbose){message(c("Knots:  ", paste(knot, collapse=" , ") ,
+                        "\n degree of the basis: ",d,
+                        "\n Nb splines in the  basis : ",
+                        nsplines
   ))}
 
   yvalues=array(data=0,c(nsplines,n_values))
     if (d>0){
-      bb=Basis$base[,(d+1+diff):(nsplines),] #only keep the effective pieces
+      bb=base[,(d+1+diff):(nsplines),] #only keep the effective pieces
     for (j in 1:nsplines) #go through splines of the base
       {
       if (kn==1){ # In case of a single piece
@@ -129,7 +131,7 @@ bs_direct<-function(Basis,x_values=NULL,verbose=FALSE)
       }
       }
       if (d==0){
-        bb=Basis$base
+        bb=base[,(1+diff):nsplines,]
         for (j in 1:nsplines)
           {
           p=makpp(bb[j,],tn=knot)
@@ -229,8 +231,7 @@ evalpp<-function(p,x_values){
 #' @param verbose Boolean
 #' @return A PP object or a callable function
 #' @export
-makpp <- function(coefficients, tn, callable = FALSE, verbose=FALSE) {
-  # Déterminer kn
+makpp <- function(coefficients, tn, callable = FALSE, verbose=FALSE){
   if (length(tn) == 2) {
     kn <- length(tn) - 1
   } else if (!is.null(dim(coefficients))) {
@@ -245,7 +246,7 @@ makpp <- function(coefficients, tn, callable = FALSE, verbose=FALSE) {
     stop("length of coefficients and number of knots do not match")
   }
 
-  # Créer l'objet PP
+  # Creer l'objet PP
   pp_obj <- list(
     coefficients = coefficients,
     knot = tn,
@@ -259,7 +260,7 @@ makpp <- function(coefficients, tn, callable = FALSE, verbose=FALSE) {
       evalpp(pp_obj, x_values)
     }
 
-    # Ajouter les paramètres comme attributs
+    # Ajouter les parametres comme attributs
     attr(eval_func, "coefficients") <- coefficients
     attr(eval_func, "knot") <- tn
     attr(eval_func, "degree") <- degree
@@ -279,7 +280,7 @@ makpp <- function(coefficients, tn, callable = FALSE, verbose=FALSE) {
 #' @param ... Additional arguments
 #' @export
 print.callable_pp <- function(x, ...) {
-  # Récupérer les attributs
+  # Get the attributes
   degree <- attr(x, "degree")
   knot <- attr(x, "knot")
   coeff <- attr(x, "coefficients")
@@ -324,7 +325,7 @@ print.non_callable_pp <- function(x, ...) {
   cat("  $knots:", length(knot),knot, "\n" )
   if (!is.null(dim(coeff))) {
     cat(" Coefficients dimension:", dim(coeff)[1], "x", dim(coeff)[2], "\n")
-    # Afficher les coefficients (tronqués si trop nombreux)
+    # Afficher les coefficients (troncated if too numerous)
     if (n_intervals <= 5 && dim(coeff)[2] <= 4) {
       cat("\n  $coefficients:\n")
       for (i in 1:n_intervals) {
@@ -461,7 +462,7 @@ make_spline <- function(Bspline,verbose=FALSE,callable=TRUE){
     #Callable from callable
         if (is.function(Bspline) && inherits(Bspline, "callable_spline"))
           {
-    # Déjà une callable, l'utiliser directement
+    # Deja une callable, l'utiliser directement
     message("Already a callable spline object")
     return(Bspline)
     if (verbose){print(Bspline)}}
