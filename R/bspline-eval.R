@@ -14,6 +14,7 @@
 #' @param Bvalues : the values of the 'Bspline' basis evaluated at the values x
 #' this increases the speed by avoiding re-doing the same calculations
 #' of the basis for each spline with the same knots.
+#' @param verbose boollean, if TRUE output more messages
 #' @return vector of same length as x_values, with Spline values at the requested points
 #' @examples
 #'{ # Create and evaluate a spline
@@ -30,7 +31,7 @@
 #' y <- spline_eval(Bspline=Bspline,x_values=x_values, Bvalues=Bvalues )}
 #' @export
 
-spline_eval<-function(Bspline, x_values=NULL,der=0, Bvalues=NULL)
+spline_eval<-function(Bspline, x_values=NULL,der=0, Bvalues=NULL,verbose=FALSE)
 {
   if (is.function(Bspline) && inherits(Bspline, "callable_spline") ) {
     # Already callable, retrieve the parameters
@@ -41,7 +42,8 @@ spline_eval<-function(Bspline, x_values=NULL,der=0, Bvalues=NULL)
   knot=Bspline$knot #vector of effective knots
   degree=Bspline$degree
   coeff=Bspline$coeff
-
+  if (is.null(x_values)){message("no x_value given, compute at the knots")
+    x_values<-knot}
   #Bvalues=bs(x_values,knot=knot,degree)  "can be used instead of the following lines
   #to accelerate the calculations
   # values at knots by default
@@ -54,25 +56,25 @@ spline_eval<-function(Bspline, x_values=NULL,der=0, Bvalues=NULL)
       sn=c(rep(t1,degree),knot,rep(tkn,degree) ) #extended knot partition
       BB=Bspline_base(sn,degree=degree) # first compute the Basis
       # then evaluate the basis as the values
-
-  }else{
-  if (inherits(Bvalues,"bspline_basis")){
+      D_BB<-Bspline_base_deriv(BB,der=der,verbose=verbose)
+      D_Bvalues<-bs_direct(D_BB,x_values=x_values,verbose=verbose)
+      }else{
+    if (inherits(Bvalues,"bspline_basis")){ #case basis
     BB<-Bvalues
   #We trust the dimensions, knots, are compatible
-    }
-    else{
-      BB<-list(base=Bvalues,
-                  knot=knot,
-                  degree=degree,
-                  nspline=degree+length(knot)-1)
-        }
-    }
     if (der==0){
       D_Bvalues=bs_direct(BB,x_values)
-    }else{D_BB<-Bspline_base_deriv(BB,der)
+    }else{
+      D_BB<-Bspline_base_deriv(BB,der)
     D_Bvalues<-D_BB$base
     D_Bvalues<-bs_direct(D_BB,x_values)}
+    }
+    else{ #case values
+      D_Bvalues<-Bvalues}
 
+    n1=dim(D_Bvalues)[1]
+    if (n1!=length(coeff)){D_Bvalues<-t(D_Bvalues)}
+  }
    yvalues<-(t(D_Bvalues))%*%coeff
 
   return(yvalues)
@@ -88,12 +90,16 @@ spline_eval<-function(Bspline, x_values=NULL,der=0, Bvalues=NULL)
 #' @return Matrix of basis function values (n_splines x length(x_values))
 #' @export
 
-bs_direct<-function(Basis,x_values,verbose=FALSE)
+bs_direct<-function(Basis,x_values=NULL,verbose=FALSE)
 {
   #Calcule les valeurs d'une base 'Basis'
   #comme la fonction 'bs' de 'R', mais en utilisant la
   # base calculee sous PP-forme : coeff des polynomes sur la base locale.
   #indep. du choix de la notation croissant/decroissant
+  if (is.null(x_values))
+    {message("no xvalue given, computing at knots")
+    return(Spline_der_knot(Basis))
+           }
 
   n_values=length(x_values)
   knot=Basis$knot  # knot
@@ -104,7 +110,8 @@ bs_direct<-function(Basis,x_values,verbose=FALSE)
   if(verbose){message(c("Noeuds:  ", paste(knot, collapse=" , ") ,
                         "\n degré de la base: ",d,
                         "\n Nb splines dans la base : ",nsplines
-                        ))}
+  ))}
+
   yvalues=array(data=0,c(nsplines,n_values))
     if (d>0){
       bb=Basis$base[,(d+1+diff):(nsplines),] #only keep the effective pieces

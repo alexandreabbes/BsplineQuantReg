@@ -130,13 +130,13 @@ plot(xtab, ytab, pch = 16,  col = "black",
      main = "Partial Increasing Constraint\n(first 7 intervals only)\n tau=0.5, 0.1")
 lines(x_eval, y_croiss1, col = "blue", lwd = 2)
 lines(x_eval, y_croiss2, col = "blue", lwd = 2)
-abline(v = knots, col = "blue", lty = 2, lwd = 0.5)
-legend("topleft",c("true","fitted"),col = c("black", "blue"),lwd = 2)
+abline(v = knots, col = "blue", lty = 2, lwd = 0.2)
+legend("topleft",c("true","fitted"),col = c("black", "blue"),lwd = 1.5)
 lines(x_eval, y_true, col = "black", lwd = 1, )
 # Highlight the constrained region
 abline(v = knots[n_constrained + 1], col = "red", lty = 2, lwd = 2)
-text(knots[n_constrained + 1] + 0.02, max(ytab) - 0.2,
-     "Constrained region", col = "red", cex = 0.7, srt = 90)
+text(knots[n_constrained + 1] + 0.1, max(ytab) - 1.7,
+     "Constrained \n region", col = "red", cex = 0.7, srt = 90)
 grid()
 
 # Plot 2: Full decreasing constraint

@@ -130,26 +130,9 @@ y_mixed <- fit_mixed(x_eval)
 # 6. Compute and verify third derivatives
 # ============================================================
 
-# Function to compute third derivative numerically
-compute_third_deriv <- function(y, x) {
-  h <- diff(x)[1]
-  n <- length(y)
-  # Central differences for interior points
-  d3 <- numeric(n)
-  for (i in 3:(n-2)) {
-    d3[i] <- (-y[i-2] + 2*y[i-1] - 2*y[i+1] + y[i+2]) / (2 * h^3)
-  }
-  # Boundary approximations
-  d3[1] <- d3[3]
-  d3[2] <- d3[3]
-  d3[n-1] <- d3[n-2]
-  d3[n] <- d3[n-2]
-  return(d3)
-}
-
-d3_pos <- compute_third_deriv(y_pos, x_eval)
-d3_neg <- compute_third_deriv(y_neg, x_eval)
-d3_mixed <- compute_third_deriv(y_mixed, x_eval)
+d3_pos <- spline_eval(fit_pos, x_eval,der=3)
+d3_neg <- spline_eval(fit_neg, x_eval,der=3)
+d3_mixed <- spline_eval(fit_mixed, x_eval,der=3)
 
 # Verification
 cat("=== Verification of Third Derivative Constraints ===\n")
@@ -183,15 +166,10 @@ lines(x_eval, y_uncon, col = "red", lwd = 1.5)
 lines(x_eval, y_pos, col = "yellow", lwd = 1.5)
 lines(x_eval, y_neg, col = "darkgreen", lwd = 1.5)
 lines(x_eval, y_mixed, col = "black", lwd = 1.5)
-abline(v = knotlegend("topleft",
-       legend = c(paste("tau =", c(0.1, 0.5, 0.9))),
-       col = colors[1:3],  # ou colors pour les 3 couleurs
-       lty = c(3, 1, 2),   # ou rep(1, 3)
-       lwd = 1.5,
-       cex = 0.6)s, col = "yellow", lty = 3, lwd = 0.5)
-legend("top", legend = c("True", "Unconstrained", "Positive", "Negative", "Mixed"),
+
+legend("bottomright", legend = c("True", "Unconstrained", "Positive", "Negative", "Mixed"),
        col = c("black", "red", "yellow", "darkgreen", "black"),
-       lty = c(2, 1, 1, 1, 1), lwd = 2, cex = 0.5)
+       lty = c(2, 1, 1, 1, 1), lwd = 2, cex = 0.4)
 
 # Plot 2: Third derivatives - Positive constraint
 plot(x_eval, d3_pos, type = "l", col = "yellow", lwd = 2,

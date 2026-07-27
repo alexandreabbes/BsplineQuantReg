@@ -7,7 +7,7 @@ Computes local polynomial coefficients for each B-spline basis function
 on each interval. Polynomials are expressed in the canonical basis
 Uses De Boor's recursion formula.}
 \usage{
-Bspline_base(sn, degree = 3, der = NULL, verbose = FALSE)
+Bspline_base(sn, degree = 3, der = 0, verbose = FALSE)
 }
 \arguments{
 \item{sn}{Extended knot vector (including endpoint repetitions)
@@ -24,9 +24,11 @@ at the beginning
 }
 \value{
 A list containing:
-  \item{base}{Coefficients in the local bases, in the form of an 3-d array [j,nu,coeff], j : the number of the spline in the basis,
-  nu: the number of the interval in the extended notation, coeff : the coefficients in decreasing order
-  convention on the local bases (t-s_nu)^l, l=3..1
+  \item{base}{Coefficients in the local bases, in the form of an 3-d array [j,nu,coeff],
+   j : the number of the spline in the basis,
+  nu: the number of the interval in the extended notation,
+  coeff : the coefficients in decreasing order
+  Decresing (matlab) convention on the local bases (t-s_nu)^l, l=3.2.1
   base[j,,] is a matrix of piecewise polynomial function compatible with the pp-form.}
   \item{base0}{Coefficients in canonical basis (centered at 0) (1, t, t^2, t^3) centered at the interval origin.}
   \item{ext_knot}{Extended knot vector}

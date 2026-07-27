@@ -1,8 +1,8 @@
-monotonicity        Monotonicity constraints demo
-convexity           Convexity and concavity constraints demo
-temperature         Temperature anomaly analysis: uniform increasing vs mixed constraints (decreasing 1956-1973 only)
-temperature2        Temperature anomaly analysis with alternative constraint configurations
-logistic            Quantile regression test on a logistic function
-comprehensive       Comprehensive test of various constraints on an oscillating function
-degrees_comparison  Simultaneous comparison of constraints across degrees 1, 2, 3, and 4
-demo_der3           Demonstration of third-order derivative constraints
+monotonicity_basic    Monotonicity constraints demo
+convexity             Convexity and concavity constraints demo
+temperature           Temperature anomaly analysis: uniform increasing vs mixed constraints (decreasing 1956-1973 only)
+temperature2          Temperature anomaly analysis with alternative constraint configurations
+logistic              Quantile regression test on a logistic function
+comprehensive         Comprehensive test of various constraints on an oscillating function
+degrees_comparison    Simultaneous comparison of constraints across degrees 1, 2, 3, and 4
+demo_der3             Demonstration of third-order derivative constraints

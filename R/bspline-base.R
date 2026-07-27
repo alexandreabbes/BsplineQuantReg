@@ -59,7 +59,7 @@ Omega<-function(s,j,o)#t: knot in the base t-t[j]
 #' @export
 #'
 #'
-Bspline_base<-function(sn,degree=3,der=NULL,verbose=FALSE)
+Bspline_base<-function(sn,degree=3,der=0,verbose=FALSE)
 { if (verbose) {message("Constructing the B-spline basis, \n Degree = ", degree, " \n Extended knots partition: ", sn)}
 
   tn <- tryCatch({
@@ -119,15 +119,15 @@ Bspline_base<-function(sn,degree=3,der=NULL,verbose=FALSE)
     }}}
 
 
-  Base0=B[(degree+1),,,]
-  BaseL=Bn[(degree+1),,,]
+  Base0=B[(degree+1),,,]  #basis x^i at each knot
+  BaseL=Bn[(degree+1),,,] #Local basis (x-t_nu)^i at knot nu
   Base0=round(Base0,10)
   BaseL=round(BaseL,10)
 
-  if ( !is.null(der) ){
+  if (der!=0){
     Base0=Bspline_deriv(Base0,der = der)
     BaseL=Bspline_deriv(BaseL,der=der)
-  } else{deriv_order<-0}
+  }
 basis<-list(base =BaseL ,
             base0=Base0,
             ext_knot = sn,
@@ -187,95 +187,6 @@ Bspline_base_deriv<-function(Bsbasis,der=2,verbose=FALSE){
   return(D_basis)
 }
 
-
-#' Compute derivative coefficients of a B-spline
-#'
-#' Given a B-spline of given degree, coefficients, knots, compute the coefficients
-#' of the derivative of order 'der' in the B-spline basis of degree d-der.
-#' Uses the standard algorithm for differentiating bsplines
-#'
-#'
-#' @param coeff Coefficients of the original B-spline
-#' @param degree Degree of the original B-spline
-#' @param knots Knot vector (effective partition, not extended)
-#' @param der Derivative order (default = 1)
-#' @param callable boolean, if TRUE returns a callable Bspline. If not provided
-#' return the same class as input : 'callable' or 'non_callable'
-#' @return Coefficients of the derivative B-spline (degree = degree - der)
-#' @export
-
-bspline_deriv <- function(bspline, der = 1, callable=NULL) {
-  if (inherits(bspline, "callable_spline")) {
-    params <- get_parameters(bspline)
-    coeff <- params$coeff
-    knot <- params$knot
-    degree <- params$degree
-    result <-params$result
-    if (is.null(callable)){callable<-"TRUE"}
-  } else {
-    coeff <- bspline$coeff
-    knot <- bspline$knot
-    degree <- bspline$degree
-    result <-bspline$result
-    if (is.null(callable)){callable<-"FALSE"}
-  }
-
-  if (der > degree) {
-  message("Derivative order exceeds degree")
-  coeff<-rep(0,length(knot)-1)
-  d<-0
-  }
-
-  # Start with original coefficients
-
-   co <- coeff
-
-  for (j in 1:der) {
-    # Number of coefficients decreases by 1 at each derivative
-
-    d <- degree-j
-    N <- length(co)
-
-    co_new <- numeric(N)
-    s <- c(rep(knot[1],d),knot,rep(rev(knot)[1],d))
-    print(c(d,degree-j))
-    # Extended knots for the current degree
-    # t_i for i = 1..n+d+1 (standard knot sequence)
-    # For a B-spline of degree d with n basis functions,
-    # the knot sequence has length n + d + 1
-    # Here we need t_{i} and t_{i+d} for i = 1..n-1
-
-    # For the derivative formula, we need t_i and t_{i+d}
-    # where i goes from 1 to n-1 (new basis functions)
-    for (i in (1+j):(N)) {
-      # s_i is the i-th knot (1-indexed)
-      # t_{i+d} is the (i+d)-th knot
-      # We need the effective knots
-
-      denom <- s[i + d-1] - s[i-1] #usual formula
-                                #s[i+k-j]-s[i] k= initial deg
-
-      if (denom == 0) {
-        co_new[i] <- 0
-      } else {
-        co_new[i] <- d * (co[i] - co[i-1]) / denom
-      }
-    }
-    cat(co,'\n',co_new)
-    # Update for next derivative
-    co <- co_new
-
-  }
-
-  diff_spline=list(
-    coeff = co[(der+1):N],
-    degree = degree - der,
-    knot = knot,
-    result = result
-  )
-  diff_spline<-make_spline(diff_spline,callable=callable)
-  return(diff_spline)
-}
 
 
 #' Convert a B-spline to Piecewise Polynomial (PP) form
