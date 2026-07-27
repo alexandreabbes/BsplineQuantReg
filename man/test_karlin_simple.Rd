@@ -4,20 +4,18 @@
 \alias{test_karlin_simple}
 \title{Comprehensive test function}
 \usage{
-test_karlin_simple(verbose = FALSE, seed = NULL)
+test_karlin_simple(degree = 3, seed = NULL, verbose = FALSE)
 }
 \arguments{
-\item{verbose}{boolean FALSE (default) or TRUE.}
+\item{degree}{1, 2, 3 or 4 (default 3). The degree of the regression spline.}
 
 \item{seed}{(default=NULL) value for the random generator.}
-}
-\value{
-No return value, produces plots.
+
+\item{verbose}{boolean FALSE (default) or TRUE.}
 }
 \description{
 Runs quantile regression tests with and without constraints,
 and displays results. Demo function.
-}
-\examples{
-test_karlin_simple()
+This example also shows that solution may be evaluated (extrapolation)
+out of the knot range
 }

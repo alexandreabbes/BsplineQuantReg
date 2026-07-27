@@ -4,17 +4,21 @@
 \alias{makpp}
 \title{Build a piecewise polynomial (PP) form}
 \usage{
-makpp(coef, tn)
+makpp(coefficients, tn, callable = FALSE, verbose = FALSE)
 }
 \arguments{
-\item{coef}{Coefficient matrix (kn x (degree+1))}
+\item{coefficients}{Coefficient matrix (kn x (degree+1))}
 
-\item{tn}{Knot vector of length kn+1}
+\item{tn}{a Knot vector of length kn+1.}
+
+\item{callable}{Boolean; if TRUE, returns a callable function}
+
+\item{verbose}{Boolean}
 }
 \value{
-List with components \code{coefficients} and \code{knots}
+A PP object or a callable function
 }
 \description{
 Creates a PP structure from polynomial coefficients and knots.
+If callable = TRUE, returns a function that evaluates the PP.
 }
-\keyword{internal}

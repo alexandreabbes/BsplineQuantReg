@@ -4,15 +4,17 @@
 \alias{bs_direct}
 \title{Direct evaluation of a B-spline basis}
 \usage{
-bs_direct(Basis, xvalues)
+bs_direct(Basis, x_values = NULL, verbose = FALSE)
 }
 \arguments{
 \item{Basis}{Object returned by \code{Bspline_base}}
 
-\item{xvalues}{Vector of evaluation points}
+\item{x_values}{Vector of evaluation points}
+
+\item{verbose}{set to TRUE increases verbosity}
 }
 \value{
-Matrix of basis function values (n_splines x length(xvalues))
+Matrix of basis function values (n_splines x length(x_values))
 }
 \description{
 Computes the values of all B-spline basis functions at given points.

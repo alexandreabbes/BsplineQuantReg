@@ -4,12 +4,22 @@
 \alias{spline_eval}
 \title{Evaluate a B-spline}
 \usage{
-spline_eval(Bspline, x_values = NULL, Bvalues = NULL)
+spline_eval(Bspline, x_values = NULL, der = 0, Bvalues = NULL, verbose = FALSE)
 }
 \arguments{
-\item{Bspline}{Spline object (list with coefficients on the Bspline basis, degree, extended knot)}
+\item{Bspline}{Spline object (list with coefficients on the 'Bspline' basis, degree, extended knot)
+A 'Bspline' can also be rendered callable witk 'make_spline(BSpline)'}
 
-\item{x_values}{Vector of evaluation points}
+\item{x_values}{Vector of evaluation points. By default, evaluation is calculated
+at the knots}
+
+\item{der}{integer 0 (defalut)...degree is the order of derivative}
+
+\item{Bvalues}{: the values of the 'Bspline' basis evaluated at the values x
+this increases the speed by avoiding re-doing the same calculations
+of the basis for each spline with the same knots.}
+
+\item{verbose}{boollean, if TRUE output more messages}
 }
 \value{
 vector of same length as x_values, with Spline values at the requested points
@@ -19,12 +29,15 @@ Evaluates a spline (linear combination of B-splines) at given points.
 }
 \examples{
 { # Create and evaluate a spline
+# This function is also used when a 'Bspline' object is rendered callable as a function
+# with make_spline()
 tn<-c(0,1,2,3,4,5)
-Bspline=list(degree=3, knot=tn,coefficients=runif(basis$n_splines))
-y <- spline_eval(Bspline, seq(0,5,length=100))
+x_values<-seq(0,5,length=100)
+Bspline=list(degree=3, knot=tn,coefficients=runif(length(tn)+3-1))
+y <- spline_eval(Bspline, x_values)
 #alternatively compute the base before to optimize if needed
 sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
 Bsbase <- Bspline_base(sn, degree=3)
 Bvalues <-bs_direct(Bsbase,x_values)
-y <- spline_eval(Bspline=Bspline, Bvalues=Bvalues )}
+y <- spline_eval(Bspline=Bspline,x_values=x_values, Bvalues=Bvalues )}
 }

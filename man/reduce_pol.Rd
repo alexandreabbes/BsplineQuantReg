@@ -7,9 +7,9 @@
 reduce_pol(p, verbose = FALSE)
 }
 \arguments{
-\item{p}{Polynomial coefficient vector(coef in decreasing order)}
+\item{p}{Polynomial coefficient vector(coefficients are in decreasing order)}
 
-\item{verbose}{boolean FALSE (default) or TRUE.}
+\item{verbose}{Boolean FALSE (default) or TRUE.}
 }
 \value{
 Reduced vector (without leading zeros)

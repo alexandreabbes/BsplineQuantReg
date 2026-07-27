@@ -2,7 +2,7 @@
 % Please edit documentation in R/bspline-eval.R
 \name{evalpp}
 \alias{evalpp}
-\title{Evaluate a piecewise polynomial (PP) form}
+\title{Evaluates a piecewise polynomial (PP form)  function at given points.}
 \usage{
 evalpp(p, x_values)
 }
@@ -15,6 +15,6 @@ evalpp(p, x_values)
 Function values at the requested points
 }
 \description{
-Evaluates a piecewise polynomial function at given points.
+Evaluates a piecewise polynomial (PP form)  function at given points.
 }
 \keyword{internal}
