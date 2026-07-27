@@ -1,6 +1,6 @@
 # bs_direct, makpp, evalpp, spline_eval, view_spline
 # Spline_der_knot, bspline_to_deriv_coeffs_pp
-# make_spline, print.callable_spline
+
 
 #' Evaluate a B-spline
 #'
@@ -38,7 +38,6 @@ spline_eval<-function(Bspline, x_values=NULL,der=0, Bvalues=NULL,verbose=FALSE)
     Bspline<-get_parameters(Bspline)
   }
 
-
   knot=Bspline$knot #vector of effective knots
   degree=Bspline$degree
   coeff=Bspline$coeff
@@ -54,10 +53,11 @@ spline_eval<-function(Bspline, x_values=NULL,der=0, Bvalues=NULL,verbose=FALSE)
       {t1=knot[1]
       tkn=rev(knot)[1] #last knot
       sn=c(rep(t1,degree),knot,rep(tkn,degree) ) #extended knot partition
-      BB=Bspline_base(sn,degree=degree) # first compute the Basis
-      # then evaluate the basis as the values
-      D_BB<-Bspline_base_deriv(BB,der=der,verbose=verbose)
-      D_Bvalues<-bs_direct(D_BB,x_values=x_values,verbose=verbose)
+      D_BB=Bspline_base(sn,degree=degree,der=der,verbose=verbose) # first compute the Basis
+      #BB=Bspline_base(sn,degree=degree,verbose=verbose)
+      #then evaluate the basis as the values
+      #D_BB<-Bspline_base_deriv(BB,der=der,verbose=verbose)
+      D_Bvalues <- bs_direct(D_BB,x_values=x_values,verbose=verbose)
       }else{
     if (inherits(Bvalues,"bspline_basis")){ #case basis
     BB<-Bvalues
@@ -131,7 +131,7 @@ bs_direct<-function(Basis,x_values=NULL,verbose=FALSE)
       }
       }
       if (d==0){
-        bb=base[,(1+diff):nsplines,]
+        bb=base[,(1+diff):nsplines,1]
         for (j in 1:nsplines)
           {
           p=makpp(bb[j,],tn=knot)
@@ -404,164 +404,4 @@ Spline_der_knot<-function(Bsbase,der=1)
     }
   }
   return(t(Der2_knot))
-}
-
-
-
-
-
-
-#' Create a callable spline object
-#'
-#' Transforms a list container 'Bspline' that may result from
-#'  any of the regression functions associated to 'quantile_spline' into a
-#' callable function that is the spline function with given knots and
-#' coefficients on the corresponding B-spline basis. It can be evaluated
-#' at any point of the knot range transfering the call to the 'spline_eval()' function,
-#' while preserving access to parameters.
-#' Outside the knots range, it extrapolates the side part of the spline.
-#' @param Bspline A list containing at least (knot, coefficients, degree)
-#'        like the one returned by quantile_spline or one of the degree-specific functions.
-#'        If it already contains a 'spline' element, returns the object unchanged.
-#' @param verbose Boolean. If TRUE : output the attributes of the 'Bspline'
-#' @param callable is a Boolean flag that allows to return a simple
-#'        spline list with class 'non_callable_spline'.
-#' @return Either a callable function can be called as `Bspline(x)`, with
-#'         class ('callable_spline'), and all parameters as attributes
-#'         or the list of parameters with an additional 'non_callable_spline' classe.
-#'
-#' @export
-make_spline <- function(Bspline,verbose=FALSE,callable=TRUE){
-  if (!callable) {#erase the callable status
-    if (inherits(Bspline, "non_callable_spline") )
-      { #non callable from non callable
-      message ("Already a non_callable_spline object")
-      if (verbose) {print(Bspline)}
-      return(Bspline)
-      }
-    else if(inherits(Bspline, "callable_spline")){
-      NCspline_obj<-get_parameters(Bspline)
-      class(NCspline_obj)<-c("non_callable_spline","list")
-      if(verbose){print(NCspline_obj)}
-        return(NCspline_obj)
-      }
-      else {#nothing to non callable
-        for (i in (1:3)){if (!is.element(c("knot","degree","coeff")[i],names(Bspline) ))
-          {message(c("missing ", c("knot","degree","coeff")[i]," in input"))
-          return(NULL)
-          }}
-        NCspline_obj<-Bspline
-        class(NCspline_obj)<-c("non_callable_spline","list")
-        return(NCspline_obj)
-        if(verbose){print(NCspline_obj)}
-      }
-    }
-
-  if (callable)
-    {
-    #Callable from callable
-        if (is.function(Bspline) && inherits(Bspline, "callable_spline"))
-          {
-    # Deja une callable, l'utiliser directement
-    message("Already a callable spline object")
-    return(Bspline)
-    if (verbose){print(Bspline)}}
-    else
-  {  # Callable from non_callable
-    #Extract components
-    for (i in (1:3)){if (!is.element(list("knot","degree","coeff")[i],names(Bspline) ))
-    {message(c("missing ", c("knot","degree","coeff")[i]," in input"))
-      return(NULL)
-    }}
-  coeff <- Bspline$coeff
-  degree <- Bspline$degree
-  knot <- Bspline$knot
-  result <- Bspline$result # keep other parameters
-  # Create the callable function
-  spline_func <- function(x_values){
-    # Build the spline object structure expected by spline_eval
-    spline_obj <- list(
-      coeff = coeff,
-      degree = degree,
-      knot = knot,
-      result=result
-    )
-    # Evaluate the spline
-    spline_eval(Bspline, x_values)
-  }
-  # Attach parameters as attributes (accessible via attr())
-  attr(spline_func, "degree") <- degree
-  attr(spline_func, "knot") <- knot
-  attr(spline_func, "coeff") <- coeff
-
-  # Store the full 'Bspline' as an attribute
-  attr(spline_func, "result") <- result
-
-  # Set class for print method
-  class(spline_func) <- c("callable_spline", "function")
-  if (verbose){print(spline_func)}
-  return(spline_func)
-  }
-  }
-  }
-
-
-#' Get parameters from a callable spline or a callable pp object
-#'
-#' @param x A callable spline object
-#' @return A list with degree, knots, coefficients, and 'Bspline' object
-#' @export
-get_parameters <- function(x) {
-  if (!inherits(x, "callable_spline") &&
-      !inherits(x,"callable_pp")) {
-    message("Object is neither a callable spline
-            or a callable pp")
-    return(NULL)
-  }
-  else
-  list(
-    degree = attr(x, "degree"),
-    knot = attr(x, "knot"),
-    coeff = attr(x, "coeff"),
-    result = attr(x, "result")
-  )
-  }
-
-
-
-#' Print method for callable spline
-#'
-#' @param x A callable spline object
-#' @param ... Additional arguments
-#' @export
-print.callable_spline <- function(x, ...) {
-  cat("callable_spline Object\n")
-  cat("======================\n")
-  cat("  Degree:", attr(x, "degree"), "\n")
-  knot <- attr(x, "knot")
-  coeff <- attr(x, "coeff")
-  result <- attr(x, "result")
-  if (!is.null(knot)) {
-    cat("  Knots (", length(knot), "): ",knot,"\n")
-  } else {
-    cat("  Knots: NULL\n")
-  }
-  cat("  Coefficients (", length(coeff),"): ", coeff, "\n")
-  cat("for result, type get_parameter(spline)\n")
-    invisible(x)
-}
-
-#' Print method for non_callable_spline results
-#'
-#' @param x Result object from quantile_spline when callable=FALSE
-#' @param ... Additional arguments
-#' @export
-print.non_callable_spline <- function(x, ...) {
-  cat("Non callable Spline List \n")
-  cat("======================== \n")
-  cat(" $degree: ", x$degree, "\n")
-  cat(" $knot : [",paste(x$knot,collapse = ", " ) ,"]", "(", length(x$knot), "knots ) \n")
-  cat(" $coeff (rounded 10^(-7)) :[",paste(round(x$coeff,7),collapse = ", " ) , "]  ( dim Basis is ",length(x$coeff),")\n")
-  if (!is.null(x$result)){cat(" $result is non NULL")}
-  invisible(x)
 }

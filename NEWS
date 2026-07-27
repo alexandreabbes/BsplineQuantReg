@@ -2,8 +2,9 @@ Version=0.2.2 (07/2026)
 
 ## Bug Fixes
 - adapt demos to new notations
-- derivatve of spline: fix bs-directuntil order 0
 - add a new class "bspline_basis" including parameter order_deriv
+- derivative of constant polynomials and bsplines,
+- bspline_basis, bspline_base_der and bs-direct until order 0
 
 ## Changes
 - add an option to 'makepp' function to render PP polynomial callable

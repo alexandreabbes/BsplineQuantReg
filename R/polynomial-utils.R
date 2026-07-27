@@ -164,8 +164,9 @@ poly_eval<-function(p,xvalues){
 #' @export
 
 polyderiv<-function(p,der=1){
-  if (der==0)   {return(p)}
+  if (der==0)   {q=p}
   else {
+    if (length(p)==1){q=0}else{
     l=length(p)
     #p=rev(p)#reverse
     A=array(data=0,c(l,l))
@@ -174,6 +175,7 @@ polyderiv<-function(p,der=1){
     if (der>1){for (i in 2:der){D=A%*%D}} #compute the d-th power of A
     q=D%*%p
     q=q[(1+der):(l)]
+    }
 
     return(q)
   }
