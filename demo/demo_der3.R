@@ -149,7 +149,6 @@ cat(sprintf("  Negative: %s\n", ifelse(max(d3_neg, na.rm = TRUE) <= 1e-4, "OK", 
 cat(sprintf("  Mixed:    %s (first half >= 0, second half <= 0)\n",
             ifelse(min(d3_mixed[1:150], na.rm = TRUE) >= -1e-4 &&
                      max(d3_mixed[151:300], na.rm = TRUE) <= 1e-4, "OK", "FAILED")))
-
 # ============================================================
 # 7. Visualization
 # ============================================================
