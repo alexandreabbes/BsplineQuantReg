@@ -1,4 +1,3 @@
-
 #' Compute derivative coefficients of a B-spline
 #'
 #' Given a B-spline of given degree, coefficients, knots, compute the coefficients

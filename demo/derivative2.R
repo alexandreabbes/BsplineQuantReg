@@ -99,8 +99,11 @@ cat("\n")
 cat("5. Visualizing derivative bases...\n")
 
 # Ouvrir une nouvelle fenetre pour les bases derivees
-dev.new()
-par(mfrow = c(2, 2), mar = c(4, 4, 4, 2))
+#dev.new()
+#par(mfrow = c(2, 2), mar = c(4, 4, 4, 2))
+oldpar <- par(mfrow = c(5, 2), mar = c(3, 3, 3, 1))
+
+
 
 # Base originale
 view_basis(basis)
@@ -121,8 +124,7 @@ title("Third Derivative Basis (deg 0)")
 cat("  Derivative bases plotted.\n\n")
 
 # Restaurer les parametres graphiques
-par(mfrow = c(1, 1), mar = c(5, 4, 4, 2))
-
+#par(mfrow = c(1, 1), mar = c(5, 4, 4, 2))
 # ============================================================
 # 6. Evaluate and plot the spline and its derivatives
 # ============================================================
@@ -155,8 +157,9 @@ cat("  Both methods are consistent up to", max(max_diff1,max_diff2,max_diff3),"\
 cat("\n")
 
 # Ouvrir une nouvelle fenetre pour les graphiques
-dev.new()
-oldpar <- par(mfrow = c(2, 3), mar = c(4, 4, 4, 2))
+#dev.new()
+#oldpar <- par(mfrow = c(2, 3), mar = c(4, 4, 4, 2))
+
 
 # Plot 1: Original spline
 plot(x_eval, y_orig, type = "l", col = "blue", lwd = 2,

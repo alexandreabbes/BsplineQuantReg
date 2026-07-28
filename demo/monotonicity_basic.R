@@ -8,6 +8,7 @@ library(BsplineQuantReg)
 oldpar <- par(mfrow = c(2,2))
 
 
+
 if (!exists("degree")){degree=3}
 
 # Generate data
