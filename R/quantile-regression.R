@@ -59,7 +59,10 @@
 #' \code{\link{SplineLinearQuant}}, \code{\link{SplineQuadraticQuant}},
 #' \code{\link{SplineCubicQuant}}, \code{\link{SplineQuarticQuant}}
 #' @export
-quantile_spline <- function(xtab, ytab, knot, tau=0.5,
+quantile_spline <- function(xtab,
+                            ytab,
+                            knot,
+                            tau = 0.5,
                             degree = 3,
                             monot = 0,
                             convcons = 0,
@@ -68,7 +71,6 @@ quantile_spline <- function(xtab, ytab, knot, tau=0.5,
                             weight = NULL,
                             verbose = FALSE,
                             callable = TRUE) {
-
   # Validate degree
   if (degree < 1 || degree > 4) {
     stop("degree must be between 1 and 4. Received: ", degree)
@@ -76,42 +78,59 @@ quantile_spline <- function(xtab, ytab, knot, tau=0.5,
 
   # Dispatch to the appropriate function based on degree
   if (degree == 1) {
-    fit <- SplineLinearQuant(xtab, ytab, knot, tau=tau,
-                                monot = monot,
-                                solver = solver,
-                                weight = weight,
-                                verbose = verbose)
+    fit <- SplineLinearQuant(
+      xtab,
+      ytab,
+      knot,
+      tau = tau,
+      monot = monot,
+      solver = solver,
+      weight = weight,
+      verbose = verbose
+    )
   } else if (degree == 2) {
-    fit <- SplineQuadraticQuant(xtab, ytab, knot, tau=tau,
-                                   monot = monot,
-                                   convcons = convcons,
-                                   solver = solver,
-                                   weight = weight,
-                                   verbose = verbose)
+    fit <- SplineQuadraticQuant(
+      xtab,
+      ytab,
+      knot,
+      tau = tau,
+      monot = monot,
+      convcons = convcons,
+      solver = solver,
+      weight = weight,
+      verbose = verbose
+    )
   } else if (degree == 3) {
-    fit <- SplineCubicQuant(xtab, ytab, knot, tau=tau,
-                               monot = monot,
-                               convcons = convcons,
-                               der3cons = der3cons,
-                               solver = solver,
-                               weight = weight,
-                               verbose = verbose)
+    fit <- SplineCubicQuant(
+      xtab,
+      ytab,
+      knot,
+      tau = tau,
+      monot = monot,
+      convcons = convcons,
+      der3cons = der3cons,
+      solver = solver,
+      weight = weight,
+      verbose = verbose
+    )
   } else if (degree == 4) {
-    fit <- SplineQuarticQuant(xtab, ytab, knot, tau=tau,
-                                 monot = monot,
-                                 convcons = convcons,
-                                 der3cons = der3cons,
-                                 solver = solver,
-                                 weight = weight,
-                                 verbose = verbose)
+    fit <- SplineQuarticQuant(
+      xtab,
+      ytab,
+      knot,
+      tau = tau,
+      monot = monot,
+      convcons = convcons,
+      der3cons = der3cons,
+      solver = solver,
+      weight = weight,
+      verbose = verbose
+    )
   }
 
   # Return callable object if requested
 
-    result=make_spline(fit,callable=callable)
+  result = make_spline(fit, callable = callable)
 
   return(result)
 }
-
-
-

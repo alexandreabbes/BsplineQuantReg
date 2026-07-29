@@ -15,13 +15,18 @@
 #' polymul(c(1, 1), c(1, 1)) # returns c(1, 2, 1)
 #' @export
 
-polymul <- function(p1, p2,ord=0,verbose=FALSE)
+polymul <- function(p1,
+                    p2,
+                    ord = 0,
+                    verbose = FALSE)
 {
-  if ((sum(abs(p1))==0) || (sum(abs(p2))==0)){ return(0)}
+  if ((sum(abs(p1)) == 0) || (sum(abs(p2)) == 0)) {
+    return(0)
+  }
   else
   {
-    p1=rev(p1)#invert for decreasing convention
-    p2=rev(p2)
+    p1 = rev(p1)#invert for decreasing convention
+    p2 = rev(p2)
     deg1 <- length(p1) - 1
     deg2 <- length(p2) - 1
     res <- numeric(deg1 + deg2 + 1)
@@ -32,8 +37,8 @@ polymul <- function(p1, p2,ord=0,verbose=FALSE)
       }
     }
     #reduce pol
-    res=rev(res)#in standard notation
-    res=reduce_pol(res,verbose)
+    res = rev(res)#in standard notation
+    res = reduce_pol(res, verbose)
     return(res)
   }
 }
@@ -51,21 +56,23 @@ polymul <- function(p1, p2,ord=0,verbose=FALSE)
 #' polyadd(c(1, 1), c(1, -1)) # returns c(2, 0)
 #' @export
 
-polyadd<- function(p1, p2,verbose=FALSE) {
-  p1=rev(p1)
-  p2=rev(p2)
+polyadd <- function(p1, p2, verbose = FALSE) {
+  p1 = rev(p1)
+  p2 = rev(p2)
   l1 <- length(p1)
   l2 <- length(p2)
-  if (l1>l2) {p=p2
-  p2=p1
-  p1=p
-  l=l2
-  l2=l1
-  l1=l}
-  p1=c(p1,rep(0,(l2-l1)))
-  sp1p2=p1+p2
-  res=rev(p1+p2)
-  res=reduce_pol(res,verbose)
+  if (l1 > l2) {
+    p = p2
+    p2 = p1
+    p1 = p
+    l = l2
+    l2 = l1
+    l1 = l
+  }
+  p1 = c(p1, rep(0, (l2 - l1)))
+  sp1p2 = p1 + p2
+  res = rev(p1 + p2)
+  res = reduce_pol(res, verbose)
   return(res)
 }
 
@@ -85,7 +92,7 @@ polyadd<- function(p1, p2,verbose=FALSE) {
 change_polynomial_base_taylor <- function(coeffs_a, a, b)
 {
   #pol is in std decreasing notation
-  coeffs_a=rev(coeffs_a)
+  coeffs_a = rev(coeffs_a)
   n <- length(coeffs_a) - 1
 
 
@@ -117,12 +124,16 @@ change_polynomial_base_taylor <- function(coeffs_a, a, b)
 #' @examples
 #' reduce_pol(c(0,0, 1, 1))
 #' @export
-reduce_pol<-function(p,verbose=FALSE){
-  l=length(p)
-  k=1
-  while (p[k]==0 & k<l){k=k+1}
+reduce_pol <- function(p, verbose = FALSE) {
+  l = length(p)
+  k = 1
+  while (p[k] == 0 & k < l) {
+    k = k + 1
+  }
   if (verbose)
-    {message("removed ",k," useless zeroes to ",p)}
+  {
+    message("removed ", k, " useless zeroes to ", p)
+  }
   return(p[k:l])
 }
 #' Evaluate polynomial
@@ -137,18 +148,18 @@ reduce_pol<-function(p,verbose=FALSE){
 #' poly_eval(c(1, 1, 1), c(0, 1, 2)) # returns c(1, 3, 7)
 #' @export
 
-poly_eval<-function(p,xvalues){
-  p=rev(p)
+poly_eval <- function(p, xvalues) {
+  p = rev(p)
   #we evaluate the values in the convention p=c(p0,p1,p2)
   #represent the polynomial p0+p1x+p2*x^2
-  y=c()
-  d=length(p)-1
-  for (x in xvalues){
-    val=0
-    for (i in 0:d){
-      val=val+p[i+1]*x^i
+  y = c()
+  d = length(p) - 1
+  for (x in xvalues) {
+    val = 0
+    for (i in 0:d) {
+      val = val + p[i + 1] * x^i
     }
-    y=c(y,val)
+    y = c(y, val)
   }
   return(y)
 }
@@ -163,18 +174,28 @@ poly_eval<-function(p,xvalues){
 #' polyderiv(c(1, 0, 0), 1) # returns c(2, 0)
 #' @export
 
-polyderiv<-function(p,der=1){
-  if (der==0)   {q=p}
+polyderiv <- function(p, der = 1) {
+  if (der == 0)   {
+    q = p
+  }
   else {
-    if (length(p)==1){q=0}else{
-    l=length(p)
-    #p=rev(p)#reverse
-    A=array(data=0,c(l,l))
-    for (i in 1:(l-1)){A[i+1,(i)]=(l-i)}
-    D=A
-    if (der>1){for (i in 2:der){D=A%*%D}} #compute the d-th power of A
-    q=D%*%p
-    q=q[(1+der):(l)]
+    if (length(p) == 1) {
+      q = 0
+    } else{
+      l = length(p)
+      #p=rev(p)#reverse
+      A = array(data = 0, c(l, l))
+      for (i in 1:(l - 1)) {
+        A[i + 1, (i)] = (l - i)
+      }
+      D = A
+      if (der > 1) {
+        for (i in 2:der) {
+          D = A %*% D
+        }
+      } #compute the d-th power of A
+      q = D %*% p
+      q = q[(1 + der):(l)]
     }
 
     return(q)

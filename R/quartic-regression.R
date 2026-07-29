@@ -25,14 +25,16 @@
 #' @param verbose Logical; if TRUE, print progress messages
 #' @return A list containing coefficients, degree, and knot
 #' @export
-SplineQuarticQuant <- function(xtab, ytab, knot, tau,
+SplineQuarticQuant <- function(xtab,
+                               ytab,
+                               knot,
+                               tau,
                                monot = 0,
                                convcons = 0,
                                der3cons = 0,
                                solver = "CLARABEL",
                                weight = NULL,
                                verbose = FALSE) {
-
   if (is.null(weight)) {
     weight <- rep(1, length(xtab))
   }
@@ -128,9 +130,7 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
         s <- sign(monot[i])
 
         # Karlin-Studden constraints for cubic
-        karlin_constr <- apply_karlin_cubic(a3, a2, a1, a0,
-                                            z0_vars[[i]], z1_vars[[i]],
-                                            sign = s)
+        karlin_constr <- apply_karlin_cubic(a3, a2, a1, a0, z0_vars[[i]], z1_vars[[i]], sign = s)
         constraints <- c(constraints, karlin_constr)
       }
     }
@@ -155,9 +155,7 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
         s <- sign(convcons[i])
 
         # Karlin-Studden constraints for quadratic
-        karlin_constr <- apply_karlin_quadratic(a2, a1, a0,
-                                                z_conv_vars[[i]],
-                                                sign = s)
+        karlin_constr <- apply_karlin_quadratic(a2, a1, a0, z_conv_vars[[i]], sign = s)
         constraints <- c(constraints, karlin_constr)
       }
     }
@@ -181,10 +179,11 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
   problem <- Problem(objective, constraints)
 
   result <- NULL
-  solvers_to_try <- c(solver,"CLARABEL", "HIGHS","ECOS", "OSQP",  "SCS", "MOSEK")
+  solvers_to_try <- c(solver, "CLARABEL", "HIGHS", "ECOS", "OSQP", "SCS", "MOSEK")
 
   for (s in unique(solvers_to_try)) {
-    if (verbose) cat("Trying solver:", s, "\n")
+    if (verbose)
+      cat("Trying solver:", s, "\n")
 
     # Use new 'CVXR' syntax: psolve()
     result <- tryCatch({
@@ -198,12 +197,14 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
         alpha_value = value(alpha)
       )
     }, error = function(e) {
-      if (verbose) cat("Failed:", e$message, "\n")
+      if (verbose)
+        cat("Failed:", e$message, "\n")
       NULL
     })
 
     if (!is.null(result) && !is.null(result$alpha_value)) {
-      if (verbose) cat("Solver succeeded:", s, "\n")
+      if (verbose)
+        cat("Solver succeeded:", s, "\n")
       break
     }
   }
@@ -214,7 +215,7 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
   }
 
   alpha_val <- result$alpha_value + y_mean
-  result$y_mean<-y_mean
+  result$y_mean <- y_mean
   if (verbose) {
     cat("Status:", result$status, "\n")
     cat("Objective value:", result$value, "\n")
@@ -225,7 +226,7 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
     coeff = alpha_val,
     degree = degree,
     knot = t(knot),
-    result<-result
+    result <- result
   ))
 }
 
@@ -237,18 +238,26 @@ SplineQuarticQuant <- function(xtab, ytab, knot, tau,
 #' @inheritParams SplineQuarticQuant
 #' @return Same as SplineQuarticQuant
 #' @export
-SplineConstQuantRegBs4 <- function(xtab, ytab, knot, tau,
+SplineConstQuantRegBs4 <- function(xtab,
+                                   ytab,
+                                   knot,
+                                   tau,
                                    monot = 0,
                                    convcons = 0,
                                    der3cons = 0,
                                    solver = "CLARABEL",
                                    weight = NULL,
                                    verbose = FALSE) {
-  SplineQuarticQuant(xtab, ytab, knot, tau,
-                     monot = monot,
-                     convcons = convcons,
-                     der3cons = der3cons,
-                     solver = solver,
-                     weight = weight,
-                     verbose = verbose)
+  SplineQuarticQuant(
+    xtab,
+    ytab,
+    knot,
+    tau,
+    monot = monot,
+    convcons = convcons,
+    der3cons = der3cons,
+    solver = solver,
+    weight = weight,
+    verbose = verbose
+  )
 }

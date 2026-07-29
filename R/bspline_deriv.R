@@ -14,74 +14,95 @@
 #' @return Coefficients of the derivative B-spline (degree = degree - der)
 #' @export
 
-Bspline_deriv <- function(bspline, der = 1, callable=NULL, verbose=FALSE) {
-  if (der==0){diff_spline<-make_spline(bspline)
-  if (verbose)cat("No change, nul derivative")}else{
-  if (inherits(bspline, "callable_spline")) {
-    params <- get_parameters(bspline)
-    coeff <- params$coeff
-    knot <- params$knot
-    degree <- params$degree
-    result <-params$result
-    if (is.null(callable)){callable<-TRUE}
-  } else {
-    coeff <- bspline$coeff
-    knot <- bspline$knot
-    degree <- bspline$degree
-    result <-bspline$result
-    if (is.null(callable)){callable<-FALSE}
-  }
-  if (der > degree) {
-    if (verbose){message("Derivative order exceeds degree")}
-    coeff<-rep(0,length(knot)-1)
-    d<-0
-  }
-
-  # Start with original coefficients
-
-  co <- coeff
-
-  for (j in 1:der) {
-    # Number of coefficients decreases by 1 at each derivative
-
-    d <- degree-j+1
-    N <- length(co)
-
-    co_new <- numeric(N-1)
-    s <- c(rep(knot[1],d),knot,rep(rev(knot)[1],d))
-    # Extended knots for the current degree
-    # t_i for i = 1..n+d+1 (standard knot sequence)
-    # For a B-spline of degree d with n basis functions,
-    # the knot sequence has length n + d + 1
-    # Here we need t_{i} and t_{i+d} for i = 1..n-1
-
-    # For the derivative formula, we need t_i and t_{i+d}
-    # where i goes from 1 to n-1 (new basis functions)
-    for (i in (1):(N-1)) {
-      # s_i is the i-th knot (1-indexed)
-      # t_{i+d} is the (i+d)-th knot
-      # We need the effective knots
-      denom <- (if (is.na(s[i + d+1])){0}else{s[i+d+1]}) - (if(is.na(s[i+1])){0}else{s[i+1]})
-      #usual formula      #s[i+k-j]-s[i] k= initial deg
-
-      if (denom == 0) {
-        co_new[i] <- 0
-      } else {
-        co_new[i] <- d * (co[i+1] - co[i]) / denom
+Bspline_deriv <- function(bspline,
+                          der = 1,
+                          callable = NULL,
+                          verbose = FALSE) {
+  if (der == 0) {
+    diff_spline <- make_spline(bspline)
+    if (verbose)
+      cat("No change, nul derivative")
+  } else{
+    if (inherits(bspline, "callable_spline")) {
+      params <- get_parameters(bspline)
+      coeff <- params$coeff
+      knot <- params$knot
+      degree <- params$degree
+      result <- params$result
+      if (is.null(callable)) {
+        callable <- TRUE
+      }
+    } else {
+      coeff <- bspline$coeff
+      knot <- bspline$knot
+      degree <- bspline$degree
+      result <- bspline$result
+      if (is.null(callable)) {
+        callable <- FALSE
       }
     }
+    if (der > degree) {
+      if (verbose) {
+        message("Derivative order exceeds degree")
+      }
+      coeff <- rep(0, length(knot) - 1)
+      d <- 0
+    }
 
-    # Update for next derivative
-    co <- co_new
+    # Start with original coefficients
 
-  }
+    co <- coeff
 
-  diff_list=list(
-    coeff = co,
-    degree = degree - der,
-    knot = knot,
-    result = result)
-  diff_spline<-make_spline(diff_list, callable=callable)
+    for (j in 1:der) {
+      # Number of coefficients decreases by 1 at each derivative
+
+      d <- degree - j + 1
+      N <- length(co)
+
+      co_new <- numeric(N - 1)
+      s <- c(rep(knot[1], d), knot, rep(rev(knot)[1], d))
+      # Extended knots for the current degree
+      # t_i for i = 1..n+d+1 (standard knot sequence)
+      # For a B-spline of degree d with n basis functions,
+      # the knot sequence has length n + d + 1
+      # Here we need t_{i} and t_{i+d} for i = 1..n-1
+
+      # For the derivative formula, we need t_i and t_{i+d}
+      # where i goes from 1 to n-1 (new basis functions)
+      for (i in (1):(N - 1)) {
+        # s_i is the i-th knot (1-indexed)
+        # t_{i+d} is the (i+d)-th knot
+        # We need the effective knots
+        denom <- (if (is.na(s[i + d + 1])) {
+          0
+        } else{
+          s[i + d + 1]
+        }) - (if (is.na(s[i + 1])) {
+          0
+        } else{
+          s[i + 1]
+        })
+        #usual formula      #s[i+k-j]-s[i] k= initial deg
+
+        if (denom == 0) {
+          co_new[i] <- 0
+        } else {
+          co_new[i] <- d * (co[i + 1] - co[i]) / denom
+        }
+      }
+
+      # Update for next derivative
+      co <- co_new
+
+    }
+
+    diff_list = list(
+      coeff = co,
+      degree = degree - der,
+      knot = knot,
+      result = result
+    )
+    diff_spline <- make_spline(diff_list, callable = callable)
   }
   return(diff_spline)
 }

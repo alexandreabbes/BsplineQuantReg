@@ -11,8 +11,10 @@
 #'   \item{d2}{Second derivative values at knot: ((kn+1) x N) matrix}
 #'   \item{d3}{Third derivative values at knots: (kn x N) matrix}
 #' @export
-bspline_to_deriv_coeffs_cubic <- function(tn,degree = 3,x_values=0, verbose=FALSE) {
-
+bspline_to_deriv_coeffs_cubic <- function(tn,
+                                          degree = 3,
+                                          x_values = 0,
+                                          verbose = FALSE) {
   # create  basis with create.bspline.basis
   kn <- length(tn) - 1
   # Nombre correct de fonctions de base: kn + degree+1
@@ -20,42 +22,51 @@ bspline_to_deriv_coeffs_cubic <- function(tn,degree = 3,x_values=0, verbose=FALS
 
   norder <- degree + 1  # 4 pour cubique
 
-  sn=c(tn[1]*rep(1,degree),tn,tn[kn+1]*rep(1,degree)) # this is the extended knot sequence
-  BB <- Bspline_base(sn,degree)
-  basis<-BB$base
+  sn = c(tn[1] * rep(1, degree), tn, tn[kn + 1] * rep(1, degree)) # this is the extended knot sequence
+  BB <- Bspline_base(sn, degree)
+  basis <- BB$base
 
-  N <-BB$n_splines
+  N <- BB$n_splines
   if (verbose) {
     message("Number of  basis functions", N, "\n")
   }
   # Matrix of normalised coefficient derivativs
   deriv_coeffs <- array(0, dim = c(kn, N, 3))
-  deriv2_val<-array(0, dim = c(kn+1, N))
-  deriv3_val<-array(0, dim = c(kn, N))
-  for (j in 1:N){
-    for (nu in (degree+1):(kn+degree))
+  deriv2_val <- array(0, dim = c(kn + 1, N))
+  deriv3_val <- array(0, dim = c(kn, N))
+  for (j in 1:N) {
+    for (nu in (degree + 1):(kn + degree))
     {
-      h=sn[nu+1]-sn[nu]
-      c3<-basis[j,nu,1]
-      c2<-basis[j,nu,2]
-      a3<-3*c3*h^2
-      a2<-2*basis[j,nu,2]*h
-      a1<-basis[j,nu,3]
+      h = sn[nu + 1] - sn[nu]
+      c3 <- basis[j, nu, 1]
+      c2 <- basis[j, nu, 2]
+      a3 <- 3 * c3 * h^2
+      a2 <- 2 * basis[j, nu, 2] * h
+      a1 <- basis[j, nu, 3]
       # coeffs_poly est [a3, a2, a1, a0] a0+a1*x+a_2*x^2+a3*x^3
-      deriv_coeffs[nu-degree,j,]<-c(a3,a2,a1)
-      deriv2_val[nu-degree,j]<-c2
-      deriv3_val[nu-degree,j]<-c3 #up to a factor 6, but the sign is the same.
+      deriv_coeffs[nu - degree, j, ] <- c(a3, a2, a1)
+      deriv2_val[nu - degree, j] <- c2
+      deriv3_val[nu - degree, j] <- c3 #up to a factor 6, but the sign is the same.
     }
 
     # for the last knot the second deriv is an affine function
     # p+m(t-t_{kn-1}) h is the last intervall space
-    p<-2*basis[j,nu,2]
-    m<-6*basis[j,nu,1]
-    deriv2_val[nu-degree+1,j]=p+m*h
+    p <- 2 * basis[j, nu, 2]
+    m <- 6 * basis[j, nu, 1]
+    deriv2_val[nu - degree + 1, j] = p + m * h
   }
-  if (length(x_values)!=1){yvalues=bs_direct(BB,x_values)}
-  else {yvalues=0}
-  return(list(d0=yvalues,d1=deriv_coeffs, d2=deriv2_val,d3=deriv3_val))
+  if (length(x_values) != 1) {
+    yvalues = bs_direct(BB, x_values)
+  }
+  else {
+    yvalues = 0
+  }
+  return(list(
+    d0 = yvalues,
+    d1 = deriv_coeffs,
+    d2 = deriv2_val,
+    d3 = deriv3_val
+  ))
 }
 
 #' Convert quartic B-spline to derivative coefficients
@@ -72,8 +83,9 @@ bspline_to_deriv_coeffs_cubic <- function(tn,degree = 3,x_values=0, verbose=FALS
 #'   \item{d2}{Second derivative coefficients [a2, a1, a0] for each interval}
 #'   \item{d3}{Third derivative values at knot (linear constraints)}
 #' @export
-bspline_to_deriv_coeffs_quart <- function(knot, degree = 4, x_values = 0) {
-
+bspline_to_deriv_coeffs_quart <- function(knot,
+                                          degree = 4,
+                                          x_values = 0) {
   kn <- length(knot) - 1
   N <- kn + degree
 
@@ -113,20 +125,11 @@ bspline_to_deriv_coeffs_quart <- function(knot, degree = 4, x_values = 0) {
 
       # First derivative: P'(u) = a1 + 2*a2*u + 3*a3*u^2 + 4*a4*u^3
       # Normalized: a1 + (2*a2*h)*u + (3*a3*h^2)*u^2 + (4*a4*h^3)*u^3
-      deriv1_coeffs[nu - degree, j, ] <- c(
-        4 * a4 * h^3,
-        3 * a3 * h^2,
-        2 * a2 * h,
-        a1
-      )
+      deriv1_coeffs[nu - degree, j, ] <- c(4 * a4 * h^3, 3 * a3 * h^2, 2 * a2 * h, a1)
 
       # Second derivative: P''(u) = 2*a2 + 6*a3*u + 12*a4*u^2
       # Normalized: (2*a2) + (6*a3*h)*u + (12*a4*h^2)*u^2
-      deriv2_coeffs[nu - degree, j, ] <- c(
-        12 * a4 * h^2,
-        6 * a3 * h,
-        2 * a2
-      )
+      deriv2_coeffs[nu - degree, j, ] <- c(12 * a4 * h^2, 6 * a3 * h, 2 * a2)
     }
 
     # Third derivative at knot (for linear constraints)
@@ -150,7 +153,7 @@ bspline_to_deriv_coeffs_quart <- function(knot, degree = 4, x_values = 0) {
         h <- sn[nu + 1] - sn[nu]
         a3 <- basis[j, nu, 2]
         a4 <- basis[j, nu, 1]
-        deriv3_knot[i, j] <- 6 * a3+24*a4*h
+        deriv3_knot[i, j] <- 6 * a3 + 24 * a4 * h
       }
     }
   }
@@ -186,8 +189,10 @@ bspline_to_deriv_coeffs_quart <- function(knot, degree = 4, x_values = 0) {
 #'   \item{d1}{First derivative coefficients [a1, a0] for each interval}
 #'   \item{d2}{Second derivative values (constant per interval)}
 #' @export
-bspline_to_deriv_coeffs_quad <- function(tn, degree = 2, x_values = 0, verbose = FALSE) {
-
+bspline_to_deriv_coeffs_quad <- function(tn,
+                                         degree = 2,
+                                         x_values = 0,
+                                         verbose = FALSE) {
   kn <- length(tn) - 1
   N <- kn + degree  # Number of basis functions for quadratic = kn + 2
 
@@ -199,7 +204,11 @@ bspline_to_deriv_coeffs_quad <- function(tn, degree = 2, x_values = 0, verbose =
   basis <- BB$base
 
   if (verbose) {
-    message("Quadratic B-spline basis: ", N, " basis functions, ", kn, " intervals")
+    message("Quadratic B-spline basis: ",
+            N,
+            " basis functions, ",
+            kn,
+            " intervals")
   }
 
   # Derivative coefficients
@@ -234,11 +243,7 @@ bspline_to_deriv_coeffs_quad <- function(tn, degree = 2, x_values = 0, verbose =
     yvalues <- 0
   }
 
-  return(list(
-    d0 = yvalues,
-    d1 = deriv1_coeffs,
-    d2 = deriv2_coeffs
-  ))
+  return(list(d0 = yvalues, d1 = deriv1_coeffs, d2 = deriv2_coeffs))
 }
 
 
@@ -254,8 +259,10 @@ bspline_to_deriv_coeffs_quad <- function(tn, degree = 2, x_values = 0, verbose =
 #'   \item{d0}{Design matrix (if x_values provided)}
 #'   \item{d1}{First derivative values (constant per interval)}
 #' @export
-bspline_to_deriv_coeffs_lin <- function(tn, degree = 1, x_values = 0, verbose = FALSE) {
-
+bspline_to_deriv_coeffs_lin <- function(tn,
+                                        degree = 1,
+                                        x_values = 0,
+                                        verbose = FALSE) {
   kn <- length(tn) - 1
   N <- kn + degree  # Number of basis functions for linear = kn + 1
 
@@ -267,7 +274,11 @@ bspline_to_deriv_coeffs_lin <- function(tn, degree = 1, x_values = 0, verbose = 
   basis <- BB$base
 
   if (verbose) {
-    message("Linear B-spline basis: ", N, " basis functions, ", kn, " intervals")
+    message("Linear B-spline basis: ",
+            N,
+            " basis functions, ",
+            kn,
+            " intervals")
   }
 
   # First derivative: constant on each interval
@@ -295,8 +306,5 @@ bspline_to_deriv_coeffs_lin <- function(tn, degree = 1, x_values = 0, verbose = 
     yvalues <- 0
   }
 
-  return(list(
-    d0 = yvalues,
-    d1 = deriv1_coeffs
-  ))
+  return(list(d0 = yvalues, d1 = deriv1_coeffs))
 }

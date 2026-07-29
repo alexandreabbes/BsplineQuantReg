@@ -1,6 +1,5 @@
 # Linear Spline Quantile Regression with Shape Constraints
 # Author: Alexandre Abbes
-
 #' Quantile regression with linear splines and monotonicity constraints
 #'
 #' Performs quantile regression using linear B-splines with monotonicity constraints.
@@ -18,12 +17,14 @@
 #' @param verbose logical; if TRUE, print progress messages
 #' @return A list containing coefficients, degree, and knots
 #' @export
-SplineLinearQuant <- function(xtab, ytab, knot, tau,
+SplineLinearQuant <- function(xtab,
+                              ytab,
+                              knot,
+                              tau,
                               monot = 0,
                               solver = "CLARABEL",
                               weight = NULL,
                               verbose = FALSE) {
-
   if (is.null(weight)) {
     weight <- rep(1, length(xtab))
   }
@@ -61,7 +62,10 @@ SplineLinearQuant <- function(xtab, ytab, knot, tau,
   }
 
   # Build B-spline basis and derivative coefficients
-  deriv_data <- bspline_to_deriv_coeffs_lin(knot, degree = 1, x_values = xtab, verbose = verbose)
+  deriv_data <- bspline_to_deriv_coeffs_lin(knot,
+                                            degree = 1,
+                                            x_values = xtab,
+                                            verbose = verbose)
 
   B <- deriv_data$d0
   B <- t(B)  # Design matrix: n x N
@@ -103,10 +107,11 @@ SplineLinearQuant <- function(xtab, ytab, knot, tau,
   problem <- Problem(objective, constraints)
 
   result <- NULL
-  solvers_to_try <- c(solver,"HIGHS","CLARABEL", "GUROBI", "OSQP", "ECOS", "SCS")
+  solvers_to_try <- c(solver, "HIGHS", "CLARABEL", "GUROBI", "OSQP", "ECOS", "SCS")
 
   for (s in unique(solvers_to_try)) {
-    if (verbose) cat("Trying solver:", s, "\n")
+    if (verbose)
+      cat("Trying solver:", s, "\n")
 
     # Use new CVXR syntax: psolve() for optimal value
     result <- tryCatch({
@@ -120,9 +125,11 @@ SplineLinearQuant <- function(xtab, ytab, knot, tau,
         alpha_value = value(alpha)
       )
     }, error = function(e) {
-      if (verbose) cat("Failed:", e$message, "\n")
+      if (verbose)
+        cat("Failed:", e$message, "\n")
       NULL
-    })}
+    })
+  }
 
   if (is.null(result) || is.null(value(alpha))) {
     warning("Optimization did not converge with any solver")
@@ -130,7 +137,7 @@ SplineLinearQuant <- function(xtab, ytab, knot, tau,
   }
 
   alpha_val <- result$alpha_value + y_mean
-  result$y_mean<-y_mean
+  result$y_mean <- y_mean
 
   if (verbose) {
     message("Status:", result$status)
@@ -153,14 +160,22 @@ SplineLinearQuant <- function(xtab, ytab, knot, tau,
 #' @inheritParams SplineLinearQuant
 #' @return Same as SplineLinearQuant
 #' @export
-SplineConstQuantRegBs1 <- function(xtab, ytab, knot, tau,
+SplineConstQuantRegBs1 <- function(xtab,
+                                   ytab,
+                                   knot,
+                                   tau,
                                    monot = 0,
                                    solver = "CLARABEL",
                                    weight = NULL,
                                    verbose = FALSE) {
-  SplineLinearQuant(xtab, ytab, knot, tau,
-                    monot = monot,
-                    solver = solver,
-                    weight = weight,
-                    verbose = verbose)
+  SplineLinearQuant(
+    xtab,
+    ytab,
+    knot,
+    tau,
+    monot = monot,
+    solver = solver,
+    weight = weight,
+    verbose = verbose
+  )
 }

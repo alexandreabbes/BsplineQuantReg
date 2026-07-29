@@ -1,7 +1,5 @@
 # bs_direct, makpp, evalpp, spline_eval, view_spline
 # Spline_der_knot, bspline_to_deriv_coeffs_pp
-
-
 #' Evaluate a B-spline
 #'
 #' Evaluates a spline (linear combination of B-splines) at given points.
@@ -31,51 +29,70 @@
 #' y <- spline_eval(Bspline=Bspline,x_values=x_values, Bvalues=Bvalues )}
 #' @export
 
-spline_eval<-function(Bspline, x_values=NULL,der=0, Bvalues=NULL,verbose=FALSE)
+spline_eval <- function(Bspline,
+                        x_values = NULL,
+                        der = 0,
+                        Bvalues = NULL,
+                        verbose = FALSE)
 {
-  if (is.function(Bspline) && inherits(Bspline, "callable_spline") ) {
+  if (is.function(Bspline) && inherits(Bspline, "callable_spline")) {
     # Already callable, retrieve the parameters
-    Bspline<-get_parameters(Bspline)
+    Bspline <- get_parameters(Bspline)
   }
 
-  knot=Bspline$knot #vector of effective knots
-  degree=Bspline$degree
-  coeff=Bspline$coeff
-  if (is.null(x_values)){message("no x_value given, compute at the knots")
-    x_values<-knot}
+  knot = Bspline$knot #vector of effective knots
+  degree = Bspline$degree
+  coeff = Bspline$coeff
+  if (verbose) {
+    cat("Evaluation de la spline:\n", print(Bspline))
+  }
+  if (is.null(x_values)) {
+    message("no x_value given, compute at the knots")
+    x_values <- knot
+  }
   #Bvalues=bs(x_values,knot=knot,degree)  "can be used instead of the following lines
   #to accelerate the calculations
   # values at knots by default
   if (is.null(Bvalues))
-      # if the values of the basis
-      #are not provided, or do not match the spline coefficients
-      #then compute them
-      {t1=knot[1]
-      tkn=rev(knot)[1] #last knot
-      sn=c(rep(t1,degree),knot,rep(tkn,degree) ) #extended knot partition
-      D_BB=Bspline_base(sn,degree=degree,der=der,verbose=verbose) # first compute the Basis
-      #BB=Bspline_base(sn,degree=degree,verbose=verbose)
-      #then evaluate the basis as the values
-      #D_BB<-Bspline_base_deriv(BB,der=der,verbose=verbose)
-      D_Bvalues <- bs_direct(D_BB,x_values=x_values,verbose=verbose)
-      }else{
-    if (inherits(Bvalues,"bspline_basis")){ #case basis
-    BB<-Bvalues
-  #We trust the dimensions, knots, are compatible
-    if (der==0){
-      D_Bvalues=bs_direct(BB,x_values)
-    }else{
-      D_BB<-Bspline_base_deriv(BB,der)
-    D_Bvalues<-D_BB$base
-    D_Bvalues<-bs_direct(D_BB,x_values)}
+    # if the values of the basis
+    #are not provided, or do not match the spline coefficients
+    #then compute them
+  {
+    t1 = knot[1]
+    tkn = rev(knot)[1] #last knot
+    sn = c(rep(t1, degree), knot, rep(tkn, degree)) #extended knot partition
+    D_BB = Bspline_base(sn,
+                        degree = degree,
+                        der = der,
+                        verbose = verbose) # first compute the Basis
+    #BB=Bspline_base(sn,degree=degree,verbose=verbose)
+    #then evaluate the basis as the values
+    #D_BB<-Bspline_base_deriv(BB,der=der,verbose=verbose)
+    D_Bvalues <- bs_direct(D_BB, x_values = x_values, verbose = verbose)
+  } else{
+    if (inherits(Bvalues, "bspline_basis")) {
+      #case basis
+      BB <- Bvalues
+      #We trust the dimensions, knots, are compatible
+      if (der == 0) {
+        D_Bvalues = bs_direct(BB, x_values)
+      } else{
+        D_BB <- Bspline_base_deriv(BB, der)
+        D_Bvalues <- D_BB$base
+        D_Bvalues <- bs_direct(D_BB, x_values)
+      }
     }
-    else{ #case values
-      D_Bvalues<-Bvalues}
+    else{
+      #case values
+      D_Bvalues <- Bvalues
+    }
 
-    n1=dim(D_Bvalues)[1]
-    if (n1!=length(coeff)){D_Bvalues<-t(D_Bvalues)}
+    n1 = dim(D_Bvalues)[1]
+    if (n1 != length(coeff)) {
+      D_Bvalues <- t(D_Bvalues)
+    }
   }
-   yvalues<-(t(D_Bvalues))%*%coeff
+  yvalues <- (t(D_Bvalues)) %*% coeff
 
   return(yvalues)
 }
@@ -90,57 +107,74 @@ spline_eval<-function(Bspline, x_values=NULL,der=0, Bvalues=NULL,verbose=FALSE)
 #' @return Matrix of basis function values (n_splines x length(x_values))
 #' @export
 
-bs_direct<-function(Basis,x_values=NULL,verbose=FALSE)
+bs_direct <- function(Basis,
+                      x_values = NULL,
+                      verbose = FALSE)
 {
   #Calcule les valeurs d'une base 'Basis'
   #comme la fonction 'bs' de 'R', mais en utilisant la
   # base calculee sous PP-forme : coeff des polynomes sur la base locale.
   #indep. du choix de la notation croissant/decroissant
   if (is.null(x_values))
-    {message("no xvalue given, computing at knots")
+  {
+    message("no xvalue given, computing at knots")
     return(Spline_der_knot(Basis))
-           }
-
-  n_values=length(x_values)
-  knot=Basis$knot  # knot
-  kn=length(knot)-1
-  d=Basis$degree
-  diff<-Basis$deriv_order
-  nsplines=Basis$n_splines
-  base=Basis$base
-  if(verbose){message(c("Knots:  ", paste(knot, collapse=" , ") ,
-                        "\n degree of the basis: ",d,
-                        "\n Nb splines in the  basis : ",
-                        nsplines
-  ))}
-
-  yvalues=array(data=0,c(nsplines,n_values))
-    if (d>0){
-      bb=base[,(d+1+diff):(nsplines),] #only keep the effective pieces
-    for (j in 1:nsplines) #go through splines of the base
-      {
-      if (kn==1){ # In case of a single piece
-        if (verbose){print("only one piece")}
-        p=makpp(bb[j,],tn=knot)
-        if (verbose){print("function number",j,"is",p)}
-        yvalues[j,]<-evalpp(p,x_values)}
-      else {
-        p=makpp(bb[j,,],tn=knot)
-        yvalues[j,]<-evalpp(p,x_values)
-        }
-      }
-      }
-      if (d==0){
-        bb=base[,(1+diff):nsplines,1]
-        for (j in 1:nsplines)
-          {
-          p=makpp(bb[j,],tn=knot)
-          yvalues[j,]<-evalpp(p,x_values)
-          }
-      }
-
-   return(yvalues)
   }
+
+  n_values = length(x_values)
+  knot = Basis$knot  # knot
+  kn = length(knot) - 1
+  d = Basis$degree
+  diff <- Basis$deriv_order
+  nsplines = Basis$n_splines
+  base = Basis$base
+  if (verbose) {
+    message(
+      c(
+        "Knots:  ",
+        paste(knot, collapse = " , ") ,
+        "\n degree of the basis: ",
+        d,
+        "\n Nb splines in the  basis : ",
+        nsplines
+      )
+    )
+  }
+
+  yvalues = array(data = 0, c(nsplines, n_values))
+  if (d > 0) {
+    bb = base[, (d + 1 + diff):(nsplines), ] #only keep the effective pieces
+    for (j in 1:nsplines)
+      #go through splines of the base
+    {
+      if (kn == 1) {
+        # In case of a single piece
+        if (verbose) {
+          print("only one piece")
+        }
+        p = makpp(bb[j, ], tn = knot)
+        if (verbose) {
+          print("function number", j, "is", p)
+        }
+        yvalues[j, ] <- evalpp(p, x_values)
+      }
+      else {
+        p = makpp(bb[j, , ], tn = knot)
+        yvalues[j, ] <- evalpp(p, x_values)
+      }
+    }
+  }
+  if (d == 0) {
+    bb = base[, (1 + diff):nsplines, 1]
+    for (j in 1:nsplines)
+    {
+      p = makpp(bb[j, ], tn = knot)
+      yvalues[j, ] <- evalpp(p, x_values)
+    }
+  }
+
+  return(yvalues)
+}
 
 
 #' Evaluates a piecewise polynomial (PP form)  function at given points.
@@ -151,69 +185,76 @@ bs_direct<-function(Basis,x_values=NULL,verbose=FALSE)
 #' @export
 #' @keywords internal
 
-evalpp<-function(p,x_values){
+evalpp <- function(p, x_values) {
   #this evaluates a polynomial p under the pp form,
   #p if given with its knot and the local coefficients
   #This funciton is independent from the order convention
   #for polynomials
   #The x_values out of the knot give 0 in the corresponding yvalues
 
-  tn=p$knot
-  coeff=p$coefficients
-  kn=length(tn)-1 #number of intervals
-  n_values=length(x_values)
+  tn = p$knot
+  coeff = p$coefficients
+  kn = length(tn) - 1 #number of intervals
+  n_values = length(x_values)
 
-  pval<-c()
-  if(kn==1){#Only one piece
-    pval<-poly_eval(coeff,x_values-tn[1])
-  }else{
-  if (!is.null(dim(coeff))){#if the degree is not 0
-    if (x_values[1]<tn[1]){ message("Some x values smaler than first knot, extrapolating")
-      #values before the first knot
-      pre_k=x_values[(x_values<tn[1])]
-      poly_loc<-coeff[1,] # extrapolate using the first piece
-      h=pre_k-tn[1]
-      pval<-poly_eval(poly_loc,h)
+  pval <- c()
+  if (kn == 1) {
+    #Only one piece
+    pval <- poly_eval(coeff, x_values - tn[1])
+  } else{
+    if (!is.null(dim(coeff))) {
+      #if the degree is not 0
+      if (x_values[1] < tn[1]) {
+        message("Some x values smaler than first knot, extrapolating")
+        #values before the first knot
+        pre_k = x_values[(x_values < tn[1])]
+        poly_loc <- coeff[1, ] # extrapolate using the first piece
+        h = pre_k - tn[1]
+        pval <- poly_eval(poly_loc, h)
       }
 
-    for (i in 1:(kn))
+      for (i in 1:(kn))
+      {
+        xval = x_values[(x_values >= tn[i]) & (x_values < tn[i + 1])]
+        poly_loc <- coeff[i, ]
+        # reverse our convention to match polyval convention
+        #pval<-c(pval,polyval(p=rev(poly_loc),xval) )
+        h = xval - tn[i]
+        #shit to fit the local basis
+        yval <- poly_eval(poly_loc, h)
+        pval <- c(pval, yval)
+      }
+    }
+    if (is.null(dim(coeff)))
+      # if degree=0
     {
-    xval=x_values[(x_values>=tn[i]) & (x_values<tn[i+1])]
-    poly_loc<-coeff[i,]
-    # reverse our convention to match polyval convention
-    #pval<-c(pval,polyval(p=rev(poly_loc),xval) )
-    h=xval-tn[i]
-    #shit to fit the local basis
-    yval<-poly_eval(poly_loc,h)
-    pval<-c(pval,yval)
-    }}
-  if (is.null(dim(coeff)))# if degree=0
-    {
-    for (i in 1:(kn)) {
-    xval=x_values[(x_values>=tn[i]) & (x_values<tn[i+1])]
-    poly_loc<-coeff[i]
-    # reverse our convention to match polyval convention
-    #pval<-c(pval,polyval(p=rev(poly_loc),xval) )
-    h=xval-tn[i]
-    #shit to fit the local basis
-    yval<-poly_eval(poly_loc,h)
+      for (i in 1:(kn)) {
+        xval = x_values[(x_values >= tn[i]) & (x_values < tn[i + 1])]
+        poly_loc <- coeff[i]
+        # reverse our convention to match polyval convention
+        #pval<-c(pval,polyval(p=rev(poly_loc),xval) )
+        h = xval - tn[i]
+        #shit to fit the local basis
+        yval <- poly_eval(poly_loc, h)
 
-    pval<-c(pval,yval)
+        pval <- c(pval, yval)
 
-}}
-  xval=x_values[x_values==tn[kn+1]]
-  if (length(xval)>0){
-  h=tn[kn+1]-tn[kn] # if the last knot is in x_values
-  pval=c(pval,poly_eval(poly_loc,h))
+      }
+    }
+    xval = x_values[x_values == tn[kn + 1]]
+    if (length(xval) > 0) {
+      h = tn[kn + 1] - tn[kn] # if the last knot is in x_values
+      pval = c(pval, poly_eval(poly_loc, h))
 
-  }
-  if (x_values[n_values]>tn[kn+1]){message("Some x values greater than last knot, extrapolating")
-    # values after the last knot
-    post_k=x_values[(x_values>tn[kn+1])]
-    poly_loc<-coeff[kn,] # extrapolate using the last piece
-    h=post_k-tn[kn]
-    pval<-c(pval,poly_eval(poly_loc,h))
-  }
+    }
+    if (x_values[n_values] > tn[kn + 1]) {
+      message("Some x values greater than last knot, extrapolating")
+      # values after the last knot
+      post_k = x_values[(x_values > tn[kn + 1])]
+      poly_loc <- coeff[kn, ] # extrapolate using the last piece
+      h = post_k - tn[kn]
+      pval <- c(pval, poly_eval(poly_loc, h))
+    }
   }
 
   return(pval)
@@ -231,14 +272,17 @@ evalpp<-function(p,x_values){
 #' @param verbose Boolean
 #' @return A PP object or a callable function
 #' @export
-makpp <- function(coefficients, tn, callable = FALSE, verbose=FALSE){
+makpp <- function(coefficients,
+                  tn,
+                  callable = FALSE,
+                  verbose = FALSE) {
   if (length(tn) == 2) {
     kn <- length(tn) - 1
   } else if (!is.null(dim(coefficients))) {
     kn <- dim(coefficients)[1]
-    degree <-dim(coefficients)[2]-1
+    degree <- dim(coefficients)[2] - 1
   } else {
-    degree=0
+    degree = 0
     kn <- length(coefficients)
   }
 
@@ -247,11 +291,9 @@ makpp <- function(coefficients, tn, callable = FALSE, verbose=FALSE){
   }
 
   # Creer l'objet PP
-  pp_obj <- list(
-    coefficients = coefficients,
-    knot = tn,
-    degree = degree
-  )
+  pp_obj <- list(coefficients = coefficients,
+                 knot = tn,
+                 degree = degree)
   class(pp_obj) <- "non_callable_pp"
 
   if (callable) {
@@ -297,13 +339,24 @@ print.callable_pp <- function(x, ...) {
   cat("Callable Piecewise Polynomial (PP) Object\n")
   cat("==========================================\n")
   cat("  Degree:", degree %||% "unknown", "\n")
-  cat("  Intervals:", if (!is.null(knot)) length(knot) - 1 else "unknown", "\n")
-  cat("  Knots:", if (!is.null(knot)) length(knot) else "unknown", "\n")
+  cat("  Intervals:", if (!is.null(knot))
+    length(knot) - 1
+    else
+      "unknown", "\n")
+  cat("  Knots:", if (!is.null(knot))
+    length(knot)
+    else
+      "unknown", "\n")
   if (!is.null(knot)) {
     cat("  Knot range: [", round(min(knot), 4), ", ", round(max(knot), 4), "]\n")
   }
   if (!is.null(coeff)) {
-    cat("  Coefficients:", if (is.matrix(coeff)) paste(dim(coeff), collapse=" x ") else length(coeff), "\n")
+    cat("  Coefficients:",
+        if (is.matrix(coeff))
+          paste(dim(coeff), collapse = " x ")
+        else
+          length(coeff),
+        "\n")
   }
   cat("\n  Usage: pp(x_values) or pp_eval(pp, x_values)\n")
   invisible(x)
@@ -318,13 +371,17 @@ print.non_callable_pp <- function(x, ...) {
   coeff <- x$coefficients
   knot <- x$knot
   degree <- x$degree
-  n_intervals<-length(knot)-1
+  n_intervals <- length(knot) - 1
   cat("Piecewise Polynomial (PP) (non-callable)\n")
   cat("================================\n")
   cat("  $degree:", degree, "\n")
-  cat("  $knots:", length(knot),knot, "\n" )
+  cat("  $knots:", length(knot), knot, "\n")
   if (!is.null(dim(coeff))) {
-    cat(" Coefficients dimension:", dim(coeff)[1], "x", dim(coeff)[2], "\n")
+    cat(" Coefficients dimension:",
+        dim(coeff)[1],
+        "x",
+        dim(coeff)[2],
+        "\n")
     # Afficher les coefficients (troncated if too numerous)
     if (n_intervals <= 5 && dim(coeff)[2] <= 4) {
       cat("\n  $coefficients:\n")
@@ -332,9 +389,13 @@ print.non_callable_pp <- function(x, ...) {
         cat("    Interval", i, ":", paste(round(coeff[i, ], 4), collapse = ", "), "\n")
       }
     } else {
-      cat("\n  First interval coefficients:", paste(round(coeff[1, ], 4), collapse = ", "), "\n")
+      cat("\n  First interval coefficients:",
+          paste(round(coeff[1, ], 4), collapse = ", "),
+          "\n")
       if (n_intervals > 1) {
-        cat("  Last interval coefficients: ", paste(round(coeff[n_intervals, ], 4), collapse = ", "), "\n")
+        cat("  Last interval coefficients: ",
+            paste(round(coeff[n_intervals, ], 4), collapse = ", "),
+            "\n")
       }
     }
   } else {
@@ -355,13 +416,14 @@ print.non_callable_pp <- function(x, ...) {
 #' @return No return value, called for side effects (generates a plot)
 #' @export
 #'
-view_basis<-function(BB,x_values=0)
+view_basis <- function(BB, x_values = 0)
 {
-  if (length(x_values)==1){
-    k=range(BB$ext_knot)
-    x_values=(k[1]:(k[2]*100))/100}
+  if (length(x_values) == 1) {
+    k = range(BB$ext_knot)
+    x_values = (k[1]:(k[2] * 100)) / 100
+  }
 
-  yvalues=bs_direct(BB,x_values)
+  yvalues = bs_direct(BB, x_values)
 
   matplot(x_values, t(yvalues))
 }
@@ -377,30 +439,30 @@ view_basis<-function(BB,x_values=0)
 #' @return Matrix of derivative values (n_splines x n_knot)
 #' @export
 
-Spline_der_knot<-function(Bsbase,der=1)
+Spline_der_knot <- function(Bsbase, der = 1)
   #compute the values of a derivatives only at the knot
   #(simple, it only uses the coefficients)
 {
-  coeff=Bsbase$base
-  nsplines=Bsbase$n_splines
-  tn=Bsbase$ext_knot
-  kn=length(tn)-1
-  m=Bsbase$degree
+  coeff = Bsbase$base
+  nsplines = Bsbase$n_splines
+  tn = Bsbase$ext_knot
+  kn = length(tn) - 1
+  m = Bsbase$degree
 
-  if (der>m){
-    Der2_knot=array(data=0,c(nsplines,kn))
+  if (der > m) {
+    Der2_knot = array(data = 0, c(nsplines, kn))
   }
   else{
     #Der2_knot=coeff[,,(der+1)]*factorial(der) #in increasing pol notation
-    Der2_knot=coeff[,,(m-der+1)]*factorial(der) #in decreasing notation
+    Der2_knot = coeff[, , (m - der + 1)] * factorial(der) #in decreasing notation
     #computation of the last value
-    h=tn[kn]-tn[kn-1]
+    h = tn[kn] - tn[kn - 1]
     for (j in 1:nsplines)
     {
-      p_kn_der=polyderiv(coeff[j,kn+m-1,],der)
+      p_kn_der = polyderiv(coeff[j, kn + m - 1, ], der)
 
-      v_kn=poly_eval(p_kn_der,h)
-      Der2_knot[j,kn+m]=v_kn
+      v_kn = poly_eval(p_kn_der, h)
+      Der2_knot[j, kn + m] = v_kn
     }
   }
   return(t(Der2_knot))

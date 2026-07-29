@@ -25,13 +25,15 @@
 #' @param verbose logical; if TRUE, print progress messages
 #' @return A list containing coefficients, degree, and knots
 #' @export
-SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
+SplineQuadraticQuant <- function(xtab,
+                                 ytab,
+                                 knot,
+                                 tau,
                                  monot = 0,
                                  convcons = 0,
                                  solver = "CLARABEL",
                                  weight = NULL,
                                  verbose = FALSE) {
-
   if (is.null(weight)) {
     weight <- rep(1, length(xtab))
   }
@@ -61,7 +63,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
 
   # Handle constraints
   if (length(monot) == 1) {
-    monot <- rep(monot, kn+1)
+    monot <- rep(monot, kn + 1)
   }
 
   if (length(convcons) == 1) {
@@ -74,7 +76,10 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
   }
 
   # Build B-spline basis and derivative coefficients
-  deriv_data <- bspline_to_deriv_coeffs_quad(knot, degree = 2, x_values = xtab, verbose = verbose)
+  deriv_data <- bspline_to_deriv_coeffs_quad(knot,
+                                             degree = 2,
+                                             x_values = xtab,
+                                             verbose = verbose)
 
   B <- deriv_data$d0
   B <- t(B)  # Design matrix: n x N
@@ -110,7 +115,17 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
 
         # Apply sign of monotonicity
         s <- monot[i]
-        if (verbose){message("applying monotonicity ",s," on intervall No", i, "[", knot[i],",",knot[i+1],"]" )}
+        if (verbose) {
+          message("applying monotonicity ",
+                  s,
+                  " on intervall No",
+                  i,
+                  "[",
+                  knot[i],
+                  ",",
+                  knot[i + 1],
+                  "]")
+        }
         if (s > 0) {
           # P'(u) >= 0 on [0,1] for linear: min(P'(0), P'(1)) >= 0
           constraints <- c(constraints, list(b_coef >= 0))
@@ -130,7 +145,14 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
     for (i in 1:kn) {
       if (convcons[i] != 0) {
         # Second derivative value on interval i
-        if (verbose){message("applying convexity ",convcons[i]," at knot No", i, ":", knot[i] )}
+        if (verbose) {
+          message("applying convexity ",
+                  convcons[i],
+                  " at knot No",
+                  i,
+                  ":",
+                  knot[i])
+        }
         s2_val <- sum(alpha * deriv2_coeffs[i, ])
 
         if (convcons[i] > 0) {
@@ -146,10 +168,11 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
   problem <- Problem(objective, constraints)
 
   result <- NULL
-  solvers_to_try <- c(solver, "CLARABEL","HIGHS", "OSQP", "ECOS", "SCS")
+  solvers_to_try <- c(solver, "CLARABEL", "HIGHS", "OSQP", "ECOS", "SCS")
 
   for (s in unique(solvers_to_try)) {
-    if (verbose) cat("Trying solver:", s, "\n")
+    if (verbose)
+      cat("Trying solver:", s, "\n")
 
     # Use new 'CVXR' syntax: psolve() for optimal value
     result <- tryCatch({
@@ -163,7 +186,8 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
         alpha_value = value(alpha)
       )
     }, error = function(e) {
-      if (verbose) cat("Failed:", e$message, "\n")
+      if (verbose)
+        cat("Failed:", e$message, "\n")
       NULL
     })
   }
@@ -174,7 +198,7 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
   }
 
   alpha_val <- result$alpha_value + y_mean
-  result$y_mean<-y_mean
+  result$y_mean <- y_mean
 
   if (verbose) {
     message("Status:", result$status)
@@ -197,16 +221,24 @@ SplineQuadraticQuant <- function(xtab, ytab, knot, tau,
 #' @inheritParams SplineQuadraticQuant
 #' @return Same as SplineQuadraticQuant
 #' @export
-SplineConstQuantRegBs2 <- function(xtab, ytab, knot, tau,
+SplineConstQuantRegBs2 <- function(xtab,
+                                   ytab,
+                                   knot,
+                                   tau,
                                    monot = 0,
                                    convcons = 0,
                                    solver = "CLARABEL",
                                    weight = NULL,
                                    verbose = FALSE) {
-  SplineQuadraticQuant(xtab, ytab, knot, tau,
-                       monot = monot,
-                       convcons = convcons,
-                       solver = solver,
-                       weight = weight,
-                       verbose = verbose)
+  SplineQuadraticQuant(
+    xtab,
+    ytab,
+    knot,
+    tau,
+    monot = monot,
+    convcons = convcons,
+    solver = solver,
+    weight = weight,
+    verbose = verbose
+  )
 }

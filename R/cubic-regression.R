@@ -66,12 +66,16 @@
 #' @export
 
 
-SplineCubicQuant<- function(xtab, ytab, knot, tau,
-                                   monot = 0,
-                                   convcons=0,
-                                   der3cons=0,
-                                   solver = "CLARABEL", weight = NULL,
-                                   verbose=FALSE)
+SplineCubicQuant <- function(xtab,
+                             ytab,
+                             knot,
+                             tau,
+                             monot = 0,
+                             convcons = 0,
+                             der3cons = 0,
+                             solver = "CLARABEL",
+                             weight = NULL,
+                             verbose = FALSE)
 {
   if (is.null(weight)) {
     weight <- rep(1, length(xtab))
@@ -87,27 +91,29 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
   if (length(knot) == 1 && is.numeric(knot))
   {
     kn <- knot - 1
-    knot <- quantile(xtab, probs = (0:kn)/(kn))
+    knot <- quantile(xtab, probs = (0:kn) / (kn))
   }
 
   kn <- length(knot) - 1
   if (verbose) {
-    message("knot:", knot, "\n")
-  }
-
-  if (verbose) {
-  message("Monotonicity constraints (Karlin):", monot, "\n")
+    message(" knot:", knot, "\n")
+    message("Monotonicity constraints (Karlin):",
+            paste(monot, collapse = " "),
+            "\n")
   }
   boundary_knot <- range(knot)
-  degree=3
-  N=length(knot)+3-1
+  degree = 3
+  N = length(knot) + 3 - 1
   # Calcul des coefficients normalises des derivees
-  deriv_spline <- bspline_to_deriv_coeffs_cubic(knot, degree = 3,x_values=xtab,verbose=verbose)
-  deriv_coeffs <-deriv_spline$d1 # kn x N x 3
-  deriv_coeffs2<-deriv_spline$d2 # (kn+1) x N
-  deriv_coeffs3<-deriv_spline$d3 # kn x N
-  B<-deriv_spline$d0
-  B=t(B)
+  deriv_spline <- bspline_to_deriv_coeffs_cubic(knot,
+                                                degree = 3,
+                                                x_values = xtab,
+                                                verbose = verbose)
+  deriv_coeffs <- deriv_spline$d1 # kn x N x 3
+  deriv_coeffs2 <- deriv_spline$d2 # (kn+1) x N
+  deriv_coeffs3 <- deriv_spline$d3 # kn x N
+  B <- deriv_spline$d0
+  B = t(B)
   y_mean <- mean(ytab)
   ytab_centered <- ytab - y_mean
 
@@ -129,19 +135,20 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
     if (length(monot) == 1) {
       monot <- rep(monot, kn)
     }
-    if (length(monot)<(kn)){
+    if (length(monot) < (kn)) {
       message("Not enough monotonicity constraints, completing with 0")
-      monot<-c(monot,rep(0,kn-length(convcons))) }
+      monot <- c(monot, rep(0, kn - length(convcons)))
+    }
 
     for (i in 1:(kn)) {
       if (monot[i] != 0) {
         z_vars[[i]] <- Variable(1, name = paste0("z", i))
-        a_coef=sum(deriv_coeffs[i,,1]*alpha) *monot[i]
-        b_coef=sum(deriv_coeffs[i,,2]*alpha) *monot[i]
-        c_coef=sum(deriv_coeffs[i,,3]*alpha) *monot[i]
+        a_coef = sum(deriv_coeffs[i, , 1] * alpha) * monot[i]
+        b_coef = sum(deriv_coeffs[i, , 2] * alpha) * monot[i]
+        c_coef = sum(deriv_coeffs[i, , 3] * alpha) * monot[i]
         #a*x^2+b*x+c
-        CK<-apply_karlin_quadratic(a_coef,b_coef,c_coef,z_vars[[i]])
-        constraints<-c(constraints,CK)
+        CK <- apply_karlin_quadratic(a_coef, b_coef, c_coef, z_vars[[i]])
+        constraints <- c(constraints, CK)
       }
     }
   }
@@ -149,32 +156,40 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
   #"contraintes convexes
 
   # eliminate the null (unconstrained) case
-  if (any(convcons !=0)){
+  if (any(convcons != 0)) {
     if (length(convcons) == 1) {
-      convcons <- rep(convcons, (kn+1) )}
-    if (length(convcons)<(kn+1)){
+      convcons <- rep(convcons, (kn + 1))
+    }
+    if (length(convcons) < (kn + 1)) {
       message("Not enough convexity constraints, completing with 0")
-      convcons<-c(convcons,rep(0,kn+1-length(convcons))) }
-    if (verbose){
+      convcons <- c(convcons, rep(0, kn + 1 - length(convcons)))
+    }
+    if (verbose) {
       message("Convexity constraints (Linear):", convcons, "\n")
-      }
-    CV<-list((convcons*(deriv_coeffs2 %*% alpha))>=0)
+    }
+    CV <- list((convcons * (deriv_coeffs2 %*% alpha)) >= 0)
     # Very simple, only use the sign of
     # the second derivatives at the knot.
-    constraints<-c(constraints,CV)
+    constraints <- c(constraints, CV)
   }
 
-#3rd derivative constraints
-  if (any(der3cons!=0)){
+  #3rd derivative constraints
+  if (any(der3cons != 0)) {
     #if (dim(deriv_coeffs3)[2]!=N){
-      #prepare the values for matrix mult.      #calculation
-     # deriv_coeff3=t(deriv_coeffs3)}
-    if (length(der3cons) == 1){der3cons<-rep(der3cons,kn)}
-    if (length(der3cons) < kn ){
+    #prepare the values for matrix mult.      #calculation
+    # deriv_coeff3=t(deriv_coeffs3)}
+    if (length(der3cons) == 1) {
+      der3cons <- rep(der3cons, kn)
+    }
+    if (length(der3cons) < kn) {
       message("not enough 3rd order constraints, completing with 0")
-      der3cons=c(der3cons,rep(0,kn-length(der3cons))) }
+      der3cons = c(der3cons, rep(0, kn - length(der3cons)))
+    }
     if (verbose) {
-      message("3rd order derivative constraints (constant):", der3cons, "\n")}
+      message("3rd order derivative constraints (constant):",
+              der3cons,
+              "\n")
+    }
     for (j in 1:kn) {
       sig <- der3cons[j]
       if (sig != 0) {
@@ -187,7 +202,7 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
         }
       }
     }
-    }
+  }
 
   # Solve the problem
   problem <- Problem(objective, constraints)
@@ -198,11 +213,14 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
   solvers_to_try <- unique(solvers_to_try)  # Supprimer les doublons
 
   for (s in solvers_to_try) {
-    if (verbose) cat("Trying solver:", s, "\n")
+    if (verbose)
+      cat("Trying solver:", s, "\n")
 
     # Vérifier la disponibilité de ECOS
-    if (s == "ECOS" && !requireNamespace("ECOSolveR", quietly = TRUE)) {
-      if (verbose) cat("  ECOS not available (ECOSolveR missing)\n")
+    if (s == "ECOS" &&
+        !requireNamespace("ECOSolveR", quietly = TRUE)) {
+      if (verbose)
+        cat("  ECOS not available (ECOSolveR missing)\n")
       next
     }
 
@@ -214,21 +232,27 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
         alpha_value = value(alpha)
       )
     }, error = function(e) {
-      if (verbose) cat("  Failed:", e$message, "\n")
+      if (verbose)
+        cat("  Failed:", e$message, "\n")
       NULL
     })
 
     # Vérifier si le solveur a réussi
     if (!is.null(result) && !is.null(result$alpha_value)) {
       if (result$status == "optimal") {
-        if (verbose) cat("  Solver succeeded with optimal status:", s, "\n")
+        if (verbose)
+          cat("  Solver succeeded with optimal status:", s, "\n")
         break  # OK, on sort de la boucle
       } else if (result$status == "optimal_inaccurate") {
-        if (verbose) cat("  Solver returned optimal_inaccurate:", s, "\n")
+        if (verbose)
+          cat("  Solver returned optimal_inaccurate:", s, "\n")
         fallback_result <- result
         # Continuer à essayer d'autres solveurs pour un meilleur résultat
       } else {
-        if (verbose) cat("  Solver returned non-optimal status:", result$status, "\n")
+        if (verbose)
+          cat("  Solver returned non-optimal status:",
+              result$status,
+              "\n")
         fallback_result <- result
       }
     }
@@ -239,7 +263,8 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
     # Utiliser le fallback si disponible
     if (!is.null(fallback_result)) {
       result <- fallback_result
-      if (verbose) cat("Using fallback result with status:", result$status, "\n")
+      if (verbose)
+        cat("Using fallback result with status:", result$status, "\n")
     } else {
       warning("Optimisation did not converge with any available solver")
       return(NULL)
@@ -255,17 +280,25 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
   result$y_mean <- y_mean
 
   if (verbose) {
-    message(" Statut:", result$status, "\n",
-            "Valeur objectif:", result$value, "\n",
-            "Coefficients alpha (range):", range(alpha_val), "\n")
+    message(
+      " Statut:",
+      result$status,
+      "\n",
+      "Valeur objectif:",
+      result$value,
+      "\n",
+      "Coefficients alpha (range):",
+      range(alpha_val),
+      "\n"
+    )
   }
 
 
   return(list(
     coeff = alpha_val,
-    degree=3,
-    knot=knot,
-    result=result
+    degree = 3,
+    knot = knot,
+    result = result
   ))
 }
 
@@ -277,17 +310,27 @@ SplineCubicQuant<- function(xtab, ytab, knot, tau,
 #' @return Same as SplineCubicQuant
 #' @export
 
-SplineConstQuantRegBs3<-function(xtab, ytab, knot, tau,
-                                         monot = 0,
-                                         convcons=0,
-                                         der3cons=0,
-                                         solver = "CLARABEL", weight = NULL,
-                                         verbose=FALSE)
-          {SplineCubicQuant(xtab, ytab, knot, tau,
-          monot = monot,
-          convcons=convcons,
-          der3cons=der3cons,
-          solver = solver, weight = weight,
-          verbose=verbose)
-          }
-
+SplineConstQuantRegBs3 <- function(xtab,
+                                   ytab,
+                                   knot,
+                                   tau,
+                                   monot = 0,
+                                   convcons = 0,
+                                   der3cons = 0,
+                                   solver = "CLARABEL",
+                                   weight = NULL,
+                                   verbose = FALSE)
+{
+  SplineCubicQuant(
+    xtab,
+    ytab,
+    knot,
+    tau,
+    monot = monot,
+    convcons = convcons,
+    der3cons = der3cons,
+    solver = solver,
+    weight = weight,
+    verbose = verbose
+  )
+}

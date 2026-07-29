@@ -49,15 +49,15 @@ apply_karlin_cubic <- function(p3, p2, p1, p0, z0, z1, sign = 1) {
 
   # Equations (6a)-(6d) from Karlin-Studden
   constraints <- c(constraints, list(p0 == y0))
-  constraints <- c(constraints, list(p1 == 2*y1 + x0 - y0))
-  constraints <- c(constraints, list(p2 == y2 + 2*x1 - 2*y1))
+  constraints <- c(constraints, list(p1 == 2 * y1 + x0 - y0))
+  constraints <- c(constraints, list(p2 == y2 + 2 * x1 - 2 * y1))
   constraints <- c(constraints, list(p3 == x2 - y2))
 
   # SOC constraints (6e)-(6f)
-  vec_x <- vstack(x0 - x2, 2*x1)
+  vec_x <- vstack(x0 - x2, 2 * x1)
   constraints <- c(constraints, list(x0 + x2 >= p_norm(vec_x, 2)))
 
-  vec_y <- vstack(y0 - y2, 2*y1)
+  vec_y <- vstack(y0 - y2, 2 * y1)
   constraints <- c(constraints, list(y0 + y2 >= p_norm(vec_y, 2)))
 
   return(constraints)
@@ -82,7 +82,7 @@ apply_karlin_cubic <- function(p3, p2, p1, p0, z0, z1, sign = 1) {
 #' @keywords internal*
 
 apply_karlin_quadratic <- function(p2, p1, p0, z0, sign = 1)
-  {
+{
   constraints <- list()
 
   # z0 >= 0
@@ -94,9 +94,9 @@ apply_karlin_quadratic <- function(p2, p1, p0, z0, sign = 1)
     p0 <- -p0
   }
 
-   #Karlin-Studden characterization for quadratic polynomials)
-   #p(u) = a*u^2 + b*u + c
-   #Condition: there exists z0 >= 0 such that
+  #Karlin-Studden characterization for quadratic polynomials)
+  #p(u) = a*u^2 + b*u + c
+  #Condition: there exists z0 >= 0 such that
   # (p0 + p2 + z0, p0 - p2 - z0, p1 - z0) in Q3)
 
   K1_x <- p0 + p2 + z0
