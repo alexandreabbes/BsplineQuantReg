@@ -37,7 +37,9 @@ spline_eval <- function(Bspline,
 {
   if (is.function(Bspline) && inherits(Bspline, "callable_spline")) {
     # Already callable, retrieve the parameters
-    Bspline <- get_parameters(Bspline)
+    param <- get_parameters(Bspline)
+    if(verbose){print(param)}
+    Bspline<-param
   }
 
   knot = Bspline$knot #vector of effective knots
