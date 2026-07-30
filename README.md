@@ -8,19 +8,7 @@ Constrained Quantile Regression with B-Splines (Degrees 1 to 4)
 
 This package is available on CRAN.
 
-## Citation
-
-If you use this package in your research, please cite:
-
-```bibtex
-@Article{Abbes2025,
-  author  = {Alexandre Abbes},
-  title   = {Constrained Quantile Regression with Cubic B-Splines under Shape Constraints},
-  year    = {2025},
-  doi     = {10.5281/zenodo.17427913}
-}
 ```
-
 ## Features
 
 - Quantile regression for any tau in (0,1)
@@ -31,9 +19,9 @@ If you use this package in your research, please cite:
 - Karlin-Studden SOCP formulation for rigorous shape constraints
 - Partial constraints (per interval or per knot)
 - Polynomial coefficient export
+- Conversion between PP-form and B-spline representation
+- Callable and non-callable spline objects
 
-## Graphical Interface (shiny)
-https://github.com/alexandreabbes/BsplineQuantRegGui
 
 
 ## Installation
@@ -47,10 +35,6 @@ install.packages("BsplineQuantReg")
 ### From GitHub (development version)
 
 ```r
-# Using pak
-pak::pak("alexandreabbes/BsplineQuantReg")
-
-# Or using devtools
 devtools::install_github("alexandreabbes/BsplineQuantReg")
 ```
 
@@ -89,6 +73,57 @@ install.packages("BsplineQuantReg")
 
 Windows users do not need to install Rust separately. The package uses pre-compiled binaries available on CRAN.
 
+## Graphical Interface (Shiny)
+
+This package includes an interactive Shiny interface that allows you to manage most of the functions without writing code.
+
+###Launch the GUI
+```r
+library(BsplineQuantRegGui)
+run_gui()
+```
+
+The interface will open in your default browser.
+###Features of the GUI
+
+    Load data (CSV, Excel, built-in datasets)
+
+    Configure spline parameters (degree, knots)
+
+    Apply shape constraints (monotonicity, convexity, third derivative)
+
+    Define constraints per region interactively
+
+    Run quantile regression with various solvers
+
+    Visualize results with interactive plots
+
+    Export reproducible R code
+
+    Run built-in demos
+
+###Docker Deployment
+A Docker image is available for easy deployment:
+bash
+```sh
+docker pull ghcr.io/alexandreabbes/bsplinequantreggui:latest
+docker run -p 3838:3838 ghcr.io/alexandreabbes/bsplinequantreggui:latest
+```
+Then open http://localhost:3838 in your browser.
+
+
+### Installation
+
+```r
+# Install from GitHub
+remotes::install_github("alexandreabbes/bsplinequantreggui")
+
+# Or with pak
+pak::pkg_install("alexandreabbes/bsplinequantreggui")
+```
+
+
+
 ## Related Packages
 
 ### R Packages
@@ -104,17 +139,21 @@ Windows users do not need to install Rust separately. The package uses pre-compi
 The `cobs` package (Constrained B-Splines with linear or quadratic splines)
 is the closest to this package.
 
-## Performance Notice
-This R package is intended for demonstration, prototyping, and educational purposes.
-Due to the current implementation (pure R with CVXR),
-the package is  almost 5 times slower than its Python counterpart (benchmark test).
-B-spline quantile regression with constraints involves solving SOCP problems, 
-and the R implementation does not yet leverage optimized linear algebra libraries.
-
+### Python package
 Python version: https://pypi.org/project/BsplineQuantRegpy/
 
-### Future Improvements
+### Matlab core
+You may take a look here for a glimpse at the initial matlab code.
+https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-splines/tree/matlab
+`
+## Performance Notice
+This R package is intended for demonstration, prototyping, and educational purposes.
+Due to the current implementation (pure R with CVXR) the package is  almost 5 times slower than its Python counterpart (benchmark test), but much (10 times 
+maybe) faster than the matlab one.
+B-spline quantile regression with constraints involves solving SOCP problems, and the R implementation does not yet leverage optimized linear algebra libraries.
 
+
+### Future Improvements
 - Optimize the B-spline basis computation
 - Improve the API based on user feedback
 
@@ -148,6 +187,19 @@ demo(package = "BsplineQuantReg")
 demo("comprehensive", package = "BsplineQuantReg")
 demo("temperature", package = "BsplineQuantReg")
 ```
+
+
+## Citation
+
+If you use this package in your research, please cite:
+
+```bibtex
+@Article{Abbes2025,
+  author  = {Alexandre Abbes},
+  title   = {Constrained Quantile Regression with Cubic B-Splines under Shape Constraints},
+  year    = {2025},
+  doi     = {10.5281/zenodo.17427913}
+}
 
 ## Bug Reports
 
