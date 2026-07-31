@@ -4,11 +4,11 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17427913.svg)](https://doi.org/10.5281/zenodo.17427913)
 [![CRAN downloads](https://cranlogs.r-pkg.org/badges/BsplineQuantReg)](https://cran.r-project.org/package=BsplineQuantReg)
 
-Constrained Quantile Regression with B-Splines (Degrees 1 to 4)
+## **Constrained Quantile Regression with B-Splines (Degrees 1 to 4)**
 
 This package is available on CRAN.
 
-```
+
 ## Features
 
 - Quantile regression for any tau in (0,1)
@@ -77,14 +77,14 @@ Windows users do not need to install Rust separately. The package uses pre-compi
 
 This package includes an interactive Shiny interface that allows you to manage most of the functions without writing code.
 
-###Launch the GUI
+### Launch the GUI
 ```r
 library(BsplineQuantRegGui)
 run_gui()
 ```
 
 The interface will open in your default browser.
-###Features of the GUI
+### Features of the GUI
 
     Load data (CSV, Excel, built-in datasets)
 
@@ -102,7 +102,7 @@ The interface will open in your default browser.
 
     Run built-in demos
 
-###Docker Deployment
+### Docker Deployment
 A Docker image is available for easy deployment:
 bash
 bash```
@@ -130,7 +130,7 @@ pak::pkg_install("alexandreabbes/bsplinequantreggui")
 
 | Package | Description | Constraint Type | Spline Degree |
 |---------|-------------|-----------------|---------------|
-| BsplineQuantReg (this package) | Quantile regression with Karlin-Studden constraints | Monotonicity, Convexity | 1 to 4 |
+| BsplineQuantReg (this package) | Quantile regression with Karlin-Studden constraints | Monotonicity, Convexity, Third derivative | 1 to 4 |
 | quantreg | Classical quantile regression | None (linear programming) | Linear |
 | cobs | Constrained B-splines | Monotonicity, Convexity | Linear, Quadratic |
 
