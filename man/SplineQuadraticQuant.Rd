@@ -7,13 +7,14 @@
 SplineQuadraticQuant(
   xtab,
   ytab,
-  knot,
-  tau,
+  knot = NULL,
+  tau = 0.5,
   monot = 0,
   convcons = 0,
   solver = "CLARABEL",
   weight = NULL,
-  verbose = FALSE
+  verbose = FALSE,
+  type = "quantile"
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ kn constraints are considered for kn+1 knots.}
 \item{weight}{Observation weights (default = 1 for all)}
 
 \item{verbose}{logical; if TRUE, print progress messages}
+
+\item{type}{'quantile' or 'mean_square' type of regression,}
 }
 \value{
 A list containing coefficients, degree, and knots

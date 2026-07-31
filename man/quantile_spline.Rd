@@ -7,7 +7,7 @@
 quantile_spline(
   xtab,
   ytab,
-  knot,
+  knot = NULL,
   tau = 0.5,
   degree = 3,
   monot = 0,
@@ -16,7 +16,8 @@ quantile_spline(
   solver = "CLARABEL",
   weight = NULL,
   verbose = FALSE,
-  callable = TRUE
+  callable = TRUE,
+  type = "quantile"
 )
 }
 \arguments{
@@ -53,6 +54,8 @@ For degree 4: per knot (1 = positive, -1 = negative)}
 
 \item{callable}{render the final container object callable:
 'y=Bspline(x)' or 'y=Bspline(x,Bvalues)' for evaluation at x}
+
+\item{type}{'quantile' or 'mean_square' type of regression}
 }
 \value{
 A list containing coefficients, degree, and knots

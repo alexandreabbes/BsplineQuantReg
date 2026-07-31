@@ -16,6 +16,7 @@
 #' @param solver 'CVXR' solver to use (default = 'CLARABEL')
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose boolean FALSE (default) or TRUE.
+#' @param type 'quantile' or 'mean_square' type of regression
 #' @return A list containing:
 #'   \item{coefficients}{B-spline coefficients (including y mean)}
 #'   \item{degree}{Spline degree (always 3)}

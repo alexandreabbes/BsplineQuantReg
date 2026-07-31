@@ -2,19 +2,22 @@
 % Please edit documentation in R/cubic-regression.R
 \name{SplineCubicQuant}
 \alias{SplineCubicQuant}
-\title{Constrained quantile regression with cubic splines}
+\title{Constrained quantile regression with cubic splines
+Performs quantile regression using cubic B-splines, with optional
+monotonicity constraints (via Karlin-Studden) and convexity constraints.}
 \usage{
 SplineCubicQuant(
   xtab,
   ytab,
-  knot,
-  tau,
+  knot = NULL,
+  tau = 0.5,
   monot = 0,
   convcons = 0,
   der3cons = 0,
   solver = "CLARABEL",
   weight = NULL,
-  verbose = FALSE
+  verbose = FALSE,
+  type = "quantile"
 )
 }
 \arguments{
@@ -40,6 +43,8 @@ SplineCubicQuant(
 \item{weight}{Observation weights (default = 1 for all)}
 
 \item{verbose}{boolean FALSE (default) or TRUE.}
+
+\item{type}{'quantile' or 'mean_square' type of regression}
 }
 \value{
 A list containing:
@@ -49,6 +54,7 @@ A list containing:
   \item{int_knot}{knot vector}
 }
 \description{
+Constrained quantile regression with cubic splines
 Performs quantile regression using cubic B-splines, with optional
 monotonicity constraints (via Karlin-Studden) and convexity constraints.
 }

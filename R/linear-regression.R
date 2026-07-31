@@ -15,7 +15,7 @@
 #' @param solver CVXR solver to use (default = "OSQP")
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose logical; if TRUE, print progress messages
-#' @param type 'quantile' or 'mean_square' type of regression,
+#' @param type 'quantile' or 'mean_square' type of regression
 #' i.e form of the objective.
 #' @return A list containing coefficients, degree, and knots
 #' @export

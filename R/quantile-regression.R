@@ -26,6 +26,7 @@
 #'  'y=Bspline(x)' or 'y=Bspline(x,Bvalues)' for evaluation at x
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose logical; if TRUE, print progress messages
+#' @param type 'quantile' or 'mean_square' type of regression
 #' @return A list containing coefficients, degree, and knots
 #' @examples
 #' # Generate data
