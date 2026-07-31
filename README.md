@@ -105,7 +105,7 @@ The interface will open in your default browser.
 ###Docker Deployment
 A Docker image is available for easy deployment:
 bash
-```sh
+bash```
 docker pull ghcr.io/alexandreabbes/bsplinequantreggui:latest
 docker run -p 3838:3838 ghcr.io/alexandreabbes/bsplinequantreggui:latest
 ```
