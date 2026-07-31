@@ -27,13 +27,15 @@
 #' @export
 SplineQuadraticQuant <- function(xtab,
                                  ytab,
-                                 knot,
-                                 tau,
+                                 knot=NULL,
+                                 tau=0.5,
                                  monot = 0,
                                  convcons = 0,
                                  solver = "CLARABEL",
                                  weight = NULL,
-                                 verbose = FALSE) {
+                                 verbose = FALSE,
+                                 type='quantile'){
+  if (is.null(knot)){knot=c(min(xtab),max(xtab))}
   if (is.null(weight)) {
     weight <- rep(1, length(xtab))
   }
@@ -98,7 +100,14 @@ SplineQuadraticQuant <- function(xtab,
 
   # Objective function
   residuals <- ytab_centered - B %*% alpha
-  weighted_loss <- sum(weight * (tau * pos(residuals) + (1 - tau) * pos(-residuals)))
+  if (type=='mean_square'){
+    weighted_loss <- norm2(residuals)
+  }
+  else{
+    u_plus <- pos(residuals)
+    u_minus <- pos(-residuals)
+    weighted_loss <- sum(weight * (u_plus*tau+u_minus*(1-tau)))
+  }
   objective <- Minimize(weighted_loss)
 
   constraints <- list()

@@ -15,16 +15,20 @@
 #' @param solver CVXR solver to use (default = "OSQP")
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose logical; if TRUE, print progress messages
+#' @param type 'quantile' or 'mean_square' type of regression,
+#' i.e form of the objective.
 #' @return A list containing coefficients, degree, and knots
 #' @export
 SplineLinearQuant <- function(xtab,
                               ytab,
-                              knot,
-                              tau,
+                              knot=NULL,
+                              tau=0.5,
                               monot = 0,
                               solver = "CLARABEL",
                               weight = NULL,
-                              verbose = FALSE) {
+                              verbose = FALSE,
+                              type='quantile') {
+  if (is.null(knot)){knot=c(min(xtab),max(xtab))}
   if (is.null(weight)) {
     weight <- rep(1, length(xtab))
   }
@@ -79,10 +83,20 @@ SplineLinearQuant <- function(xtab,
 
   # Optimization variables
   alpha <- Variable(N)
+  #quantile
+
+
 
   # Objective function
   residuals <- ytab_centered - B %*% alpha
-  weighted_loss <- sum(weight * (tau * pos(residuals) + (1 - tau) * pos(-residuals)))
+  if (type=='mean_square'){
+    weighted_loss <- norm2(residuals)
+  }
+   else{
+   u_plus <- pos(residuals)
+   u_minus <- pos(-residuals)
+   weighted_loss <- sum(weight * (u_plus*tau+u_minus*(1-tau)))
+   }
   objective <- Minimize(weighted_loss)
 
   constraints <- list()

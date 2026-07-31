@@ -61,7 +61,7 @@
 #' @export
 quantile_spline <- function(xtab,
                             ytab,
-                            knot,
+                            knot=NULL,
                             tau = 0.5,
                             degree = 3,
                             monot = 0,
@@ -70,8 +70,11 @@ quantile_spline <- function(xtab,
                             solver = "CLARABEL",
                             weight = NULL,
                             verbose = FALSE,
-                            callable = TRUE) {
-  # Validate degree
+                            callable = TRUE,
+                            type='quantile') {
+  if (is.null(knot)){knot=c(min(xtab),max(xtab))}
+
+    # Validate degree
   if (degree < 1 || degree > 4) {
     stop("degree must be between 1 and 4. Received: ", degree)
   }
@@ -86,7 +89,8 @@ quantile_spline <- function(xtab,
       monot = monot,
       solver = solver,
       weight = weight,
-      verbose = verbose
+      verbose = verbose,
+      type=type
     )
   } else if (degree == 2) {
     fit <- SplineQuadraticQuant(
@@ -98,7 +102,8 @@ quantile_spline <- function(xtab,
       convcons = convcons,
       solver = solver,
       weight = weight,
-      verbose = verbose
+      verbose = verbose,
+      type=type
     )
   } else if (degree == 3) {
     fit <- SplineCubicQuant(
@@ -111,7 +116,8 @@ quantile_spline <- function(xtab,
       der3cons = der3cons,
       solver = solver,
       weight = weight,
-      verbose = verbose
+      verbose = verbose,
+      type=type
     )
   } else if (degree == 4) {
     fit <- SplineQuarticQuant(
@@ -124,7 +130,8 @@ quantile_spline <- function(xtab,
       der3cons = der3cons,
       solver = solver,
       weight = weight,
-      verbose = verbose
+      verbose = verbose,
+      type=type
     )
   }
 
