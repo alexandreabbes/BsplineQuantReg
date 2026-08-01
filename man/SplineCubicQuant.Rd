@@ -17,7 +17,7 @@ SplineCubicQuant(
   solver = "CLARABEL",
   weight = NULL,
   verbose = FALSE,
-  type = "quantile"
+  type_reg = "quantile"
 )
 }
 \arguments{
@@ -44,7 +44,7 @@ SplineCubicQuant(
 
 \item{verbose}{boolean FALSE (default) or TRUE.}
 
-\item{type}{'quantile' or 'mean_square' type of regression}
+\item{type_reg}{'quantile' or 'mean_square' type of regression}
 }
 \value{
 A list containing:

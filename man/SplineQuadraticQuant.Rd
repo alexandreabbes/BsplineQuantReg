@@ -14,7 +14,7 @@ SplineQuadraticQuant(
   solver = "CLARABEL",
   weight = NULL,
   verbose = FALSE,
-  type = "quantile"
+  type_reg = "quantile"
 )
 }
 \arguments{
@@ -42,7 +42,7 @@ kn constraints are considered for kn+1 knots.}
 
 \item{verbose}{logical; if TRUE, print progress messages}
 
-\item{type}{'quantile' or 'mean_square' type of regression,}
+\item{type_reg}{'quantile' or 'mean_square' type of regression,}
 }
 \value{
 A list containing coefficients, degree, and knots

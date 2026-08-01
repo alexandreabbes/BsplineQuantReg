@@ -1,7 +1,9 @@
+#' @importFrom utils install.packages packageVersion
+
 .onLoad <- function(libname, pkgname) {
   # Définir le solveur par défaut
   if (is.null(getOption("CVXR.solver"))) {
-    options(CVXR.solver = "OSQP")
+    options(CVXR.solver = "ECOS")
   }
 }
 
@@ -13,9 +15,9 @@
 #' @export
 setup_solver <- function(solver = "OSQP", install = FALSE) {
   solver_pkg <- switch(toupper(solver),
-                       OSQP = "osqp",
                        ECOS = "ECOSolveR",
                        SCS = "scs",
+                       OSQP = "osqp",
                        CLARABEL = "CLARABEL")
 
   if (!requireNamespace(solver_pkg, quietly = TRUE)) {

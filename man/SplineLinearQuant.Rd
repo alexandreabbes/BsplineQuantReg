@@ -13,7 +13,7 @@ SplineLinearQuant(
   solver = "CLARABEL",
   weight = NULL,
   verbose = FALSE,
-  type = "quantile"
+  type_reg = "quantile"
 )
 }
 \arguments{
@@ -34,7 +34,7 @@ SplineLinearQuant(
 
 \item{verbose}{logical; if TRUE, print progress messages}
 
-\item{type}{'quantile' or 'mean_square' type of regression
+\item{type_reg}{'quantile' or 'mean_square' type of regression
 i.e form of the objective.}
 }
 \value{

@@ -27,7 +27,7 @@ SplineLinearQuant <- function(xtab,
                               solver = "CLARABEL",
                               weight = NULL,
                               verbose = FALSE,
-                              type_reg_reg='quantile') {
+                              type_reg='quantile') {
   if (is.null(knot)){knot=c(min(xtab),max(xtab))}
   if (is.null(weight)) {
     weight <- rep(1, length(xtab))
@@ -89,7 +89,7 @@ SplineLinearQuant <- function(xtab,
 
   # Objective function
   residuals <- ytab_centered - B %*% alpha
-  if (type_reg_reg=='mean_square'){
+  if (type_reg=='mean_square'){
     weighted_loss <- norm2(residuals)
   }
    else{

@@ -17,7 +17,7 @@ quantile_spline(
   weight = NULL,
   verbose = FALSE,
   callable = TRUE,
-  type = "quantile"
+  type_reg = "quantile"
 )
 }
 \arguments{
@@ -55,7 +55,7 @@ For degree 4: per knot (1 = positive, -1 = negative)}
 \item{callable}{render the final container object callable:
 'y=Bspline(x)' or 'y=Bspline(x,Bvalues)' for evaluation at x}
 
-\item{type}{'quantile' or 'mean_square' type of regression}
+\item{type_reg}{'quantile' or 'mean_square' type of regression}
 }
 \value{
 A list containing coefficients, degree, and knots

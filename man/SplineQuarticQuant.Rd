@@ -15,7 +15,7 @@ SplineQuarticQuant(
   solver = "CLARABEL",
   weight = NULL,
   verbose = FALSE,
-  type = "quantile"
+  type_reg = "quantile"
 )
 }
 \arguments{
@@ -42,7 +42,7 @@ SplineQuarticQuant(
 
 \item{verbose}{Logical; if TRUE, print progress messages}
 
-\item{type}{'quantile' or 'mean_square' type of regression}
+\item{type_reg}{'quantile' or 'mean_square' type of regression}
 }
 \value{
 A list containing coefficients, degree, and knot
