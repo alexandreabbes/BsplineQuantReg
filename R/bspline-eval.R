@@ -278,8 +278,10 @@ makpp <- function(coefficients,
                   tn,
                   callable = FALSE,
                   verbose = FALSE) {
-  if (length(tn) == 2) {
-    kn <- length(tn) - 1
+  coefficient<-as.array(coefficients)
+  if (length(tn) == 2 || length(dim(coefficient))==1) {
+    kn <-1 #only one intervals
+    degree<-length(coefficient)-1 # only one polynopial
   } else if (!is.null(dim(coefficients))) {
     kn <- dim(coefficients)[1]
     degree <- dim(coefficients)[2] - 1

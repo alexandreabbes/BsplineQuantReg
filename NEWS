@@ -2,7 +2,8 @@ Version=0.2.3 (08/2026)
 ##changes
 - Update README.md with the anouncement of the gui and its docker on github
 - Add possibility to chose the type of regression (quantile or mean square)
-
+##fixed
+- Case : only 2 knots (1 interval) in 'makpp()' function.
 
 
 Version=0.2.2 (07/2026)
