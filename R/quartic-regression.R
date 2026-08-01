@@ -23,7 +23,7 @@
 #' @param solver 'CVXR' solver to use (default = "OSQP")
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose Logical; if TRUE, print progress messages
-#' @param type 'quantile' or 'mean_square' type of regression
+#' @param type_reg 'quantile' or 'mean_square' type of regression
 #' @return A list containing coefficients, degree, and knot
 #' @export
 SplineQuarticQuant <- function(xtab,
@@ -36,7 +36,7 @@ SplineQuarticQuant <- function(xtab,
                                solver = "CLARABEL",
                                weight = NULL,
                                verbose = FALSE,
-                               type='quantile')
+                               type_reg='quantile')
 {
   if (is.null(knot)){knot=c(min(xtab),max(xtab))}
   if (is.null(weight)) {
@@ -107,10 +107,10 @@ SplineQuarticQuant <- function(xtab,
   # Objective function
   residuals <- ytab_centered - B %*% alpha
 
-  if (type=='mean_square'){
+  if (type_reg=='mean_square'){
     weighted_loss <- norm2(residuals)
   }
-  else{#if (type=='quantile'){
+  else{#if (type_reg=='quantile'){
     #quantile
     u_plus <- pos(residuals)
     u_minus <- pos(-residuals)

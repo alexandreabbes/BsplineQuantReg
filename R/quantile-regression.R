@@ -26,7 +26,7 @@
 #'  'y=Bspline(x)' or 'y=Bspline(x,Bvalues)' for evaluation at x
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose logical; if TRUE, print progress messages
-#' @param type 'quantile' or 'mean_square' type of regression
+#' @param type_reg 'quantile' or 'mean_square' type of regression
 #' @return A list containing coefficients, degree, and knots
 #' @examples
 #' # Generate data
@@ -72,7 +72,7 @@ quantile_spline <- function(xtab,
                             weight = NULL,
                             verbose = FALSE,
                             callable = TRUE,
-                            type='quantile') {
+                            type_reg='quantile') {
   if (is.null(knot)){knot=c(min(xtab),max(xtab))}
 
     # Validate degree
@@ -91,7 +91,7 @@ quantile_spline <- function(xtab,
       solver = solver,
       weight = weight,
       verbose = verbose,
-      type=type
+      type_reg=type_reg
     )
   } else if (degree == 2) {
     fit <- SplineQuadraticQuant(
@@ -104,7 +104,7 @@ quantile_spline <- function(xtab,
       solver = solver,
       weight = weight,
       verbose = verbose,
-      type=type
+      type_reg=type_reg
     )
   } else if (degree == 3) {
     fit <- SplineCubicQuant(
@@ -118,7 +118,7 @@ quantile_spline <- function(xtab,
       solver = solver,
       weight = weight,
       verbose = verbose,
-      type=type
+      type_reg=type_reg
     )
   } else if (degree == 4) {
     fit <- SplineQuarticQuant(
@@ -132,7 +132,7 @@ quantile_spline <- function(xtab,
       solver = solver,
       weight = weight,
       verbose = verbose,
-      type=type
+      type_reg=type_reg
     )
   }
 

@@ -1,3 +1,10 @@
+Version=0.2.3 (08/2026)
+##changes
+- Update README.md with the anouncement of the gui and its docker on github
+- Add possibility to chose the type of regression (quantile or mean square)
+
+
+
 Version=0.2.2 (07/2026)
 
 ## Bug Fixes

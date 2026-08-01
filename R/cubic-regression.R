@@ -16,7 +16,7 @@
 #' @param solver 'CVXR' solver to use (default = 'CLARABEL')
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose boolean FALSE (default) or TRUE.
-#' @param type 'quantile' or 'mean_square' type of regression
+#' @param type_reg 'quantile' or 'mean_square' type of regression
 #' @return A list containing:
 #'   \item{coefficients}{B-spline coefficients (including y mean)}
 #'   \item{degree}{Spline degree (always 3)}
@@ -77,7 +77,7 @@ SplineCubicQuant <- function(xtab,
                              solver = "CLARABEL",
                              weight = NULL,
                              verbose = FALSE,
-                             type='quantile')
+                             type_reg='quantile')
 { if (is.null(knot)){knot=c(min(xtab),max(xtab))}
   if (is.null(weight)) {
     weight <- rep(1, length(xtab))
@@ -125,10 +125,10 @@ SplineCubicQuant <- function(xtab,
   residuals <- ytab_centered - (B %*% alpha)
 
 
-  if (type=='mean_square'){
+  if (type_reg=='mean_square'){
     weighted_loss <- norm2(residuals)
   }
-   else{#if (type=='quantile'){
+   else{#if (type_reg=='quantile'){
       #quantile
       u_plus <- pos(residuals)
       u_minus <- pos(-residuals)
