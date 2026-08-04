@@ -67,7 +67,6 @@ convexity, third derivative).
 }
 \examples{
 # Generate data
-set.seed(42)
 x <- seq(0, 1, length.out = 100)
 y <- 2*x + sin(6*pi*x)/2 + rnorm(100, 0, 0.05)
 knot <- quantile(x, probs = seq(0, 1, length.out = 10))
