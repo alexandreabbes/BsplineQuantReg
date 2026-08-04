@@ -67,23 +67,68 @@ SplineQuarticQuant <- function(xtab,
   }
 
   # Handle constraints
-  if (length(monot) == 1) {
-    monot <- rep(monot, kn)
+
+  if (any(monot != 0)) {
+    if (length(monot) == 1) {
+      monot <- rep(monot, kn)
+    }
+    if (length(monot) < (kn)) {
+      message("Not enough monotonicity constraints, completing with 0")
+      monot <- c(monot, rep(0, kn - length(convcons)))
+    }
+
+    for (i in 1:(kn)) {
+      if (monot[i] != 0) {
+        z_vars[[i]] <- Variable(1, name = paste0("z", i))
+        a_coef = sum(deriv_coeffs[i, , 1] * alpha) * monot[i]
+        b_coef = sum(deriv_coeffs[i, , 2] * alpha) * monot[i]
+        c_coef = sum(deriv_coeffs[i, , 3] * alpha) * monot[i]
+        #a*x^2+b*x+c
+        CK <- apply_karlin_quadratic(a_coef, b_coef, c_coef, z_vars[[i]])
+        constraints <- c(constraints, CK)
+      }
+    }
   }
 
-  if (length(convcons) == 1) {
-    convcons <- rep(convcons, kn)
+  #"contraintes convexes
+
+  # eliminate the null (unconstrained) case
+  if (any(convcons != 0)) {
+    if (length(convcons) == 1) {
+      convcons <- rep(convcons, (kn + 1))
+    }
+    if (length(convcons) < (kn + 1)) {
+      message("Not enough convexity constraints, completing with 0")
+      convcons <- c(convcons, rep(0, kn + 1 - length(convcons)))
+    }
+    if (verbose) {
+      message("Convexity constraints (Linear):", convcons, "\n")
+    }
+    CV <- list((convcons * (deriv_coeffs2 %*% alpha)) >= 0)
+    # Very simple, only use the sign of
+    # the second derivatives at the knot.
+    constraints <- c(constraints, CV)
   }
 
-  if (length(der3cons) == 1) {
-    der3cons <- rep(der3cons, kn + 1)
+  #3rd derivative constraints
+  if (any(der3cons != 0)) {
+    #if (dim(deriv_coeffs3)[2]!=N){
+    #prepare the values for matrix mult.      #calculation
+    # deriv_coeff3=t(deriv_coeffs3)}
+    if (length(der3cons) == 1) {
+      der3cons <- rep(der3cons, kn)
+    }
+    if (length(der3cons) < kn+1) {
+      message("not enough 3rd order constraints, completing with 0")
+      der3cons = c(der3cons, rep(0, kn+1 - length(der3cons)))
+    }
+    if (verbose) {
+      message("3rd order derivative constraints (constant):",
+              der3cons,
+              "\n")
+    }
   }
 
-  if (verbose) {
-    cat("Monotonicity constraints:", monot, "\n")
-    cat("Convexity constraints:", convcons, "\n")
-    cat("3rd derivative constraints:", der3cons, "\n")
-  }
 
   # Build B-spline basis and derivative coefficients
   deriv_data <- bspline_to_deriv_coeffs_quart(knot, degree = 4, x_values = xtab)

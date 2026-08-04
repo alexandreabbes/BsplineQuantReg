@@ -2,18 +2,25 @@
 % Please edit documentation in R/bspline-eval.R
 \name{view_basis}
 \alias{view_basis}
-\title{Visualize a B-spline functions basis}
+\title{Visualize a B-spline functions basis
+Visualize a B-spline basis
+Plots all basis functions of a B-spline basis with improved styling.}
 \usage{
-view_basis(BB, x_values = 0)
+view_basis(BB, x_values = 0, add_knots = TRUE)
 }
 \arguments{
 \item{BB}{Object returned by \code{Bspline_base}}
 
-\item{x_values}{Vector of evaluation points for plotting (by default 100 points are computed in the knot range)}
+\item{x_values}{Vector of evaluation points for plotting.
+If length is 1 (default = 0), generates 200 points in the knot range.}
+
+\item{add_knots}{Logical; if TRUE, adds vertical lines at knot positions.}
 }
 \value{
 No return value, called for side effects (generates a plot)
 }
 \description{
-Plots all  functions of a B-spline basis.
+Visualize a B-spline functions basis
+Visualize a B-spline basis
+Plots all basis functions of a B-spline basis with improved styling.
 }

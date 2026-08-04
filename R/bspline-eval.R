@@ -412,19 +412,51 @@ print.non_callable_pp <- function(x, ...) {
 
 
 #' Visualize a B-spline functions basis
-#'
-#' Plots all  functions of a B-spline basis.
-#'
+#' Visualize a B-spline basis
+#' Plots all basis functions of a B-spline basis with improved styling.
 #' @param BB Object returned by \code{Bspline_base}
-#' @param x_values Vector of evaluation points for plotting (by default 100 points are computed in the knot range)
+#' @param x_values Vector of evaluation points for plotting.
+#'        If length is 1 (default = 0), generates 200 points in the knot range.
+#' @param add_knots Logical; if TRUE, adds vertical lines at knot positions.
 #' @return No return value, called for side effects (generates a plot)
 #' @export
-#'
-view_basis <- function(BB, x_values = 0)
+view_basis <- function(BB, x_values = 0,add_knots=TRUE) {
+  if (length(x_values) == 1) {
+    k <- range(BB$knot)
+    margin <- 0.05 * diff(k)
+    x_values <- seq(k[1] - margin, k[2] + margin, length.out = 200)
+  }
+
+  yvalues <- bs_direct(BB, x_values)
+  n_splines <- nrow(yvalues)
+
+  # Palette de couleurs automatique
+  colors <- rainbow(n_splines)
+
+  # Graphique
+  matplot(x_values, t(yvalues), type = "l", lwd = 1.5,
+          xlab = "x", ylab = "Basis values",
+          main = paste("B-spline Basis (degree", BB$degree, ")"),
+          col = colors, lty = 1)
+
+  # Ajouter les nœuds
+    # Ajouter les nœuds
+  if (add_knots) {
+
+  abline(v = BB$knot, col = "red", lty = 2, lwd = 0.8)
+  grid(col = "gray90", lty = 1)}
+
+  # Légende
+  legend("topright", legend = c("Basis", "Knots"),
+         col = c("black", "red"), lty = c(1, 2), cex = 0.8)
+}
+
+view_basis_bak <- function(BB, x_values = 0)
 {
   if (length(x_values) == 1) {
-    k = range(BB$ext_knot)
-    x_values = (k[1]:(k[2] * 100)) / 100
+    k = range(BB$knot)
+    m=max(abs(k))
+    x_values = (k[1]/m:(k[2]/m * 200)) / 200
   }
 
   yvalues = bs_direct(BB, x_values)

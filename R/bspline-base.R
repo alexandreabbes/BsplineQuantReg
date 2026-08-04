@@ -1,4 +1,4 @@
-# Omega, Bspline_base, Bspline_deriv, make_spline, get_parameters,
+# Omega, Bspline_base, Bspline_base_deriv, make_spline, get_parameters,
 #print.callable_spline, print.non_callable_spline
 
 #' Omega function for De Boor recursion
@@ -125,8 +125,8 @@ Bspline_base <- function(sn,
           term2 = polymul(Bjp1nu, wjp1o)
 
           sumterm = polyadd(term1, term2)
-
-          #B[o,j,nu,(1:o)]<-sumterm
+          if (length(sumterm)<o){sumterm<-c(sumterm,rep(0,o-length(sumterm)))}
+          #cat(sumterm,'\n',o,j,nu,degree,'\n')# for debug only
           B[o, j, nu, (degree - o + 2):(degree + 1)] <- sumterm
         }
       }

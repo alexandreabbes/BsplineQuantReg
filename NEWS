@@ -4,7 +4,9 @@ Version=0.2.3 (08/2026)
 - Add possibility to chose the type of regression (quantile or mean square)
 ##fixed
 - Case : only 2 knots (1 interval) in 'makpp()' function.
-
+- Length of local polynomial in Bspline_basis in Case  of multiple interior knots
+(degenerated case)
+-complete contraints with 0 for quartic if missing
 
 Version=0.2.2 (07/2026)
 
