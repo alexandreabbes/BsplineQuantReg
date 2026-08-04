@@ -423,21 +423,22 @@ print.non_callable_pp <- function(x, ...) {
 view_basis <- function(BB, x_values = 0,add_knots=TRUE) {
   if (length(x_values) == 1) {
     k <- range(BB$knot)
-    margin <- 0.05 * diff(k)
+    margin <- 0.02 * diff(k)
     x_values <- seq(k[1] - margin, k[2] + margin, length.out = 200)
   }
 
   yvalues <- bs_direct(BB, x_values)
+
   n_splines <- nrow(yvalues)
 
   # Palette de couleurs automatique
-  colors <- rainbow(n_splines)
+  #colors <- rainbow(n_splines)
 
   # Graphique
   matplot(x_values, t(yvalues), type = "l", lwd = 1.5,
           xlab = "x", ylab = "Basis values",
-          main = paste("B-spline Basis (degree", BB$degree, ")"),
-          col = colors, lty = 1)
+          main = paste("B-spline Basis (degree", BB$degree, ")"),lty=1)
+          #col = colors, lty = 1)
 
   # Ajouter les nœuds
     # Ajouter les nœuds
@@ -447,21 +448,8 @@ view_basis <- function(BB, x_values = 0,add_knots=TRUE) {
   grid(col = "gray90", lty = 1)}
 
   # Légende
-  legend("topright", legend = c("Basis", "Knots"),
-         col = c("black", "red"), lty = c(1, 2), cex = 0.8)
-}
-
-view_basis_bak <- function(BB, x_values = 0)
-{
-  if (length(x_values) == 1) {
-    k = range(BB$knot)
-    m=max(abs(k))
-    x_values = (k[1]/m:(k[2]/m * 200)) / 200
-  }
-
-  yvalues = bs_direct(BB, x_values)
-
-  matplot(x_values, t(yvalues))
+  #legend("topright", legend = c("Basis", "Knots"),
+  #       col = c("black", "red"), lty = c(1, 2), cex = 0.8)
 }
 
 

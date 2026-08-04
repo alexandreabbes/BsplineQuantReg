@@ -75,20 +75,7 @@ SplineQuarticQuant <- function(xtab,
     if (length(monot) < (kn)) {
       message("Not enough monotonicity constraints, completing with 0")
       monot <- c(monot, rep(0, kn - length(convcons)))
-    }
-
-    for (i in 1:(kn)) {
-      if (monot[i] != 0) {
-        z_vars[[i]] <- Variable(1, name = paste0("z", i))
-        a_coef = sum(deriv_coeffs[i, , 1] * alpha) * monot[i]
-        b_coef = sum(deriv_coeffs[i, , 2] * alpha) * monot[i]
-        c_coef = sum(deriv_coeffs[i, , 3] * alpha) * monot[i]
-        #a*x^2+b*x+c
-        CK <- apply_karlin_quadratic(a_coef, b_coef, c_coef, z_vars[[i]])
-        constraints <- c(constraints, CK)
-      }
-    }
-  }
+    }}
 
   #"contraintes convexes
 
@@ -104,11 +91,7 @@ SplineQuarticQuant <- function(xtab,
     if (verbose) {
       message("Convexity constraints (Linear):", convcons, "\n")
     }
-    CV <- list((convcons * (deriv_coeffs2 %*% alpha)) >= 0)
-    # Very simple, only use the sign of
-    # the second derivatives at the knot.
-    constraints <- c(constraints, CV)
-  }
+    }
 
   #3rd derivative constraints
   if (any(der3cons != 0)) {
