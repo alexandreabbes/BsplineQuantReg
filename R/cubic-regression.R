@@ -176,7 +176,11 @@ SplineCubicQuant <- function(xtab,
     if (verbose) {
       message("Convexity constraints (Linear):", convcons, "\n")
     }
-    CV <- list((convcons * (deriv_coeffs2 %*% alpha)) >= 0)
+    CV<-c()
+    for (j in 1:(kn+1)){
+      var_conv<-sum(deriv_coeffs2[j,]*alpha)
+      CV<-c(CV,apply_linear_constraint(var_conv,convcons[j]))
+    }
     # Very simple, only use the sign of
     # the second derivatives at the knot.
     constraints <- c(constraints, CV)
