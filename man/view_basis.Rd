@@ -6,7 +6,7 @@
 Visualize a B-spline basis
 Plots all basis functions of a B-spline basis with improved styling.}
 \usage{
-view_basis(BB, x_values = 0, add_knots = TRUE)
+view_basis(BB, x_values = 0, view_knot = TRUE, add_knot = NULL)
 }
 \arguments{
 \item{BB}{Object returned by \code{Bspline_base}}
@@ -14,7 +14,9 @@ view_basis(BB, x_values = 0, add_knots = TRUE)
 \item{x_values}{Vector of evaluation points for plotting.
 If length is 1 (default = 0), generates 200 points in the knot range.}
 
-\item{add_knots}{Logical; if TRUE, adds vertical lines at knot positions.}
+\item{view_knot}{Logical; if TRUE, adds vertical lines at knot positions.}
+
+\item{add_knot}{logical, same value as 'view_knot' for retro compatibility}
 }
 \value{
 No return value, called for side effects (generates a plot)

@@ -425,10 +425,12 @@ print.non_callable_pp <- function(x, ...) {
 #' @param BB Object returned by \code{Bspline_base}
 #' @param x_values Vector of evaluation points for plotting.
 #'        If length is 1 (default = 0), generates 200 points in the knot range.
-#' @param add_knots Logical; if TRUE, adds vertical lines at knot positions.
+#' @param view_knot Logical; if TRUE, adds vertical lines at knot positions.
+#' @param add_knot logical, same value as 'view_knot' for retro compatibility
 #' @return No return value, called for side effects (generates a plot)
 #' @export
-view_basis <- function(BB, x_values = 0,add_knots=TRUE) {
+view_basis <- function(BB, x_values = 0, view_knot=TRUE, add_knot=NULL) {
+  add_knot<-view_knot # for compatibility with 2.3 version
   if (length(x_values) == 1) {
     k <- range(BB$knot)
     margin <- 0.01 * diff(k)
@@ -450,7 +452,7 @@ view_basis <- function(BB, x_values = 0,add_knots=TRUE) {
 
   # Ajouter les nœuds
     # Ajouter les nœuds
-  if (add_knots) {
+  if (view_knot) {
 
   abline(v = BB$knot, col = "red", lty = 2, lwd = 0.8)
   grid(col = "gray90", lty = 1)}

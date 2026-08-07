@@ -1,0 +1,23 @@
+---
+title: "Shape_constraints"
+output: html_document
+---
+
+
+### `vignettes/shape-constraints.Rmd`
+
+```markdown
+---
+title: "Shape Constraints with BsplineQuantReg"
+author: "Alexandre Abbes"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Shape Constraints with BsplineQuantReg}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 7, fig.height = 5)
+library(BsplineQuantReg)

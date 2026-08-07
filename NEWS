@@ -1,3 +1,8 @@
+Version=0.2.4
+##change
+-update the view basis function
+-Update the name of the logical variable in view_basis
+
 Version=0.2.3 (08/2026)
 ##changes
 - Update README.md with the anouncement of the gui and its docker on github
