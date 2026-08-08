@@ -1,5 +1,7 @@
 # polymul, polyadd, polyderiv, poly_eval, reduce_pol
-# change_polynomial_base_taylor
+# change_polynomial_base_taylor,
+# makpp, evalpp, print.callable_pp, print.non_callable_pp
+
 
 #' Polynomial multiplication
 #'
@@ -200,4 +202,234 @@ polyderiv <- function(p, der = 1) {
 
     return(q)
   }
+}
+
+
+#' Evaluates a piecewise polynomial (PP form)  function at given points.
+#'
+#' @param p List with components \code{ext_knot} (ext_knot) and \code{coeff}
+#' @param x_values Vector of evaluation points
+#' @return Function values at the requested points
+#' @export
+#' @keywords internal
+
+evalpp <- function(p, x_values) {
+  #this evaluates a polynomial p under the pp form,
+  #p if given with its knot and the local coefficients
+  #This funciton is independent from the order convention
+  #for polynomials
+  #The x_values out of the knot give 0 in the corresponding yvalues
+  if (inherits(p,'callable_pp')){p<-get_parameters(p)}
+  tn = p$knot
+  coeff = p$coefficients
+  kn = length(tn) - 1 #number of intervals
+  n_values = length(x_values)
+  degree<-p$degree
+  pval <- c()
+  xvalues<-as.vector(x_values)
+  if (kn == 1) {
+    #Only one piece
+    pval <- poly_eval(coeff, x_values - tn[1])
+  } else if (kn>1)
+  {
+    if (x_values[1] < tn[1]) {
+      message("Some x values smaler than first knot, extrapolating")
+      #values before the first knot
+      pre_k = x_values[(x_values < tn[1])]
+      h = pre_k - tn[1]
+      if (degree>0){
+        poly_loc <- coeff[1, ] # extrapolate using the first piece
+        pval <- poly_eval(poly_loc, h)
+      } else if (degree==0){
+        pval=rep(coeff[1],length(h))
+      }}
+
+    for (i in 1:(kn))
+    {
+      xval = x_values[(x_values >= tn[i]) & (x_values < tn[i + 1])]
+      if (degree>0)
+      {poly_loc <- coeff[i, ]} else{
+        poly_loc <- coeff[i]
+      }
+
+      # reverse our convention to match polyval convention
+      #pval<-c(pval,polyval(p=rev(poly_loc),xval) )
+      h = xval - tn[i]
+      #shit to fit the local basis
+      yval <- poly_eval(poly_loc, h)
+      pval <- c(pval, yval)
+    }
+
+
+    xval = x_values[x_values == tn[kn + 1]]
+    if (length(xval) > 0) {
+      h = tn[kn + 1] - tn[kn] # if the last knot is in x_values
+      yval<-poly_eval(poly_loc, h)
+      pval = c(pval,yval )
+
+    }
+    if (x_values[n_values] > tn[kn + 1]) {
+      message("Some x values greater than last knot, extrapolating")
+      # values after the last knot
+      post_k = x_values[(x_values > tn[kn + 1])]
+      h = post_k - tn[kn]
+      if(degree>0){
+        poly_loc <- coeff[kn, ] # extrapolate using the last piece
+        yval<- poly_eval(poly_loc, h)
+        pval <- c(pval, yval)
+      }
+      else if (degree==0){
+
+        pval<-c(pval,rep(coeff[kn],length(h) ))}
+    }
+  }
+
+  return(pval)
+}
+
+
+#' Build a piecewise polynomial (PP) form
+#'
+#' Creates a PP structure from polynomial coefficients and knots.
+#' If callable = TRUE, returns a function that evaluates the PP.
+#'
+#' @param coefficients Coefficient matrix (kn x (degree+1))
+#' @param tn a Knot vector of length kn+1.
+#' @param callable Boolean; if TRUE, returns a callable function
+#' @param verbose Boolean
+#' @return A PP object or a callable function
+#' @export
+makpp <- function(coefficients,
+                  tn,
+                  callable = FALSE,
+                  verbose = FALSE) {
+  coefficient<-as.array(coefficients)
+  if (length(tn) == 2) {
+    kn <-1 #only one intervals
+    degree<-length(coefficient)-1 # only one polynopial
+  } else if (!is.null(dim(coefficients))) {
+    kn <- dim(coefficients)[1]
+    degree <- dim(coefficients)[2] - 1
+  } else if (any(dim(coefficients)==1) || is.null(dim(coefficients))){
+    degree = 0
+    kn <- length(coefficients)
+  }
+
+  if (length(tn) != (kn + 1)) {
+    stop("length of coefficients and number of knots do not match")
+  }
+
+  # Creer l'objet PP
+  pp_obj <- list(coefficients = coefficients,
+                 knot = tn,
+                 degree = degree)
+  class(pp_obj) <- "non_callable_pp"
+
+  if (callable) {
+    # Retourner une fonction callable
+    eval_func <- function(x_values) {
+      evalpp(pp_obj, x_values)
+    }
+
+    # Ajouter les parametres comme attributs
+    attr(eval_func, "coefficients") <- coefficients
+    attr(eval_func, "knot") <- tn
+    attr(eval_func, "degree") <- degree
+    attr(eval_func, "pp_obj") <- pp_obj
+
+    class(eval_func) <- c("callable_pp", "function")
+    return(eval_func)
+  }
+
+  return(pp_obj)
+}
+
+
+#' Print method for callable_pp objects
+#'
+#' @param x A callable_pp object
+#' @param ... Additional arguments
+#' @export
+print.callable_pp <- function(x, ...) {
+  # Get the attributes
+  degree <- attr(x, "degree")
+  knot <- attr(x, "knot")
+  coeff <- attr(x, "coefficients")
+  pp_obj <- attr(x, "pp_obj")
+
+  # Si pas d'attributs, essayer de les extraire de l'environnement
+  if (is.null(degree) || is.null(knot) || is.null(coeff)) {
+    env <- environment(x)
+    degree <- env$degree %||% attr(x, "degree")
+    knot <- env$knot %||% attr(x, "knot")
+    coeff <- env$coeff %||% attr(x, "coefficients")
+  }
+
+  cat("Callable Piecewise Polynomial (PP) Object\n")
+  cat("==========================================\n")
+  cat("  Degree:", degree %||% "unknown", "\n")
+  cat("  Intervals:", if (!is.null(knot))
+    length(knot) - 1
+    else
+      "unknown", "\n")
+  cat("  Knots:", if (!is.null(knot))
+    length(knot)
+    else
+      "unknown", "\n")
+  if (!is.null(knot)) {
+    cat("  Knot range: [", round(min(knot), 4), ", ", round(max(knot), 4), "]\n")
+  }
+  if (!is.null(coeff)) {
+    cat("  Coefficients:",
+        if (is.matrix(coeff))
+          paste(dim(coeff), collapse = " x ")
+        else
+          length(coeff),
+        "\n")
+  }
+  cat("\n  Usage: pp(x_values) or evalpp(pp, x_values)\n")
+  invisible(x)
+}
+
+#' Print method for non_callable_pp objects
+#'
+#' @param x A non_callable_pp object
+#' @param ... Additional arguments
+#' @export
+print.non_callable_pp <- function(x, ...) {
+  coeff <- x$coefficients
+  knot <- x$knot
+  degree <- x$degree
+  n_intervals <- length(knot) - 1
+  cat("Piecewise Polynomial (PP) (non-callable)\n")
+  cat("================================\n")
+  cat("  $degree:", degree, "\n")
+  cat("  $knots:", length(knot), knot, "\n")
+  if (!is.null(dim(coeff))) {
+    cat(" Coefficients dimension:",
+        dim(coeff)[1],
+        "x",
+        dim(coeff)[2],
+        "\n")
+    # Afficher les coefficients (troncated if too numerous)
+    if (n_intervals <= 5 && dim(coeff)[2] <= 4) {
+      cat("\n  $coefficients:\n")
+      for (i in 1:n_intervals) {
+        cat("    Interval", i, ":", paste(round(coeff[i, ], 4), collapse = ", "), "\n")
+      }
+    } else {
+      cat("\n  First interval coefficients:",
+          paste(round(coeff[1, ], 4), collapse = ", "),
+          "\n")
+      if (n_intervals > 1) {
+        cat("  Last interval coefficients: ",
+            paste(round(coeff[n_intervals, ], 4), collapse = ", "),
+            "\n")
+      }
+    }
+  } else {
+    cat("  Coefficients length:", length(coeff), "\n")
+  }
+  cat("\n  Usage: pp_eval(pp, x_values)\n")
+  invisible(x)
 }

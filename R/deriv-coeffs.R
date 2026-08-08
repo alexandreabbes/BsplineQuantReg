@@ -11,22 +11,26 @@
 #'   \item{d2}{Second derivative values at knot: ((kn+1) x N) matrix}
 #'   \item{d3}{Third derivative values at knots: (kn x N) matrix}
 #' @export
-bspline_to_deriv_coeffs_cubic <- function(tn,
+bspline_to_deriv_coeffs_cubic <- function(tn=NULL,
                                           degree = 3,
                                           x_values = 0,
+                                          BsBasis=NULL,
                                           verbose = FALSE) {
+if (!is.null(BsBasis)){
+  tn<-BsBasis$knot
+  degree=BsBasis$degree}
+else {if (is.null(tn)){
+  cat('Provide at least the knots')
+  return()
+}
   # create  basis with create.bspline.basis
   kn <- length(tn) - 1
-  # Nombre correct de fonctions de base: kn + degree+1
-  nbasis <- kn + degree
-
-  norder <- degree + 1  # 4 pour cubique
-
   sn = c(tn[1] * rep(1, degree), tn, tn[kn + 1] * rep(1, degree)) # this is the extended knot sequence
-  BB <- Bspline_base(sn, degree)
-  basis <- BB$base
+  BsBasis <- Bspline_base(sn, degree)
+}
+  basis <- BsBasis$base
 
-  N <- BB$n_splines
+  N <- BsBasis$n_splines
   if (verbose) {
     message("Number of  basis functions", N, "\n")
   }
@@ -56,7 +60,7 @@ bspline_to_deriv_coeffs_cubic <- function(tn,
     deriv2_val[nu - degree + 1, j] = p + m * h
   }
   if (length(x_values) != 1) {
-    yvalues = bs_direct(BB, x_values)
+    yvalues = bs_direct(BsBasis, x_values)
   }
   else {
     yvalues = 0
@@ -69,8 +73,8 @@ bspline_to_deriv_coeffs_cubic <- function(tn,
   ))
 }
 
-#' Convert quartic B-spline to derivative coefficients
-#'
+
+
 #' Computes normalized first, second, and third derivative coefficients
 #' for quartic B-splines on each interval.
 #'
@@ -247,7 +251,7 @@ bspline_to_deriv_coeffs_quad <- function(tn,
 }
 
 
-#' Derivative coefficients for linear B-spline to
+#' Derivative coefficients for linear B-spline
 #' Computes normalized first derivative coefficients for linear B-splines.
 #' For linear splines, the derivative is constant on each interval.
 #'

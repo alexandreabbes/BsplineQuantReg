@@ -1,3 +1,5 @@
+#Bspline_deriv, Spline_der_knot
+
 #' Compute derivative coefficients of a B-spline
 #'
 #' Given a B-spline of given degree, coefficients, knots, compute the coefficients
@@ -106,3 +108,43 @@ Bspline_deriv <- function(bspline,
   }
   return(diff_spline)
 }
+
+#' Derivatives at knot of a B-spline
+#'
+#' Computes derivative values of a B-spline at knot (efficient because it
+#' directly uses polynomial coefficients).
+#'
+#' @param Bsbase Object returned by \code{Bspline_base}
+#' @param der Derivative order (default = 1)
+#' @return Matrix of derivative values (n_splines x n_knot)
+#' @export
+
+Spline_der_knot <- function(Bsbase, der = 1)
+  #compute the values of a derivatives only at the knot
+  #(simple, it only uses the coefficients)
+{
+  coeff = Bsbase$base
+  nsplines = Bsbase$n_splines
+  tn = Bsbase$ext_knot
+  kn = length(tn) - 1
+  m = Bsbase$degree
+
+  if (der > m) {
+    Der2_knot = array(data = 0, c(nsplines, kn))
+  }
+  else{
+    #Der2_knot=coeff[,,(der+1)]*factorial(der) #in increasing pol notation
+    Der2_knot = coeff[, , (m - der + 1)] * factorial(der) #in decreasing notation
+    #computation of the last value
+    h = tn[kn] - tn[kn - 1]
+    for (j in 1:nsplines)
+    {
+      p_kn_der = polyderiv(coeff[j, kn + m - 1, ], der)
+
+      v_kn = poly_eval(p_kn_der, h)
+      Der2_knot[j, kn + m] = v_kn
+    }
+  }
+  return(t(Der2_knot))
+}
+
