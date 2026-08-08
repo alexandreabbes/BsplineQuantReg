@@ -1,0 +1,452 @@
+------------------------------------------------------------------------
+
+editor_options: markdown: wrap: 72 ---
+
+title: "B-spline Basis Manipulation" author: "Alexandre Abbes" date: "`r Sys.Date()`" output: rmarkdown::html_vignette: toc: true toc_depth: 3 fig_width: 7 fig_height: 5 vignette: \> %\VignetteIndexEntry{B-spline Basis Manipulation} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8} ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 7, fig.height = 5)
+library(BsplineQuantReg)
+```
+
+## Introduction
+
+This vignette covers the B-spline basis manipulation tools provided by the `BsplineQuantReg` package. B-splines are a powerful tool for nonparametric regression and function approximation. The package provides a comprehensive set of functions for building, manipulating, and evaluating B-spline bases. The calculations are standard and follow authors such as Deboor or Schumaker.
+
+## Building a B-spline Basis
+
+### Basic Construction
+
+The primary function for building a B-spline basis is `Bspline_base()`, which takes an extended knot sequence and returns the basis functions in piecewise polynomial form.
+
+```{r build-basis}
+# Extended knot sequence for cubic B-splines on [0,5]
+# with internal knots at 1, 2, 3, 4
+sn <- c(0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5)
+
+# Build the basis
+basis <- Bspline_base(sn, degree = 3)
+
+# Inspect the basis structure
+str(basis[1:4])
+```
+
+### Visualizing the Basis
+
+The `view_basis()` function provides a quick visualization of all basis functions.
+
+```{r view-basis}
+# Visualize the basis
+view_basis(basis)
+```
+
+### Understanding the Extended Knot Sequence
+
+For a B-spline of degree `d` with `kn` intervals, the extended knot sequence has length `kn + 1 + 2*d`:
+
+```{r extended-knots}
+# d = 3, kn = 5 (intervals: [0,1], [1,2], [2,3], [3,4], [4,5])
+# Length: 5 + 1 + 6 = 12
+sn_example <- c(0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5)
+
+# The first and last d knots are repeated to enforce boundary conditions
+basis_example <- Bspline_base(sn_example, degree = 3)
+cat("Number of basis functions:", basis_example$n_splines, "\n")
+cat("Effective knots:", basis_example$knot, "\n")
+```
+
+## Visualizing B-spline Bases
+
+### Visualizing a B-spline Basis
+
+The `view_basis()` function provides a quick visualization of all basis functions.
+
+```{r view-basis-2}
+# Visualize the basis
+view_basis(basis)
+```
+
+### Visualizing Different Degrees
+
+```{r view-degrees}
+# piecewise constant (degree 0)
+sn_cnst <- c(0, 1, 2, 3, 4, 5)
+basis_cnst <- Bspline_base(sn_cnst, degree = 0)
+view_basis(basis_cnst)
+
+# Linear (degree 1)
+sn_lin <- c(0, 0, 1, 2, 3, 4, 5, 5)
+basis_lin <- Bspline_base(sn_lin, degree = 1)
+view_basis(basis_lin)
+
+# Quadratic (degree 2)
+sn_quad <- c(0, 0, 0, 1, 2, 3, 4, 5, 5, 5)
+basis_quad <- Bspline_base(sn_quad, degree = 2)
+view_basis(basis_quad)
+```
+
+### Customizing Visualization
+
+```{r view-custom}
+# View with custom evaluation points
+x_fine <- seq(-0.5, 5.5, length.out = 300)
+view_basis(basis, x_values = x_fine)
+```
+
+## Differentiating a B-spline Basis
+
+The `Bspline_base_deriv()` function computes the basis of derivatives of a B-spline basis.
+
+```{r basis-deriv}
+# Compute first derivative basis
+basis_der1 <- Bspline_base_deriv(basis, der = 1)
+
+# Compute second derivative basis
+basis_der2 <- Bspline_base_deriv(basis, der = 2)
+
+# Compute third derivative basis
+basis_der3 <- Bspline_base_deriv(basis, der = 3)
+
+# Check degrees
+cat("Original degree:", basis$degree, "\n")
+cat("1st derivative degree:", basis_der1$degree, "\n")
+cat("2nd derivative degree:", basis_der2$degree, "\n")
+cat("3rd derivative degree:", basis_der3$degree, "\n")
+```
+
+### Visualizing Derivative Bases
+
+```{r view-deriv-bases}
+par(mfrow = c(2, 2))
+view_basis(basis, main = "Original Basis (deg 3)")
+view_basis(basis_der1, main = "1st Derivative Basis (deg 2)")
+view_basis(basis_der2, main = "2nd Derivative Basis (deg 1)")
+view_basis(basis_der3, main = "3rd Derivative Basis (deg 0)")
+par(mfrow = c(1, 1))
+```
+
+## Differentiating a B-spline Function
+
+There are two methods to compute derivatives of a B-spline function.
+
+### Method 1: Using `spline_eval()` with `der` Parameter
+
+The simplest method is to use `spline_eval()` with the `der` argument. This function calculates the derivative of the Bspline basis, then the values of the differentiated basis, and finaly evaluates the function.
+
+```{r eval-deriv}
+# Create a random B-spline function
+bs_function<-basis
+bs_function$coeff <- rnorm(basis$n_splines)
+
+# Evaluate the function and its derivatives
+x_plot <- seq(0, 5, length.out = 200)
+y <- spline_eval(bs_function, x_plot, der = 0)
+y1 <- spline_eval(bs_function, x_plot, der = 1)
+y2 <- spline_eval(bs_function, x_plot, der = 2)
+y3 <- spline_eval(bs_function, x_plot, der = 3)
+
+# Plot
+par(mfrow = c(2, 2))
+plot(x_plot, y, type = "l", main = "Function", xlab = "x", ylab = "f(x)")
+plot(x_plot, y1, type = "l", main = "1st Derivative", xlab = "x", ylab = "f'(x)")
+plot(x_plot, y2, type = "l", main = "2nd Derivative", xlab = "x", ylab = "f''(x)")
+plot(x_plot, y3, type = "l", main = "3rd Derivative", xlab = "x", ylab = "f'''(x)")
+par(mfrow = c(1, 1))
+```
+
+### Method 2: Using `Bspline_deriv()` to Get Derivative Coefficients
+
+The second method computes the coefficients of the der-th derivative B-spline directly on a Bspline basis that is supposed with new degree=degree-der .
+
+```{r bspline-deriv}
+# Compute derivative coefficients
+der1_func <- Bspline_deriv(bs_function, der = 1)
+der2_func <- Bspline_deriv(bs_function, der = 2)
+
+# Evaluate using the derivative B-spline
+y1_coeff <- spline_eval(der1_func, x_plot)
+y2_coeff <- spline_eval(der2_func, x_plot)
+
+# Both methods should give the same result
+max(abs(y1 - y1_coeff))
+max(abs(y2 - y2_coeff))
+```
+
+### Method 3: Step-by-step evaluation using basis derivatives
+
+This method follows the same path as spline_eval:
+
+#### 1. Compute the derivative basis
+
+#### 2. Evaluate the basis at points using bs_direct
+
+#### 3. Use matrix multiplication with coefficients
+
+```{r}
+
+
+
+# Create a B-spline function
+sn <- c(0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5)
+basis <- Bspline_base(sn, degree = 3)
+basis$coeff <- c(1, -2, 3, -1, 2, 1, 0, 0.5)
+
+# Step 1: Compute the derivative basis (derivative order = 1)
+basis_der1 <- Bspline_base_deriv(basis, der = 1)
+
+# Step 2: Evaluate the derivative basis at points using bs_direct
+x_plot <- seq(0, 5, length.out = 100)
+Bvalues_der1 <- bs_direct(basis_der1, x_plot)
+
+# Step 3: Compute the derivative values using matrix multiplication
+# Bvalues_der1 is (n_splines x n_points), coefficients is (n_splines x 1)
+# Result is (1 x n_points) or vector of length n_points
+y_der1 <- t(Bvalues_der1) %*% basis$coeff
+
+# Step 4: Compare with spline_eval (direct method)
+y_der1_direct <- spline_eval(basis, x_plot, der = 1)
+
+# The results are identical
+cat("Maximum difference:", max(abs(y_der1 - y_der1_direct)), "\n")
+
+# Plot to verify
+plot(x_plot, y_der1, type = "l", col = "blue", lwd = 2,
+     main = "First Derivative: Step-by-Step Method",
+     xlab = "x", ylab = "f'(x)")
+lines(x_plot, y_der1_direct, col = "red", lty = 2, lwd = 2)
+legend("topright", legend = c("Matrix multiplication", "spline_eval"),
+       col = c("blue", "red"), lty = c(1, 2), lwd = 2)
+
+# For higher derivatives, repeat the process
+basis_der2 <- Bspline_base_deriv(basis, der = 2)
+Bvalues_der2 <- bs_direct(basis_der2, x_plot)
+y_der2 <- t(Bvalues_der2) %*% basis$coeff
+
+basis_der3 <- Bspline_base_deriv(basis, der = 3)
+Bvalues_der3 <- bs_direct(basis_der3, x_plot)
+y_der3 <- t(Bvalues_der3) %*% basis$coeff
+
+# Plot all derivatives
+par(mfrow = c(2, 2))
+plot(x_plot, spline_eval(basis, x_plot), type = "l", col = "blue", lwd = 2,
+     main = "Function", xlab = "x", ylab = "f(x)")
+grid()
+
+plot(x_plot, y_der1, type = "l", col = "darkgreen", lwd = 2,
+     main = "1st Derivative", xlab = "x", ylab = "f'(x)")
+grid()
+abline(h = 0, col = "gray", lty = 3)
+
+plot(x_plot, y_der2, type = "l", col = "purple", lwd = 2,
+     main = "2nd Derivative", xlab = "x", ylab = "f''(x)")
+grid()
+abline(h = 0, col = "gray", lty = 3)
+
+plot(x_plot, y_der3, type = "l", col = "orange", lwd = 2,
+     main = "3rd Derivative", xlab = "x", ylab = "f'''(x)")
+grid()
+abline(h = 0, col = "gray", lty = 3)
+par(mfrow = c(1, 1))
+```
+
+## PP-form Conversion
+
+B-splines can be converted to piecewise polynomial (PP) form using `Bsplinetopp()`.
+
+```{r bspline-to-pp}
+# Convert to PP form
+pp <- Bsplinetopp(bs_function,Bsbasis=basis, callable = FALSE)
+# PP form contains polynomial coefficients for each interval
+print(pp)
+#or omit the basis (slower, re-calculate the basis)
+pp <- Bsplinetopp(bs_function, callable = FALSE)
+# PP form contains polynomial coefficients for each interval
+print(pp)
+
+# Evaluate the PP form
+y_pp <- evalpp(pp, x_plot)
+# Recalculatethe
+y <- spline_eval(bs_function,x_plot)
+
+# Should match the original B-spline
+max(abs(y - y_pp))
+```
+
+### Callable PP Objects
+
+```{r callable-pp}
+# Create a callable PP object
+pp_call <- Bsplinetopp(bs_function, callable = TRUE)
+class(pp_call)  # "callable_pp" "function"
+
+# Evaluate directly
+y_call <- pp_call(x_plot)
+
+# Access parameters
+params <- get_parameters(pp_call)
+print(params$degree)
+print(params$knot)
+
+# Print method
+print(pp_call)
+```
+
+## Callable Splines
+
+### Creating Callable Splines
+
+The `make_spline()` function transforms a B-spline object into a callable function.
+
+```{r make-spline}
+# Create a callable spline
+spline_func <- make_spline(bs_function, callable = TRUE)
+class(spline_func)  # "callable_spline" "function"
+
+# Evaluate directly
+y_callable <- spline_func(x_plot)
+
+# Access parameters
+get_parameters(spline_func)$degree
+get_parameters(spline_func)$knot
+get_parameters(spline_func)$coeff
+
+# Print method
+print(spline_func)
+```
+
+### Non-Callable Splines
+
+```{r non-callable}
+# Create a non-callable spline
+spline_list <- make_spline(bs_function, callable = FALSE)
+class(spline_list)  # "non_callable_spline" "list"
+
+# Access components
+spline_list$degree
+spline_list$knot
+spline_list$coeff
+
+# Print method
+print(spline_list)
+```
+
+### Getting Parameters
+
+The `get_parameters()` function extracts parameters from callable objects.
+
+```{r get-params}
+params <- get_parameters(spline_func)
+print(params$degree)
+print(params$knot)
+print(head(params$coeff, 5))
+```
+
+## Advanced: Knot Multiplicity and Regularity
+
+Knot multiplicity controls the smoothness of B-splines at knot points. The regularity at a knot is determined by the multiplicity `m` and the degree `d`: the spline is `C^(d - m - 1)` at that knot.
+
+### Creating B-splines with Multiple Knots
+
+```{r multiplicity}
+# Create a basis with a double knot at 3: accept discontinuity of the 2cnd derivative at 3
+sn_mult <- c(0, 0, 0, 0, 1, 2, 3, 3, 4, 5, 5, 5, 5)
+basis_mult <- Bspline_base(sn_mult, degree = 3)
+
+# Visualize
+view_basis(basis_mult)
+abline(v = 3, col = "orange", lty = 2, lwd = 2)
+```
+
+### Effect of Multiplicity on Regularity
+
+```{r multiplicity-effect}
+# Single knot (m=1): C^2 continuity
+# Double knot (m=2): C^1 continuity
+# Triple knot (m=3): C^0 continuity
+# Quadruple knot (m=4): Discontinuity
+
+sn1 <- c(0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5)  # m=1 at 3
+sn2 <- c(0, 0, 0, 0, 1, 2, 3, 3, 4, 5, 5, 5, 5)  # m=2 at 3
+sn3 <- c(0, 0, 0, 0, 1, 2, 3, 3, 3, 4, 5, 5, 5, 5)  # m=3 at 3
+sn4 <- c(0, 0, 0, 0, 1, 2, 3, 3, 3, 3, 4, 5, 5, 5, 5)  # m=3 at 3
+# Compare the bases
+basis1 <- Bspline_base(sn1, degree = 3)
+basis2 <- Bspline_base(sn2, degree = 3)
+basis3 <- Bspline_base(sn3, degree = 3)
+basis4 <- Bspline_base(sn4, degree = 3)
+
+# Visualize the differences
+par(mfrow = c(2, 1))
+view_basis(basis1, main = "m=1 (only C² at x=3)")
+view_basis(basis2, main = "m=2 (only C¹ at x=3)")
+par(mfrow = c(2, 1))
+view_basis(basis3, main = "m=3 (only C⁰ at x=3)")
+view_basis(basis4, main = "m=4 (discontinuous at x=3)")
+par(mfrow = c(1, 1))
+```
+
+## Derivatives at Knots
+
+The `Spline_der_knot()` function computes derivative values at knot points efficiently.
+
+```{r der-knot}
+# Compute derivatives at knots
+der_knots <- Spline_der_knot(basis, der = 1)
+print(head(der_knots))
+```
+## Simple Example: Coherence of Derivative Evaluation Methods (Degree 5)
+```{r}
+# Create a degree 5 B-spline
+sn5 <- c(0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5, 5, 5)
+basis5 <- Bspline_base(sn5, degree = 5)
+basis5$coeff <- c(1, -2, 3, -1, 2, 1, 0, -1, 2,5)
+
+# Evaluation points
+x <- seq(0, 5, length.out = 100)
+
+# --- Method 1: spline_eval with der parameter ---
+y1 <- spline_eval(basis5, x, der = 1)
+
+# --- Method 2: Bspline_deriv + spline_eval ---
+der_basis <- Bspline_deriv(basis5, der = 1)
+y2 <- spline_eval(der_basis, x)
+
+# --- Method 3: Step-by-step (basis derivative + bs_direct + matrix mult) ---
+der_basis2 <- Bspline_base_deriv(basis5, der = 1)
+Bvals <- bs_direct(der_basis2, x)
+y3 <- t(Bvals) %*% basis5$coeff
+
+# All three methods give identical results
+cat("Max differences:\n")
+cat("  Method 1 vs Method 2:", max(abs(y1 - y2)), "\n")
+cat("  Method 1 vs Method 3:", max(abs(y1 - y3)), "\n")
+cat("  Method 2 vs Method 3:", max(abs(y2 - y3)), "\n")
+
+# Plot to verify visually
+plot(x, y1, type = "l", col = "blue", lwd = 2,
+     main = "First Derivative - All Methods Coincide (deg 5)",
+     xlab = "x", ylab = "f'(x)")
+lines(x, y2, col = "red", lty = 2, lwd = 2)
+lines(x, y3, col = "green", lty = 3, lwd = 2)
+legend("topright", 
+       legend = c("spline_eval(der=1)", "Bspline_deriv", "Step-by-step"),
+       col = c("blue", "red", "green"), lty = c(1, 2, 3), lwd = 2)
+grid()
+
+```
+
+## Summary
+
+| Feature | Function | Description |
+|---------------------|-----------------------|----------------------------|
+| Build basis | `Bspline_base()` | Create B-spline basis |
+| View basis | `view_basis()` | Visualize basis functions |
+| Differentiate basis | `Bspline_base_deriv()` | Compute derivative basis |
+| Differentiate function | `spline_eval(der=...)` | Evaluate derivatives |
+| Derivative coefficients | `Bspline_deriv()` | Get derivative B-spline |
+| PP conversion | `Bsplinetopp()` | Convert to PP form |
+| Callable spline | `make_spline()` | Create callable function |
+| Extract params | `get_parameters()` | Get parameters from callable |
+| Derivatives at knots | `Spline_der_knot()` | Efficient knot derivatives |
+
+All Bsplines functions are implemented in pure R and support B-splines of any degree (greater than 0), with full derivative and PP-form capabilities. Limitation to degree 4 is only for regression with contsraints over intervals.

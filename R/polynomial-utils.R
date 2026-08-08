@@ -221,7 +221,7 @@ evalpp <- function(p, x_values) {
   #The x_values out of the knot give 0 in the corresponding yvalues
   if (inherits(p,'callable_pp')){p<-get_parameters(p)}
   tn = p$knot
-  coeff = p$coefficients
+  coeff = p$coeff
   kn = length(tn) - 1 #number of intervals
   n_values = length(x_values)
   degree<-p$degree
@@ -293,26 +293,53 @@ evalpp <- function(p, x_values) {
 #' Creates a PP structure from polynomial coefficients and knots.
 #' If callable = TRUE, returns a function that evaluates the PP.
 #'
-#' @param coefficients Coefficient matrix (kn x (degree+1))
-#' @param tn a Knot vector of length kn+1.
+#' @param coeff coefficients matrix or pp polynomial. Coefficient matrix (kn x (degree+1))
+#' @param tn a Knot vector of length kn+1. Needed if coefficient is not pp
 #' @param callable Boolean; if TRUE, returns a callable function
 #' @param verbose Boolean
 #' @return A PP object or a callable function
 #' @export
-makpp <- function(coefficients,
-                  tn,
+makpp <- function(coeff,
+                  tn=NULL,
                   callable = FALSE,
                   verbose = FALSE) {
-  coefficient<-as.array(coefficients)
+  if ( inherits(coeff,'callable_pp')){
+     if (callable) {
+      if(verbose){
+        cat("Already a 'callable_pp'")}
+
+        return(coeff) }
+    else{ pp<-get_parameters(coeff)
+    coeff<-pp$coeff
+    tn<-pp$knot
+    if (verbose)
+    cat("transform 'non_callable_pp' to 'callable_pp'\n")}}
+
+    if ( inherits(coeff,'non_callable_pp')){
+      { if (!callable) {
+        if(verbose)
+          cat("Already a 'non_callable_pp'\n ")
+
+        return(coeff) }
+        else{ pp<-coeff
+        coeff<-pp$coeff
+        tn<-pp$knot
+        if (verbose)
+          cat("transform 'non_callable_pp' to 'callable_pp'\n")
+        }}
+    }
+#  coeff<-as.array(coeff)
+
+
   if (length(tn) == 2) {
     kn <-1 #only one intervals
-    degree<-length(coefficient)-1 # only one polynopial
-  } else if (!is.null(dim(coefficients))) {
-    kn <- dim(coefficients)[1]
-    degree <- dim(coefficients)[2] - 1
-  } else if (any(dim(coefficients)==1) || is.null(dim(coefficients))){
+    degree<-length(coeff)-1 # only one polynopial
+  } else if (!is.null(dim(coeff))) {
+    kn <- dim(coeff)[1]
+    degree <- dim(coeff)[2] - 1
+  } else if (any(dim(coeff)==1) || is.null(dim(coeff))){
     degree = 0
-    kn <- length(coefficients)
+    kn <- length(coeff)
   }
 
   if (length(tn) != (kn + 1)) {
@@ -320,7 +347,7 @@ makpp <- function(coefficients,
   }
 
   # Creer l'objet PP
-  pp_obj <- list(coefficients = coefficients,
+  pp_obj <- list(coeff = coeff,
                  knot = tn,
                  degree = degree)
   class(pp_obj) <- "non_callable_pp"
@@ -332,7 +359,7 @@ makpp <- function(coefficients,
     }
 
     # Ajouter les parametres comme attributs
-    attr(eval_func, "coefficients") <- coefficients
+    attr(eval_func, "coeff") <- coeff
     attr(eval_func, "knot") <- tn
     attr(eval_func, "degree") <- degree
     attr(eval_func, "pp_obj") <- pp_obj
@@ -354,7 +381,7 @@ print.callable_pp <- function(x, ...) {
   # Get the attributes
   degree <- attr(x, "degree")
   knot <- attr(x, "knot")
-  coeff <- attr(x, "coefficients")
+  coeff <- attr(x, "coeff")
   pp_obj <- attr(x, "pp_obj")
 
   # Si pas d'attributs, essayer de les extraire de l'environnement
@@ -362,7 +389,7 @@ print.callable_pp <- function(x, ...) {
     env <- environment(x)
     degree <- env$degree %||% attr(x, "degree")
     knot <- env$knot %||% attr(x, "knot")
-    coeff <- env$coeff %||% attr(x, "coefficients")
+    coeff <- env$coeff %||% attr(x, "coeff")
   }
 
   cat("Callable Piecewise Polynomial (PP) Object\n")
@@ -380,7 +407,7 @@ print.callable_pp <- function(x, ...) {
     cat("  Knot range: [", round(min(knot), 4), ", ", round(max(knot), 4), "]\n")
   }
   if (!is.null(coeff)) {
-    cat("  Coefficients:",
+    cat("  coefficients:",
         if (is.matrix(coeff))
           paste(dim(coeff), collapse = " x ")
         else
@@ -397,7 +424,7 @@ print.callable_pp <- function(x, ...) {
 #' @param ... Additional arguments
 #' @export
 print.non_callable_pp <- function(x, ...) {
-  coeff <- x$coefficients
+  coeff <- x$coeff
   knot <- x$knot
   degree <- x$degree
   n_intervals <- length(knot) - 1
@@ -406,14 +433,14 @@ print.non_callable_pp <- function(x, ...) {
   cat("  $degree:", degree, "\n")
   cat("  $knots:", length(knot), knot, "\n")
   if (!is.null(dim(coeff))) {
-    cat(" Coefficients dimension:",
+    cat(" coefficients dimension:",
         dim(coeff)[1],
         "x",
         dim(coeff)[2],
         "\n")
     # Afficher les coefficients (troncated if too numerous)
     if (n_intervals <= 5 && dim(coeff)[2] <= 4) {
-      cat("\n  $coefficients:\n")
+      cat("\n  $coeff:\n")
       for (i in 1:n_intervals) {
         cat("    Interval", i, ":", paste(round(coeff[i, ], 4), collapse = ", "), "\n")
       }

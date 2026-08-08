@@ -125,7 +125,7 @@ Spline_der_knot <- function(Bsbase, der = 1)
 {
   coeff = Bsbase$base
   nsplines = Bsbase$n_splines
-  tn = Bsbase$ext_knot
+  tn = Bsbase$knot
   kn = length(tn) - 1
   m = Bsbase$degree
 

@@ -21,7 +21,7 @@
 #' # with make_spline()
 #' tn<-c(0,1,2,3,4,5)
 #' x_values<-seq(0,5,length=100)
-#' Bspline=list(degree=3, knot=tn,coefficients=runif(length(tn)+3-1))
+#' Bspline=list(degree=3, knot=tn,coeffs=runif(length(tn)+3-1))
 #' y <- spline_eval(Bspline, x_values)
 #' #alternatively compute the base before to optimize if needed
 #' sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
@@ -265,9 +265,10 @@ Bsplinetopp <- function(Bspline,
 #'        If length is 1 (default = 0), generates 200 points in the knot range.
 #' @param view_knot Logical; if TRUE, adds vertical lines at knot positions.
 #' @param add_knot logical, same value as 'view_knot' for retro compatibility
+#' @param main Title to print over the plot
 #' @return No return value, called for side effects (generates a plot)
 #' @export
-view_basis <- function(BB, x_values = 0, view_knot=TRUE, add_knot=NULL) {
+view_basis <- function(BB, x_values = 0, main=NULL, view_knot=TRUE, add_knot=NULL) {
   add_knot<-view_knot # for compatibility with 2.3 version
   if (length(x_values) == 1) {
     k <- range(BB$knot)
@@ -281,11 +282,12 @@ view_basis <- function(BB, x_values = 0, view_knot=TRUE, add_knot=NULL) {
 
   # Palette de couleurs automatique
   #colors <- rainbow(n_splines)
-
+  if (is.null(main)) main<-paste("B-spline Basis (degree", BB$degree, ")")
   # Graphique
   matplot(x_values, t(yvalues), type = "l", lwd = 1.5,
           xlab = "x", ylab = "Basis values",
-          main = paste("B-spline Basis (degree", BB$degree, ")"),lty=1)
+          main = main,
+          lty=1)
           #col = colors, lty = 1)
 
   # Ajouter les nœuds

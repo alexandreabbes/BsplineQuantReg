@@ -4,6 +4,7 @@
 #' @param tn Knot vector (effective partition, not extended)
 #' @param degree Spline degree (default = 3)
 #' @param x_values Evaluation points for design matrix (0 = no evaluation)
+#' @param Bsbasis optional the bspline basis if already computed
 #' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list containing (kn: Nb intervals, N=kn+3: Nb basis functions):
 #'   \item{d0}{Design matrix (if x_values provided)}
@@ -14,11 +15,11 @@
 bspline_to_deriv_coeffs_cubic <- function(tn=NULL,
                                           degree = 3,
                                           x_values = 0,
-                                          BsBasis=NULL,
+                                          Bsbasis=NULL,
                                           verbose = FALSE) {
-if (!is.null(BsBasis)){
-  tn<-BsBasis$knot
-  degree=BsBasis$degree}
+if (!is.null(Bsbasis)){
+  tn<-Bsbasis$knot
+  degree=Bsbasis$degree}
 else {if (is.null(tn)){
   cat('Provide at least the knots')
   return()
@@ -26,11 +27,11 @@ else {if (is.null(tn)){
   # create  basis with create.bspline.basis
   kn <- length(tn) - 1
   sn = c(tn[1] * rep(1, degree), tn, tn[kn + 1] * rep(1, degree)) # this is the extended knot sequence
-  BsBasis <- Bspline_base(sn, degree)
+  Bsbasis <- Bspline_base(sn, degree)
 }
-  basis <- BsBasis$base
+  basis <- Bsbasis$base
 
-  N <- BsBasis$n_splines
+  N <- Bsbasis$n_splines
   if (verbose) {
     message("Number of  basis functions", N, "\n")
   }
@@ -60,7 +61,7 @@ else {if (is.null(tn)){
     deriv2_val[nu - degree + 1, j] = p + m * h
   }
   if (length(x_values) != 1) {
-    yvalues = bs_direct(BsBasis, x_values)
+    yvalues = bs_direct(Bsbasis, x_values)
   }
   else {
     yvalues = 0
