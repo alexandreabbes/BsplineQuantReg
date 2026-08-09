@@ -1,8 +1,15 @@
-------------------------------------------------------------------------
+title: "B-spline Basis Manipulation" 
 
-editor_options: markdown: wrap: 72 ---
-
-title: "B-spline Basis Manipulation" author: "Alexandre Abbes" date: "`r Sys.Date()`" output: rmarkdown::html_vignette: toc: true toc_depth: 3 fig_width: 7 fig_height: 5 vignette: \> %\VignetteIndexEntry{B-spline Basis Manipulation} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8} ---
+author: "Alexandre Abbes" date: "`r Sys.Date()`" 
+output: rmarkdown::html_vignette: 
+toc: true 
+toc_depth: 3 
+fig_width: 7 
+fig_height: 5
+vignette: >
+%\VignetteIndexEntry{B-spline Basis Manipulation} 
+%\VignetteEngine{knitr::rmarkdown} 
+%\VignetteEncoding{UTF-8} ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.width = 7, fig.height = 5)
@@ -394,7 +401,9 @@ The `Spline_der_knot()` function computes derivative values at knot points effic
 der_knots <- Spline_der_knot(basis, der = 1)
 print(head(der_knots))
 ```
+
 ## Simple Example: Coherence of Derivative Evaluation Methods (Degree 5)
+
 ```{r}
 # Create a degree 5 B-spline
 sn5 <- c(0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5, 5, 5)

@@ -22,8 +22,9 @@ This vignette covers shape constraints in B-spline quantile regression using the
 The package includes several demos that illustrate shape constraints:
 
 ```{r demos}
-# List available demos
-demo(package = "BsplineQuantReg")
+# Example of available demos
+dev.new()
+demo(package = "BsplineQuantReg",temperature2)
 
 # Run specific demos:
 # demo("monotonicity")      - Increasing/decreasing constraints
@@ -82,7 +83,7 @@ lines(x_eval, spline_eval(fit_convex, x_eval), col = "blue", lwd = 2)
 
 ### Third Derivative Constraints
 
-Third derivative constraints control the curvature of the second derivative, useful for enforcing smoothness of the curvature.
+Third derivative constraints control the curvature of the second derivative. The control of its sign allows enforcing smoothness of the curvature.
 
 ```{r der3}
 # Cubic function with varying third derivative
@@ -100,8 +101,9 @@ lines(x_eval, spline_eval(fit_der3_pos, x_eval), col = "blue", lwd = 2)
 |--------|--------------|-----------|------------------|
 | 1 (Linear) | +(linear) | X | X |
 | 2 (Quadratic) | + (Karlin) | +(constant) | X|
-| 3 (Cubic) | +(Karlin) | +(Karlin) | +(linear) |
+| 3 (Cubic) | +(Karlin) | +(Karlin) | +(linear (constant)) |
 | 4 (Quartic) | +(Karlin) | +(Karlin) | +(linear) |
+'Karlin' means in fact 'quadratic' inequality.
 
 ## Partial Constraints
 
@@ -188,9 +190,6 @@ lines(x_eval, spline_eval(fit_both, x_eval), col = "blue", lwd = 2)
 
 par(mfrow = c(1, 1))
 ```
-
-## Karlin-Studden SOCP Formulation
-
 ## Karlin-Studden SOCP Formulation
 
 The shape constraints are implemented using the **Karlin-Studden characterization** of non-negative polynomials of degree 2 or 3. 
