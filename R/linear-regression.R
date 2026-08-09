@@ -44,7 +44,7 @@ SplineLinearQuant <- function(xtab,
   # Handle knots
   if (length(knot) == 1 && is.numeric(knot)) {
     kn <- knot - 1
-    knot <- quantile(xtab, probs = seq(0, 1, length.out = kn + 1))
+    knot <- as.numeric(quantile(xtab, probs = seq(0, 1, length.out = kn + 1)))
   }
 
   kn <- length(knot) - 1
@@ -83,9 +83,6 @@ SplineLinearQuant <- function(xtab,
 
   # Optimization variables
   alpha <- Variable(N)
-  #quantile
-
-
 
   # Objective function
   residuals <- ytab_centered - B %*% alpha

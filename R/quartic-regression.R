@@ -54,7 +54,7 @@ SplineQuarticQuant <- function(xtab,
   # Handle knot
   if (length(knot) == 1 && is.numeric(knot)) {
     kn <- knot - 1
-    knot <- quantile(xtab, probs = seq(0, 1, length.out = kn + 1))
+    knot <- as.numeric(quantile(xtab, probs = seq(0, 1, length.out = kn + 1)))
   }
 
   kn <- length(knot) - 1
