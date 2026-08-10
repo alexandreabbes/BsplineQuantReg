@@ -2,7 +2,8 @@
 % Please edit documentation in R/deriv-coeffs.R
 \name{bspline_to_deriv_coeffs_quart}
 \alias{bspline_to_deriv_coeffs_quart}
-\title{Convert quartic B-spline to derivative coefficients}
+\title{Computes normalized first, second, and third derivative coefficients
+for quartic B-splines on each interval.}
 \usage{
 bspline_to_deriv_coeffs_quart(knot, degree = 4, x_values = 0)
 }

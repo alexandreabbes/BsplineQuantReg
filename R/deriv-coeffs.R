@@ -1,10 +1,11 @@
 #' normalized first and second derivative coefficients on each interval.
 #' for a cubic B-spline basis
 #'
-#' @param tn Knot vector (effective partition, not extended)
+#' @param tn Knot vector (effective partition, not extended. OPtionnal if Bsbasis
+#' is given)
 #' @param degree Spline degree (default = 3)
 #' @param x_values Evaluation points for design matrix (0 = no evaluation)
-#' @param Bsbasis optional the bspline basis if already computed
+#' @param Bsbasis Bspline basis structure if already computed. Optional if knots are given.
 #' @param verbose boolean FALSE (default) or TRUE.
 #' @return A list containing (kn: Nb intervals, N=kn+3: Nb basis functions):
 #'   \item{d0}{Design matrix (if x_values provided)}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/deriv-coeffs.R
 \name{bspline_to_deriv_coeffs_lin}
 \alias{bspline_to_deriv_coeffs_lin}
-\title{Derivative coefficients for linear B-spline to
+\title{Derivative coefficients for linear B-spline
 Computes normalized first derivative coefficients for linear B-splines.
 For linear splines, the derivative is constant on each interval.}
 \usage{
@@ -23,7 +23,7 @@ A list containing:
   \item{d1}{First derivative values (constant per interval)}
 }
 \description{
-Derivative coefficients for linear B-spline to
+Derivative coefficients for linear B-spline
 Computes normalized first derivative coefficients for linear B-splines.
 For linear splines, the derivative is constant on each interval.
 }

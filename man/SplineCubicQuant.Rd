@@ -62,7 +62,7 @@ monotonicity constraints (via Karlin-Studden) and convexity constraints.
 #optional set.seed(42)
 x <- seq(0, 1, length=100)
 y <- 2*x + sin(6*pi*x)/2 + rnorm(100, 0, 0.05)
-knot <- quantile(x, probs=seq(0,1,length.out=10))
+knot <- as.numeric(quantile(x, probs=seq(0,1,length.out=10)))
 
 # Median quantile regression without constraints
 fit <- SplineConstQuantRegBs3(x, y, knot, tau=0.5)

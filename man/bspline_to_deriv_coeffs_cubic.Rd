@@ -5,14 +5,23 @@
 \title{normalized first and second derivative coefficients on each interval.
 for a cubic B-spline basis}
 \usage{
-bspline_to_deriv_coeffs_cubic(tn, degree = 3, x_values = 0, verbose = FALSE)
+bspline_to_deriv_coeffs_cubic(
+  tn = NULL,
+  degree = 3,
+  x_values = 0,
+  Bsbasis = NULL,
+  verbose = FALSE
+)
 }
 \arguments{
-\item{tn}{Knot vector (effective partition, not extended)}
+\item{tn}{Knot vector (effective partition, not extended. OPtionnal if Bsbasis
+is given)}
 
 \item{degree}{Spline degree (default = 3)}
 
 \item{x_values}{Evaluation points for design matrix (0 = no evaluation)}
+
+\item{Bsbasis}{Bspline basis structure if already computed. Optional if knots are given.}
 
 \item{verbose}{boolean FALSE (default) or TRUE.}
 }

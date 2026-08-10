@@ -33,7 +33,7 @@ Evaluates a spline (linear combination of B-splines) at given points.
 # with make_spline()
 tn<-c(0,1,2,3,4,5)
 x_values<-seq(0,5,length=100)
-Bspline=list(degree=3, knot=tn,coefficients=runif(length(tn)+3-1))
+Bspline=list(degree=3, knot=tn,coeffs=runif(length(tn)+3-1))
 y <- spline_eval(Bspline, x_values)
 #alternatively compute the base before to optimize if needed
 sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
