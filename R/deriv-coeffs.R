@@ -17,7 +17,8 @@ bspline_to_deriv_coeffs_cubic <- function(tn=NULL,
                                           degree = 3,
                                           x_values = 0,
                                           Bsbasis=NULL,
-                                          verbose = FALSE) {
+                                          verbose = FALSE)
+  {
 if (!is.null(Bsbasis)){
   tn<-Bsbasis$knot
   degree=Bsbasis$degree}
