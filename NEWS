@@ -4,7 +4,7 @@ Version=0.2.4
 -Update the name of the logical variable in view_basis
 -re-organise functions in files
 -add vignettes
--add show function polynomial and pp/spline on each interval, base local/canonical
+-add "show" function for polynomial and pp/spline on each interval, base local/canonical
 
 ##fixed
 -print.non_callable_pp

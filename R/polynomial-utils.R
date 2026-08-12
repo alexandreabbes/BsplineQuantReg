@@ -149,7 +149,6 @@ reduce_pol <- function(p, verbose = FALSE) {
 #' # P(x) = 1 + x + x^2
 #' poly_eval(c(1, 1, 1), c(0, 1, 2)) # returns c(1, 3, 7)
 #' @export
-
 poly_eval <- function(p, xvalues) {
   p = rev(p)
   #we evaluate the values in the convention p=c(p0,p1,p2)
@@ -424,7 +423,51 @@ show_poly <- function(obj,
 }
 
 
-
+#' Afficher un objet Piecewise Polynomial (PP) sous forme lisible
+#'
+#' Cette fonction prend un objet PP (callable ou non) ou une spline et affiche
+#' les équations polynomiales sur chaque intervalle. Les polynômes peuvent être
+#' affichés dans la base canonique (1, x, x², ...) ou dans la base locale
+#' (1, (x-t_k), (x-t_k)², ...) centrée sur chaque noeud t_k.
+#'
+#' @param ppol Un objet PP (callable_pp, non_callable_pp) ou spline
+#'        (callable_spline, non_callable_spline)
+#' @param local Logique. Si TRUE (défaut), utilise la base locale (x-a)^i.
+#'        Si FALSE, utilise la base canonique 1, x, x², ...
+#' @param digits Nombre de chiffres significatifs pour l'affichage (défaut: 4)
+#' @param verbose Logique. Si TRUE, affiche des informations supplémentaires
+#'
+#' @return Une matrice ou un vecteur contenant les équations formatées.
+#'         Si un seul intervalle, retourne un vecteur de caractères.
+#'         Si plusieurs intervalles, retourne une matrice avec pour chaque
+#'         ligne: [intervalle, équation].
+#'
+#' @examples
+#' \dontrun{
+#' # Exemple avec un PP simple
+#' knot <- c(0, 0.5, 1)
+#' coeff <- matrix(c(1, 2, 0.5, 0, 1, -1), nrow = 2, ncol = 3, byrow = TRUE)
+#' pp <- makpp(coeff, knot)
+#' show_pp(pp, local = FALSE)
+#' # Sortie:
+#' # [0.000, 0.500] 0.5x^2 + 2x + 1
+#' # [0.500, 1.000] -1x^2 + 1x + 0
+#'
+#' # Avec base locale
+#' show_pp(pp, local = TRUE)
+#' # Sortie:
+#' # [0.000, 0.500] 0.5(x-0)^2 + 2(x-0) + 1
+#' # [0.500, 1.000] -1(x-0.5)^2 + 1(x-0.5) + 0
+#'
+#' # Avec une spline
+#' sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
+#' basis <- Bspline_base(sn, degree = 3)
+#' basis$coeff <- runif(basis$n_splines)
+#' show_pp(basis, local = TRUE, verbose = TRUE)
+#' }
+#'
+#' @seealso \code{\link{print_poly}}, \code{\link{Bsplinetopp}}, \code{\link{makpp}}
+#' @export
 show_pp<-function(ppol,local=TRUE,digits=4, verbose=FALSE)
   {
     if (inherits(ppol, 'callable_pp') ||
