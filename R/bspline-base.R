@@ -369,7 +369,10 @@ make_spline <- function(Bspline,
 #' @return A list with degree, knots, coefficients, and 'Bspline' object
 #' @export
 get_parameters <- function(x) {
-  if (!inherits(x, "callable_spline") &&
+  if (inherits(x, "non_callable_spline") ||
+      inherits(x, "non_callable_pp"))
+  {return(x)}
+  else if (!inherits(x, "callable_spline") &&
       !inherits(x, "callable_pp")) {
     message("Object is neither a callable spline
             or a callable pp")

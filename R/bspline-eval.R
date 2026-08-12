@@ -1,5 +1,5 @@
 # bs_direct, spline_eval, view_spline
-#  bsplinetopp
+
 
 #' Evaluate a B-spline
 #'
@@ -209,6 +209,7 @@ bs_direct <- function(Basis,
 #'
 #' @examples
 #' \dontrun{
+#'
 #' # Create a B-spline
 #' sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
 #' basis <- Bspline_base(sn, degree = 3)

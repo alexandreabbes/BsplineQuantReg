@@ -1,7 +1,7 @@
 # polymul, polyadd, polyderiv, poly_eval, reduce_pol
 # change_polynomial_base_taylor,
 # makpp, evalpp, print.callable_pp, print.non_callable_pp
-
+#show_poly, show_pp
 
 #' Polynomial multiplication
 #'
@@ -372,6 +372,126 @@ makpp <- function(coeff,
 }
 
 
+
+#' Affiche l'équation d'un polynôme dans différentes bases
+#'
+#' @param obj Polynomial object (coeff vector), decreasing power
+#' @param a : the base in which the coefficients are given is (x-a)^i,
+#' default 0 for canonical
+#' @param b : the base for output is (x-b)^i, default b=0
+#' @param digits Nombre de chiffres significatifs à afficher
+#' @return the polynomial written on the base (x-b)^i
+#' @export
+#'
+#' @examples
+#' # Polynôme simple
+#' p <- c(3, -2, 1)  # 3 - 2x + x^2
+#' show_poly(p) # or
+#' show_poly(p,base_a=0, base_b=0)
+#' # base not zero
+#' p <- c(3, -2, 1)  # 3 - 2(x-2) + (x-2)^2
+#' show_poly(p, base_a=2, base_b=2)
+show_poly <- function(obj,
+                       a=0,
+                       b=0,
+                       digits = 4,
+                       verbose = FALSE) {
+
+    pol=""
+    d=length(obj)
+    if (a!=b){obj<-change_polynomial_base_taylor(coeff, a, b)}
+
+    for (j in 1:d){
+      i<-d-j
+      if (i==0) {
+        fact<-""}
+      else{
+        if (b==0) {
+          fact<-paste0("x^",i,collapse="")}
+        else {if (b<0) {bp<-paste0("+",-b ) }
+        else if (b>0) {bp<-paste0("-",b)}
+       fact <- paste0("(x",bp,")^",i,collapse="")}
+      }
+
+      c_i<-paste0(round(obj[j],digits),collapse="")
+
+      if (j>1){
+      pol<-paste0(pol,if (c_i>=0)"+",c_i, if (fact!="") "*",fact,collapse="")
+      }
+      else pol<-paste0(c_i,"*",fact,collapse="")
+    }
+    return(pol)
+}
+
+
+
+show_pp<-function(ppol,local=TRUE,digits=4, verbose=FALSE)
+  {
+    if (inherits(ppol, 'callable_pp') ||
+        inherits(ppol, 'non_callable_pp'))
+      ppol <- get_parameters(ppol)
+
+    else if (inherits(ppol, 'callable_spline') ||
+             inherits(ppol, 'non_callable_spline'))
+      ppol <- Bsplinetopp(ppol, callable = FALSE)
+
+    else {
+      message("Use makpp or make_spline to format obj")
+      return()
+    }
+
+    #Extraire les composants
+    coeff <- ppol$coeff
+    knot <- ppol$knot
+    degree <- ppol$degree
+    if (verbose) print(pp)
+    # Déterminer le nombre d'intervalles
+    if (is.matrix(coeff)) {
+      n_intervals <- nrow(coeff)
+    } else if (is.list(coeff)) {
+      n_intervals <- length(coeff)
+    } else {
+      n_intervals <- length(knot) - 1}
+
+
+
+      # Construire la sortie
+      result <- ""
+
+      if (n_intervals == 1) {
+        # Un seul intervalle
+        b <- if (local)
+          knot[1]
+        else 0
+        a <- knot[1]
+        poly_str <- show_poly(coeff, a=a,b=b, digits = digits)
+        result <- c(paste0("Interval [", knot[1], ",", knot[2], "] :"),
+                    paste0(poly_str))
+      } else {
+        # Plusieurs intervalles
+        result <- array(dim=c(n_intervals, 2))
+
+        for (i in 1:n_intervals) {
+          b <- if (local)
+            knot[i]
+          else   0
+          a <- knot[i]
+
+          poly_coeff <- if (is.matrix(coeff))
+            coeff[i, ]
+          else
+            coeff
+
+          poly_str <- show_poly(poly_coeff,a=a,b=b, digits = digits)
+          interval_str <- sprintf("  [%.4f, %.4f] ", knot[i], knot[i + 1])
+
+          result[i,] <- c(interval_str, poly_str)
+        }
+      }
+      return(result)
+}
+
+
 #' Print method for callable_pp objects
 #'
 #' @param x A callable_pp object
@@ -403,18 +523,33 @@ print.callable_pp <- function(x, ...) {
     length(knot)
     else
       "unknown", "\n")
-  if (!is.null(knot)) {
-    cat("  Knot range: [", round(min(knot), 4), ", ", round(max(knot), 4), "]\n")
-  }
-  if (!is.null(coeff)) {
-    cat("  coefficients:",
-        if (is.matrix(coeff))
-          paste(dim(coeff), collapse = " x ")
-        else
-          length(coeff),
+  if (!is.null(dim(coeff))) {
+    cat(" coefficients dimension:",
+        dim(coeff)[1],
+        "x",
+        dim(coeff)[2],
         "\n")
+    # Afficher les coefficients (troncated if too numerous)
+    if (n_intervals <= 5 && dim(coeff)[2] <= 4) {
+      cat("\n  $coeff:\n")
+      for (i in 1:n_intervals) {
+        cat("    Intervals", i, ":", paste(round(coeff[i, ], 4), collapse = ", "), "\n")
+      }
+    } else {
+      cat("\n  First interval coefficients:",
+          paste(round(coeff[1, ], 4), collapse = ", "),
+          "\n")
+      if (n_intervals > 1) {
+        cat("  Last interval coefficients: ",
+            paste(round(coeff[n_intervals, ], 4), collapse = ", "),
+            "\n")
+      }
+    }
+  } else {
+    cat(" Only one interval. ",
+        "Coefficients :", coeff, "\n" )
   }
-  cat("\n  Usage: pp(x_values) or evalpp(pp, x_values)\n")
+  cat(" Usage: pp(x_values) or evalpp(pp, x_values)\n")
   invisible(x)
 }
 
@@ -431,7 +566,7 @@ print.non_callable_pp <- function(x, ...) {
   cat("Piecewise Polynomial (PP) (non-callable)\n")
   cat("================================\n")
   cat("  $degree:", degree, "\n")
-  cat("  $knots:", length(knot), knot, "\n")
+  cat("  $knot:", knot, "\n")
   if (!is.null(dim(coeff))) {
     cat(" coefficients dimension:",
         dim(coeff)[1],
@@ -442,7 +577,7 @@ print.non_callable_pp <- function(x, ...) {
     if (n_intervals <= 5 && dim(coeff)[2] <= 4) {
       cat("\n  $coeff:\n")
       for (i in 1:n_intervals) {
-        cat("    Interval", i, ":", paste(round(coeff[i, ], 4), collapse = ", "), "\n")
+        cat("    Intervals", i, ":", paste(round(coeff[i, ], 4), collapse = ", "), "\n")
       }
     } else {
       cat("\n  First interval coefficients:",
@@ -455,8 +590,9 @@ print.non_callable_pp <- function(x, ...) {
       }
     }
   } else {
-    cat("  Coefficients length:", length(coeff), "\n")
+    cat(" Only one interval ",
+    "Coefficients :", coeff, "\n" )
   }
-  cat("\n  Usage: pp_eval(pp, x_values)\n")
+  cat(" Usage: pp_eval(pp, x_values)\n")
   invisible(x)
 }
