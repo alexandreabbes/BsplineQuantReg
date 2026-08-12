@@ -55,5 +55,5 @@ show_pp(basis, local = TRUE, verbose = TRUE)
 
 }
 \seealso{
-\code{\link{print_poly}}, \code{\link{Bsplinetopp}}, \code{\link{makpp}}
+\code{\link{show_poly}}, \code{\link{Bsplinetopp}}, \code{\link{makpp}}
 }

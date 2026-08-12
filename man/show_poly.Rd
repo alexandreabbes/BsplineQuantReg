@@ -4,7 +4,7 @@
 \alias{show_poly}
 \title{Displays the equation of a polynomial in a given basis}
 \usage{
-show_poly(obj, a = 0, b = 0, digits = 4, verbose = FALSE)
+show_poly(obj, a = 0, b = 0, digits = 4)
 }
 \arguments{
 \item{obj}{Polynomial object (coeff vector), decreasing power}

@@ -393,12 +393,11 @@ makpp <- function(coeff,
 show_poly <- function(obj,
                        a=0,
                        b=0,
-                       digits = 4,
-                       verbose = FALSE) {
+                       digits = 4                      ) {
 
     pol=""
     d=length(obj)
-    if (a!=b){obj<-change_polynomial_base_taylor(coeff, a, b)}
+    if (a!=b){obj<-change_polynomial_base_taylor(obj, a, b)}
 
     for (j in 1:d){
       i<-d-j
@@ -466,7 +465,7 @@ show_poly <- function(obj,
 #' show_pp(basis, local = TRUE, verbose = TRUE)
 #' }
 #'
-#' @seealso \code{\link{print_poly}}, \code{\link{Bsplinetopp}}, \code{\link{makpp}}
+#' @seealso \code{\link{show_poly}}, \code{\link{Bsplinetopp}}, \code{\link{makpp}}
 #' @export
 show_pp<-function(ppol,local=TRUE,digits=4, verbose=FALSE)
   {

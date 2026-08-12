@@ -234,7 +234,6 @@ Bsplinetopp <- function(Bspline,
   #Convert a B-spline to a PP-polynomial
   if (inherits(Bspline, "callable_spline")) {
     Bspline = get_parameters(Bspline)
-    callable = TRUE
   }
   coeff = Bspline$coeff
   degree = Bspline$degree
