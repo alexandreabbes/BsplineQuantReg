@@ -163,11 +163,212 @@ print(pp_call)
 plot(pp_call, xlim = c(0, 2))
 ```
 
+### displaying polynomial in a human readable form
+
+## Introduction
+The `show_poly()` function displays a polynomial as a human-readable mathematical equation. It supports both canonical and local bases, and can convert between different expansion points using Taylor's formula.
+
+A polynomial $P(x) = \sum_{k=0}^d c_k (x-a)^k$ represented by coefficients `c(c_d, c_{d-1}, ..., c_0)` (decreasing power order) can be displayed in any basis $(x-b)^k$.
+
+## Basic Usage
+
+### Canonical Basis (Default)
+
+By default, `show_poly()` displays the polynomial in the canonical basis $1, x, x^2, ...$:
+
+```{r }
+# P(x) = 3x^3 - 2x^2 + x - 5
+p <- c(3, -2, 1, -5)
+show_poly(p)
+# "3*x^3 - 2*x^2 + 1*x - 5"
+```
+
+## Working with Local Bases
+
+### Display in Local Basis
+
+To display a polynomial in the local basis $(x-a)^k$, use the `b` parameter:
+
+```{r local_basis}
+# P(x) = 3(x-2)^3 - 2(x-2)^2 + (x-2) - 5
+p <- c(3, -2, 1, -5)
+show_poly(p, b = 2)
+# "3*(x-2)^3 - 2*(x-2)^2 + 1*(x-2) - 5"
+```
+
+### Converting Between Bases
+
+The `a` parameter specifies the basis in which the coefficients are given. The function automatically converts using `change_polynomial_base_taylor()`:
+
+```{r convert_bases}
+# Coefficients are in basis (x-2)^k, display in canonical basis
+p <- c(3, -2, 1, -5)  # In basis (x-2)^k
+show_poly(p, a = 2, b = 0)
+# This expands to: 3x^3 - 18x^2 + 37x - 27
+```
+
+## Examples with Different Bases
+
+### Positive and Negative Centers
+
+```{r centers}
+# Center at positive value
+p <- c(1, 0, 2)  # (x-3)^2 + 2
+show_poly(p, b = 3)
+# "(x-3)^2 + 2"
+
+# Center at negative value
+p <- c(1, 0, 2)  # (x+2)^2 + 2
+show_poly(p, b = -2)
+# "(x+2)^2 + 2"
+```
+## Controlling Output Format
+
+### Number of Digits
+
+```{r digits}
+p <- c(1/3, -2/7, 1/5)
+show_poly(p, digits = 2)
+# "0.33*x^2 - 0.29*x + 0.2"
+
+show_poly(p, digits = 4)
+# "0.3333*x^2 - 0.2857*x + 0.2"
+```
+
+### Negative Coefficients
+
+The function handles negative coefficients gracefully:
+
+```{r negative}
+# All coefficients negative
+p <- c(-3, -2, -1)  # -3x^2 - 2x - 1
+show_poly(p)
+# "-3*x^2 - 2*x - 1"
+
+# Mixed coefficients
+p <- c(3, -2, 1, -5)  # 3x^3 - 2x^2 + x - 5
+show_poly(p)
+# "3*x^3 - 2*x^2 + 1*x - 5"
+```
+
+### Working with B-splines
+
+When working with B-splines, `show_poly()` helps visualize the polynomial pieces:
+
+```{r bspline_example}
+# Create a B-spline and display its polynomial form
+sn <- c(0, 0, 0, 0, 0.3, 0.6, 1, 1, 1, 1)
+basis <- Bspline_base(sn, degree = 3)
+basis$coeff <- c(1, -0.5, 2, 0.5, -1, 0.75)
+
+# Convert to PP
+pp <- Bsplinetopp(basis, callable = FALSE)
+
+# Display each piece
+cat("Piece 1: ", show_poly(pp$coeff[1, ], b = 0), "\n")
+cat("Piece 2: ", show_poly(pp$coeff[2, ], b = 0), "\n")
+cat("Piece 3: ", show_poly(pp$coeff[3, ], b = 0), "\n")
+```
+
+
+## Integration with show_pp()
+The `show_poly()` function is used internally by `show_pp()` and `show_pp()` to display piecewise polynomials:
+
+```{r show_pp_integration}
+# Create a PP with two intervals
+knot <- c(0, 0.5, 1)
+coeff <- matrix(c(1, 2, 0.5, 0, 1, -1), nrow = 2, ncol = 3, byrow = TRUE)
+pp <- makpp(coeff, knot)
+
+# Display in local basis
+show_pp(pp, local = TRUE, digits = 3)
+```
+
+## Summary
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `obj` | Polynomial coefficients (decreasing power order) | Required |
+| `a` | Base of input coefficients $(x-a)^k$ | 0 |
+| `b` | Base for output display $(x-b)^k$ | 0 |
+| `digits` | Number of significant digits | 4 |
+| `verbose` | Print additional information |FALSE |
+
+
+
+### Displaying PP Equations
+
+The package provides convenient functions to display PP objects as human-readable mathematical equations. The `show_pp()` and `show_pp()` functions format the polynomial expressions on each interval, with support for both canonical and local bases.
+
+```{r show_pp}
+# Create a PP with two intervals
+knot <- c(0, 0.5, 1)
+coeff <- matrix(c(1, 2, 0.5, 0, 1, -1), nrow = 2, ncol = 3, byrow = TRUE)
+pp <- makpp(coeff, knot)
+
+# Display in canonical basis (1, x, x², ...)
+show_pp(pp, local = FALSE)
+# [0.000, 0.500] 0.5x^2 + 2x + 1
+# [0.500, 1.000] -1x^2 + 1x + 0
+
+# Display in local basis ((x-a)^i)
+show_pp(pp, local = TRUE)
+# [0.000, 0.500] 0.5(x-0)^2 + 2(x-0) + 1
+# [0.500, 1.000] -1(x-0.5)^2 + 1(x-0.5) + 0
+```
+
+For spline objects, the conversion to PP is automatic:
+```{r}
+
+# Create a B-spline and display its polynomial form
+sn <- c(0, 0, 0, 0, 0.3, 0.6, 1, 1, 1, 1)
+basis <- Bspline_base(sn, degree = 3)
+basis$coeff <- c(1, -0.5, 2, 0.5, -1, 0.75)
+
+show_pp(basis, local = TRUE, verbose = TRUE)
+# PP Information:
+# Degree: 3
+# Knots: 0, 0.3, 0.6, 1
+# Number of intervals: 3
+# 
+# [0.000, 0.300] 1(x-0)^3 + 2.5(x-0)^2 + 1.5(x-0) + 1
+# [0.300, 0.600] -4.63(x-0.3)^3 + ... 
+# [0.600, 1.000] ...
+```
+Customization Options
+The display functions offer several customization options:
+
+    local: Control the basis (TRUE for local, FALSE for canonical)
+
+    digits: Number of significant digits (default: 4)
+
+    verbose: Display additional PP information
+
+
+
+### Callable PP Objects
+
+A callable PP object can be evaluated directly like a function.
+
+# Create a callable PP
+pp_call <- makpp(coeff, knots, callable = TRUE)
+class(pp_call)  # "callable_pp" "function"
+
+# Evaluate directly
+x <- seq(0, 2, length.out = 10)
+y <- pp_call(x)
+
+# Print shows information
+print(pp_call)
+
+# Can be used in plots
+plot(pp_call, xlim = c(0, 2))
+
+
 ### Extrapolating values
 
 When evalpp() is called with x values outside the knot range (x \< knots[1] or x \> knots[length(knots)]), it automatically performs extrapolation by extension using the border polynomial piece (the first or last polynomial in the PP structure). For example, if the knot vector is c(0, 1, 2), points with x \< 0 will be evaluated using the polynomial from the first interval [0, 1], while points with x \> 2 will use the polynomial from the last interval [1, 2]. This is equivalent to "extending" the first and last piece of the spline. A warning message is printed to alert the user when extrapolation occurs.
 
-```{r}
 # PP with two intervals: x^2 on [0,1], 2x-1 on [1,2]
 coeff <- matrix(c(1, 0, 0, 0, 2, -1), nrow = 2, byrow = TRUE)
 knots <- c(0, 1, 2)

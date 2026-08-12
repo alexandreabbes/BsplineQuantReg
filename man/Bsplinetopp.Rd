@@ -32,6 +32,7 @@ coefficients for each interval between knots.
 }
 \examples{
 \dontrun{
+
 # Create a B-spline
 sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
 basis <- Bspline_base(sn, degree = 3)

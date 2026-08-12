@@ -372,7 +372,7 @@ makpp <- function(coeff,
 
 
 
-#' Affiche l'équation d'un polynôme dans différentes bases
+#' Displays the equation of a polynomial in a given basis
 #'
 #' @param obj Polynomial object (coeff vector), decreasing power
 #' @param a : the base in which the coefficients are given is (x-a)^i,
@@ -546,20 +546,13 @@ print.callable_pp <- function(x, ...) {
   knot <- attr(x, "knot")
   coeff <- attr(x, "coeff")
   pp_obj <- attr(x, "pp_obj")
-
-  # Si pas d'attributs, essayer de les extraire de l'environnement
-  if (is.null(degree) || is.null(knot) || is.null(coeff)) {
-    env <- environment(x)
-    degree <- env$degree %||% attr(x, "degree")
-    knot <- env$knot %||% attr(x, "knot")
-    coeff <- env$coeff %||% attr(x, "coeff")
-  }
+  n_intervals<-length(knot)-1
 
   cat("Callable Piecewise Polynomial (PP) Object\n")
   cat("==========================================\n")
   cat("  Degree:", degree %||% "unknown", "\n")
   cat("  Intervals:", if (!is.null(knot))
-    length(knot) - 1
+    n_intervals
     else
       "unknown", "\n")
   cat("  Knots:", if (!is.null(knot))
