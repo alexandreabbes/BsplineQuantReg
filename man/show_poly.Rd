@@ -26,8 +26,8 @@ Displays the equation of a polynomial in a given basis
 # Polynôme simple
 p <- c(3, -2, 1)  # 3 - 2x + x^2
 show_poly(p) # or
-show_poly(p,base_a=0, base_b=0)
+show_poly(p,a=0, b=0)
 # base not zero
 p <- c(3, -2, 1)  # 3 - 2(x-2) + (x-2)^2
-show_poly(p, base_a=2, base_b=2)
+show_poly(p, a=2, b=2)
 }
