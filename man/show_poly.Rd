@@ -23,7 +23,7 @@ the polynomial written on the base (x-b)^i
 Displays the equation of a polynomial in a given basis
 }
 \examples{
-# Polynôme simple
+# Simple polynomial
 p <- c(3, -2, 1)  # 3 - 2x + x^2
 show_poly(p) # or
 show_poly(p,a=0, b=0)

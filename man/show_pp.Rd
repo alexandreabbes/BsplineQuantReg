@@ -2,51 +2,54 @@
 % Please edit documentation in R/polynomial-utils.R
 \name{show_pp}
 \alias{show_pp}
-\title{Afficher un objet Piecewise Polynomial (PP) sous forme lisible}
+\title{Display   Piecewise Polynomial (PP)  in a human readble form}
 \usage{
 show_pp(ppol, local = TRUE, digits = 4, verbose = FALSE)
 }
 \arguments{
-\item{ppol}{Un objet PP (callable_pp, non_callable_pp) ou spline
+\item{ppol}{A PP object (callable_pp, non_callable_pp) or spline
 (callable_spline, non_callable_spline)}
 
-\item{local}{Logique. Si TRUE (défaut), utilise la base locale (x-a)^i.
-Si FALSE, utilise la base canonique 1, x, x², ...}
+\item{local}{Logical. If TRUE (default), uses the local basis (x-a)^i.
+If FALSE, uses the canonical basis 1, x, x², ...}
 
-\item{digits}{Nombre de chiffres significatifs pour l'affichage (défaut: 4)}
+\item{digits}{Number of significant digits for display (default: 4)}
 
-\item{verbose}{Logique. Si TRUE, affiche des informations supplémentaires}
+\item{verbose}{Logical. If TRUE, displays additional information}
 }
 \value{
-Une matrice ou un vecteur contenant les équations formatées.
-        Si un seul intervalle, retourne un vecteur de caractères.
-        Si plusieurs intervalles, retourne une matrice avec pour chaque
-        ligne: [intervalle, équation].
+A matrix or vector containing the formatted equations.
+        If a single interval, returns a character vector.
+        If multiple intervals, returns a matrix with each row:
+        [interval, equation].
 }
 \description{
-Cette fonction prend un objet PP (callable ou non) ou une spline et affiche
-les équations polynomiales sur chaque intervalle. Les polynômes peuvent être
-affichés dans la base canonique (1, x, x², ...) ou dans la base locale
-(1, (x-t_k), (x-t_k)², ...) centrée sur chaque noeud t_k.
+Display a Piecewise Polynomial (PP) object as readable equations
+}
+\details{
+This function takes a PP object (callable or non-callable) or a spline and
+displays the polynomial equations on each interval. Polynomials can be
+displayed in the canonical basis (1, x, x², ...) or in the local basis
+(1, (x-t_k), (x-t_k)², ...) centered at each knot t_k.
 }
 \examples{
 \dontrun{
-# Exemple avec un PP simple
+# Example with a simple PP
 knot <- c(0, 0.5, 1)
 coeff <- matrix(c(1, 2, 0.5, 0, 1, -1), nrow = 2, ncol = 3, byrow = TRUE)
 pp <- makpp(coeff, knot)
 show_pp(pp, local = FALSE)
-# Sortie:
+# Output:
 # [0.000, 0.500] 0.5x^2 + 2x + 1
 # [0.500, 1.000] -1x^2 + 1x + 0
 
-# Avec base locale
+# With local basis
 show_pp(pp, local = TRUE)
-# Sortie:
+# Output:
 # [0.000, 0.500] 0.5(x-0)^2 + 2(x-0) + 1
 # [0.500, 1.000] -1(x-0.5)^2 + 1(x-0.5) + 0
 
-# Avec une spline
+# With a spline
 sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
 basis <- Bspline_base(sn, degree = 3)
 basis$coeff <- runif(basis$n_splines)
