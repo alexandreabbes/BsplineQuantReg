@@ -406,8 +406,8 @@ show_poly <- function(obj,
       else{
         if (b==0) {
           fact<-paste0("x^",i,collapse="")}
-        else {if (b<0) {bp<-paste0("+",-b ) }
-        else if (b>0) {bp<-paste0("-",b)}
+        else {if (b<0) {bp<-paste0("+", round(-b,digits))  }
+        else if (b>0) {bp<-paste0("-",round(b,digits)) }
        fact <- paste0("(x",bp,")^",i,collapse="")}
       }
 
@@ -525,7 +525,8 @@ show_pp<-function(ppol,local=TRUE,digits=4, verbose=FALSE)
             coeff
 
           poly_str <- show_poly(poly_coeff,a=a,b=b, digits = digits)
-          interval_str <- sprintf("  [%.4f, %.4f] ", knot[i], knot[i + 1])
+          interval_str <- sprintf("  [%.4f, %.4f] ",
+                                  round(knot[i],digits), round(knot[i + 1],digits))
 
           result[i,] <- c(interval_str, poly_str)
         }
