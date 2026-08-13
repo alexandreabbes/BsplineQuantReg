@@ -126,7 +126,7 @@ SplineCubicQuant <- function(xtab,
 
 
   if (type_reg=='mean_square'){
-    weighted_loss <- norm2(residuals)
+    weighted_loss <- p_norm(residuals,2)
   }
    else{#if (type_reg=='quantile'){
       #quantile

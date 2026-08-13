@@ -87,7 +87,7 @@ SplineLinearQuant <- function(xtab,
   # Objective function
   residuals <- ytab_centered - B %*% alpha
   if (type_reg=='mean_square'){
-    weighted_loss <- norm2(residuals)
+    weighted_loss <- p_norm(residuals,2)
   }
    else{
    u_plus <- pos(residuals)

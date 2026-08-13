@@ -7,6 +7,7 @@ Version=0.2.4
 -add "show" function for polynomial and pp/spline on each interval, base local/canonical
 
 ##fixed
+-p_norm(x,2) instaed of norm2 for mean square
 -print.non_callable_pp
 
 

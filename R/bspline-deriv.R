@@ -22,7 +22,7 @@ Bspline_deriv <- function(bspline,
                           verbose = FALSE) {
   if (der == 0) {
     diff_spline <- make_spline(bspline)
-    if (verbose)
+    if (verbose)packageVersion("BsplineQuantReg")
       cat("No change, nul derivative")
   } else{
     if (inherits(bspline, "callable_spline")) {
