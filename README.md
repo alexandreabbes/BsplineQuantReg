@@ -20,9 +20,11 @@ This package is available on CRAN.
 - Partial constraints (per interval or per knot)
 - Polynomial coefficient export
 - Conversion between PP-form and B-spline representation
-- Callable and non-callable spline objects
-
-
+- Callable and non-callable spline/pp objects
+- View Bspline basis
+- Differentiable Bspline or Basis
+- Displays coefficients in human readable form, local/canonical basis
+- Robust knots multiplicity management (for lower regularity at knots, such as shocks)
 
 ## Installation
 
@@ -101,6 +103,10 @@ The interface will open in your default browser.
     Export reproducible R code
 
     Run built-in demos
+    
+    View Bspline Basis, derivatives
+    
+    Manage knots multiplicity
 
 ### Docker Deployment
 A Docker image is available for easy deployment:
