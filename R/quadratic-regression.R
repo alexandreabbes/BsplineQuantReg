@@ -79,7 +79,7 @@ SplineQuadraticQuant <- function(xtab,
     if (length(convcons) == 1) {
       convcons <- rep(convcons, (kn))
     }
-    if (length(convcons) < (kn + 1)) {
+    if (length(convcons) < (kn)) {
       message("Not enough convexity constraints, completing with 0")
       convcons <- c(convcons, rep(0, kn - length(convcons)))
     }

@@ -107,7 +107,7 @@ SplineLinearQuant <- function(xtab,
       if (monot[i] != 0) {
         #if ((knot[i]!=knot[i-1])){# if multiple knots ignore
         # Derivative on interval i is constant
-          print(deriv1_coeff[i,])
+
         deriv_val <- sum(alpha * deriv1_coeffs[i, ])
 
 #        if (monot[i] > 0) {

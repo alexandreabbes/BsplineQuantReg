@@ -1,7 +1,7 @@
 Package: BsplineQuantReg
 Type: Package
 Title: 'Constrained Quantile Regression with B-Splines'
-Version: 0.2.4
+Version: 0.2.5
 Date: 2026-07-26
 Authors@R: person("Alexandre", "Abbes", email = "alexandre.abbes@proton.me", role = c("aut", "cre"))
 Description: Quantile regression with B-splines under shape constraints.
@@ -16,7 +16,8 @@ Description: Quantile regression with B-splines under shape constraints.
     rewritten for consistency. This package provides an original
     B-spline library for conversion between PP-form and B-spline
     representation, evaluation, differentiation, callable and
-    non-callable objects, all based on "De Boor\'s" theory. It also
+    non-callable objects, print human readable pp forms, view basis,
+    all based on "De Boor\'s" theory. It also
     extends to multiple knots to catch up singularities. This feature is
     robust in the package including for constrained regression.
     This R implementation is intended for demonstration

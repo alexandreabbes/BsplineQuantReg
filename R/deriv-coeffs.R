@@ -302,8 +302,8 @@ bspline_to_deriv_coeffs_lin <- function(tn,
       a1 <- basis[j, nu, 1]
 
       # First derivative: P'(u) = a1 (constant)
-      # Normalized: a1/h on [0,1]
-      deriv1_coeffs[nu - degree, j] <- a1 / h
+      # Normalized: a1*h on [0,1]
+      deriv1_coeffs[nu - degree, j] <- a1*h
     }
   }
 
