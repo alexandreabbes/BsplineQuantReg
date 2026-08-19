@@ -47,13 +47,13 @@ else {if (is.null(tn)){
       h = sn[nu + 1] - sn[nu]
       c3 <- basis[j, nu, 1]
       c2 <- basis[j, nu, 2]
-      a3 <- 3 * c3 * h^2
-      a2 <- 2 * basis[j, nu, 2] * h
-      a1 <- basis[j, nu, 3]
+      a3 <- 3 * c3 * h^3
+      a2 <- 2 * basis[j, nu, 2] * h^2
+      a1 <- basis[j, nu, 3]*h
       # coeffs_poly est [a3, a2, a1, a0] a0+a1*x+a_2*x^2+a3*x^3
       deriv_coeffs[nu - degree, j, ] <- c(a3, a2, a1)
-      deriv2_val[nu - degree, j] <- c2
-      deriv3_val[nu - degree, j] <- c3 #up to a factor 6, but the sign is the same.
+      deriv2_val[nu - degree, j] <- c2*h^2
+      deriv3_val[nu - degree, j] <- c3*h #up to a factor 6, but the sign is the same.
     }
 
     # for the last knot the second deriv is an affine function
