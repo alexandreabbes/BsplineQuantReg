@@ -290,6 +290,7 @@ bspline_to_deriv_coeffs_lin <- function(tn,
 
   # First derivative: constant on each interval
   # deriv1_coeffs[interval, basis] = constant value
+  #deriv1_coeff <-Spline_der_knot(BB,der=1)
   deriv1_coeffs <- array(0, dim = c(kn, N))
 
   for (j in 1:N) {

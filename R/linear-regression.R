@@ -71,6 +71,9 @@ SplineLinearQuant <- function(xtab,
                                             x_values = xtab,
                                             verbose = verbose)
 
+
+
+
   B <- deriv_data$d0
   B <- t(B)  # Design matrix: n x N
 
@@ -102,15 +105,18 @@ SplineLinearQuant <- function(xtab,
   if (any(monot != 0)) {
     for (i in 1:kn) {
       if (monot[i] != 0) {
+        #if ((knot[i]!=knot[i-1])){# if multiple knots ignore
         # Derivative on interval i is constant
+          print(deriv1_coeff[i,])
         deriv_val <- sum(alpha * deriv1_coeffs[i, ])
 
-        if (monot[i] > 0) {
-          constraints <- c(constraints, list(deriv_val >= 0))
-        } else {
-          constraints <- c(constraints, list(deriv_val <= 0))
+#        if (monot[i] > 0) {
+          constraints <- c(constraints, list(monot[i]*deriv_val >= 0))
+ #       } else {
+  #        constraints <- c(constraints, list(deriv_val <= 0))
+  #      }
+        #}
         }
-      }
     }
   }
 
