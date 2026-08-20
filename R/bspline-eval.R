@@ -143,10 +143,10 @@ bs_direct <- function(Basis,
       )
     )
   }
-
-  if (d > 0) {
+  bb=array(0,dim=c(nsplines,nsplines-d-diff,d+1))
+  if (d >= 0) {
     yvalues = array(data = 0, c(nsplines, n_values))
-    bb = base[, (d + 1 + diff):(nsplines), ] #only keep the effective pieces
+    bb[,,] = base[, (d + 1 + diff):(nsplines), ] #only keep the effective pieces
     for (j in 1:nsplines)
       #go through splines of the base
     {
@@ -155,33 +155,22 @@ bs_direct <- function(Basis,
         if (verbose) {
           print("only one piece")
         }
-        p = makpp(bb[j, ], tn = knot)
+      #  p = makpp(bb[j, ], tn = knot)
         if (verbose) {
           print("function number", j, "is", p)
         }
 
-        yvalues[j, ] <- evalpp(p, x_values)
+       # yvalues[j, ] <- evalpp(p, x_values)
       }
-      else {
+#      else {
 
         p = makpp(bb[j, , ], tn = knot)
 
         yvalues[j, ] <- evalpp(p, x_values)
-      }
+ #     }
     }
   }
-  if (d == 0) {
-    yvalues = array(data = 0, c(nsplines, n_values))
 
-    bb = base[, (1 + diff):nsplines, 1]
-    for (j in 1:nsplines)
-    {
-      print(j)
-      p = makpp(bb[j, ], tn = knot)
-
-      yvalues[j, ] <- evalpp(p, x_values)
-    }
-  }
 
   return(yvalues)
 }

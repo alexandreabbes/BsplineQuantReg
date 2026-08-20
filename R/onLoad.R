@@ -5,9 +5,11 @@
   packageStartupMessage(
     "BsplineQuantReg loaded.\n",
     "Polynomial and spline functions are reimplemented for consistency.\n",
-    "Use test_karlin_simple() for a first demo, you may give the degree as a parameter."
+    "Use test_karlin_simple() for a first demo, you may give the degree as a parameter.
+    Use the gui BsplineQuantRegGui available as an app."
   )
 }
+
 #' Package load message
 #'
 #' @keywords internal

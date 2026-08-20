@@ -1,3 +1,8 @@
+
+##fixed:
+-evaluation of Bsplines of degree=0 and only 2 knots (1 intervall):
+change creting first a zero array with all dimensions.
+
 Version=0.2.5 (08/2026)
 ##fixed
 -multiple knots when degree=1 and constraints: inconstistant dividing -> multiplying  by the delta_knots. 0 when  multiple knots  caused error)

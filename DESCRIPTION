@@ -1,7 +1,7 @@
 Package: BsplineQuantReg
 Type: Package
 Title: 'Constrained Quantile Regression with B-Splines'
-Version: 0.2.5
+Version: 0.2.6
 Date: 2026-07-26
 Authors@R: person("Alexandre", "Abbes", email = "alexandre.abbes@proton.me", role = c("aut", "cre"))
 Description: Quantile regression with B-splines under shape constraints.
