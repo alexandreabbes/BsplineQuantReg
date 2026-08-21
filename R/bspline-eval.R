@@ -154,9 +154,6 @@ bs_direct <- function(Basis,
         # In case of a single piece
         if (verbose) {
           print("only one piece")
-        }
-      #  p = makpp(bb[j, ], tn = knot)
-        if (verbose) {
           print("function number", j, "is", p)
         }
 

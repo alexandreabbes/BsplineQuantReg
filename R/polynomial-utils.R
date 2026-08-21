@@ -292,14 +292,14 @@ evalpp <- function(p, x_values) {
 #' Creates a PP structure from polynomial coefficients and knots.
 #' If callable = TRUE, returns a function that evaluates the PP.
 #'
-#' @param coeff coefficients matrix or pp polynomial. Coefficient matrix (kn x (degree+1))
-#' @param tn a Knot vector of length kn+1. Needed if coefficient is not pp
+#' @param coeff matrix (coefficents) or pp polynomial. Coefficient matrix (kn x (degree+1))
+#' @param tn  vector (knots) of length kn+1. Needed if coefficient is not pp
 #' @param callable Boolean; if TRUE, returns a callable function
 #' @param verbose Boolean
 #' @return A PP object or a callable function
 #' @export
 makpp <- function(coeff,
-                  tn=NULL,
+                  tn=c(0,1),
                   callable = FALSE,
                   verbose = FALSE) {
   if ( inherits(coeff,'callable_pp')){
@@ -327,23 +327,31 @@ makpp <- function(coeff,
           cat("transform 'non_callable_pp' to 'callable_pp'\n")
         }}
     }
-#  coeff<-as.array(coeff)
 
+  coeff<-as.matrix(coeff)
+  tn<-as.vector(tn)
 
-  if (length(tn) == 2) {
-    kn <-1 #only one intervals
-    degree<-length(coeff)-1 # only one polynopial
-  } else if (!is.null(dim(coeff))) {
-    kn <- dim(coeff)[1]
-    degree <- dim(coeff)[2] - 1
-  } else if (any(dim(coeff)==1) || is.null(dim(coeff))){
-    degree = 0
-    kn <- length(coeff)
+  kn<-length(tn)-2
+
+  if (kn!=dim(coeff)[1]){
+    if (kn==dim(coeff)[2]){coeff<-t(coeff)
+    if (verbose) message('Only transposed coefficients matrix matches knots. Transposing')}
   }
+  else{
+    stop("Dimension of coefficients and number of knots do not match")
+    }
+  degree<-dim(coeff)[2]
 
-  if (length(tn) != (kn + 1)) {
-    stop("length of coefficients and number of knots do not match")
-  }
+#  if (length(tn) == 2) {
+#    kn <-1 #only one intervals
+#    degree<-length(coeff)-1 # only one polynopial
+#  } else if (!is.null(dim(coeff))) {
+#    kn <- dim(coeff)[1]
+#    degree <- dim(coeff)[2] - 1
+#  } else if (any(dim(coeff)==1) || is.null(dim(coeff))){
+#    degree = 0
+#    kn <- length(coeff)
+# }
 
   # Creer l'objet PP
   pp_obj <- list(coeff = coeff,
@@ -557,10 +565,9 @@ print.callable_pp <- function(x, ...) {
     n_intervals
     else
       "unknown", "\n")
-  cat("  Knots:", if (!is.null(knot))
-    length(knot)
-    else
-      "unknown", "\n")
+  cat("  Knots (", length(knot),") :",paste(knot,collapse=', '),"\n")
+
+
   if (!is.null(dim(coeff))) {
     cat(" coefficients dimension:",
         dim(coeff)[1],
