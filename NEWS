@@ -1,3 +1,5 @@
+##added
+monotone quantile regression with piecewise constant functions (splines of degree 0)
 
 ##fixed:
 -evaluation of Bsplines of degree=0 and only 2 knots (1 intervall):

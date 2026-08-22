@@ -75,9 +75,21 @@ quantile_spline <- function(xtab,
   if (is.null(knot)){knot=c(min(xtab),max(xtab))}
 
     # Validate degree
-  if (degree < 1 || degree > 4) {
+  if (degree < 0 || degree > 4) {
     stop("degree must be between 1 and 4. Received: ", degree)
   }
+  if (degree == 0) {
+    fit <- SplineConstantQuant(
+      xtab,
+      ytab,
+      knot,
+      tau = tau,
+      monot = monot,
+      solver = solver,
+      weight = weight,
+      verbose = verbose,
+      type_reg=type_reg
+    )}
 
   # Dispatch to the appropriate function based on degree
   if (degree == 1) {
