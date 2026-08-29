@@ -1,10 +1,10 @@
-Version=0.2.6
-##added
-monotone quantile regression with piecewise constant functions (splines of degree 0)
+##to be changed
+- add regression with degree 0 
 
 ##fixed:
 -evaluation of Bsplines of degree=0 and only 2 knots (1 intervall):
-simplify most of functions by creating first a zero array with all dimensions.
+change by creating first a zero array with all dimensions instead of dynamic array that can lose one dimension by internal coherence of R. It also impacts view_basis() function and bs-direct in the same configuration.
+
 
 Version=0.2.5 (08/2026)
 ##fixed

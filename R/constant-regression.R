@@ -70,7 +70,7 @@ SplineConstantQuant <- function(xtab,
   if (verbose) {
     message("Monotonicity constraints:", paste(monot, collapse = " "))
   }
-  fonct<-function(x,tau, type){
+  fonct<-function(x,tau, type=type_reg){
 #    print(type_reg)
      if (type=='mean_square'){
        return(mean(x))}

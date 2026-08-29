@@ -75,7 +75,7 @@ quantile_spline <- function(xtab,
   if (is.null(knot)){knot=c(min(xtab),max(xtab))}
 
     # Validate degree
-  if (degree < 0 || degree > 4) {
+  if (degree < 0 || degree < 0) {
     stop("degree must be between 1 and 4. Received: ", degree)
   }
   if (degree == 0) {
@@ -145,7 +145,20 @@ quantile_spline <- function(xtab,
       type_reg=type_reg
     )
   }
-
+  else if (degree > 4) {
+    fit <- SplinePolynQuant(
+      xtab,
+      ytab,
+      knot,
+      tau = tau,
+      degree=degree,
+      convcons = convcons,
+      der3cons = der3cons,
+      solver = solver,
+      weight = weight,
+      verbose = verbose,
+      type_reg=type_reg
+)}
   # Return callable object if requested
 
   result = make_spline(fit, callable = callable)

@@ -17,4 +17,3 @@ Function values at the requested points
 \description{
 Evaluates a piecewise polynomial (PP form)  function at given points.
 }
-\keyword{internal}
