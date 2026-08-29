@@ -211,8 +211,113 @@ polyderiv <- function(p, der = 1) {
 #' @return Function values at the requested points
 #' @export
 #' @keywords internal
+#'
+#' Evaluates a piecewise polynomial (PP form) function at given points.
+#'
+#' @param p List with components \code{ext_knot} (ext_knot) and \code{coeff}
+#' @param x_values Vector of evaluation points
+#' @return Function values at the requested points
+#' @export
 
 evalpp <- function(p, x_values) {
+  if (inherits(p, 'callable_pp')) {
+    p <- get_parameters(p)
+  }
+
+  tn <- p$knot
+  coeff <- as.matrix(p$coeff)
+  kn <- nrow(coeff)  # Nombre d'intervalles = nombre de lignes de coeff
+
+  # Si un seul intervalle
+  if (kn == 1) {
+    return(poly_eval(coeff[1, ], x_values - tn[1]))
+  }
+
+  n_values <- length(x_values)
+  pval <- numeric(n_values)
+
+  for (idx in 1:n_values) {
+    x <- x_values[idx]
+
+    # Gestion des cas extrêmes
+    if (x < tn[1]) {
+      # Extrapolation avec le premier intervalle
+      i <- 1
+      h <- x - tn[i]
+    } else if (x >= tn[kn + 1]) {
+      # Extrapolation avec le dernier intervalle
+      i <- kn
+      h <- x - tn[i]
+    } else {
+      # Trouver l'intervalle
+      i <- findInterval(x, tn, rightmost.closed = TRUE)
+      # findInterval retourne 0 si x < tn[1]
+      if (i == 0) i <- 1
+      if (i > kn) i <- kn
+      h <- x - tn[i]
+    }
+
+    # Vérifier que i est valide
+    if (i < 1 || i > kn) {
+      warning(sprintf("Intervalle %d invalide pour x = %f", i, x))
+      pval[idx] <- NA
+    } else {
+      pval[idx] <- poly_eval(coeff[i, ], h)
+    }
+  }
+
+  return(pval)
+}
+evalpp_bak2 <- function(p, x_values) {
+  if (inherits(p, 'callable_pp')) {
+    p <- get_parameters(p)
+  }
+
+  tn <- p$knot
+  coeff <- as.matrix(p$coeff)
+  kn <- nrow(coeff)  # Nombre d'intervalles = nombre de lignes de coeff
+
+  # Si un seul intervalle
+  if (kn == 1) {
+    return(poly_eval(coeff[1, ], x_values - tn[1]))
+  }
+
+  n_values <- length(x_values)
+  pval <- numeric(n_values)
+
+  for (idx in 1:n_values) {
+    x <- x_values[idx]
+
+    # Gestion des cas extrêmes
+    if (x < tn[1]) {
+      # Extrapolation avec le premier intervalle
+      i <- 1
+      h <- x - tn[i]
+    } else if (x >= tn[kn + 1]) {
+      # Extrapolation avec le dernier intervalle
+      i <- kn
+      h <- x - tn[i]
+    } else {
+      # Trouver l'intervalle
+      i <- findInterval(x, tn, rightmost.closed = TRUE)
+      # findInterval retourne 0 si x < tn[1]
+      if (i == 0) i <- 1
+      if (i > kn) i <- kn
+      h <- x - tn[i]
+    }
+
+    # Vérifier que i est valide
+    if (i < 1 || i > kn) {
+      warning(sprintf("Intervalle %d invalide pour x = %f", i, x))
+      pval[idx] <- NA
+    } else {
+      pval[idx] <- poly_eval(coeff[i, ], h)
+    }
+  }
+
+  return(pval)
+}
+evalpp_bak <- function(p, x_values) {
   #this evaluates a polynomial p under the pp form,
   #p if given with its knot and the local coefficients
   #This funciton is independent from the order convention
@@ -220,7 +325,7 @@ evalpp <- function(p, x_values) {
   #The x_values out of the knot give 0 in the corresponding yvalues
   if (inherits(p,'callable_pp')){p<-get_parameters(p)}
   tn = p$knot
-  coeff = p$coeff
+  coeff = t(as.matrix(p$coeff))
   kn = length(tn) - 1 #number of intervals
   n_values = length(x_values)
   degree<-p$degree
@@ -232,55 +337,46 @@ evalpp <- function(p, x_values) {
   } else if (kn>1)
   {
     if (x_values[1] < tn[1]) {
-      message("Some x values smaler than first knot, extrapolating")
+      message("Some x values smaler than first knot, extrapolating")}
       #values before the first knot
-      pre_k = x_values[(x_values < tn[1])]
+      pre_k = x_values[(x_values < tn[2])] #join he values befoire knot No2
       h = pre_k - tn[1]
-      if (degree>0){
         poly_loc <- coeff[1, ] # extrapolate using the first piece
         pval <- poly_eval(poly_loc, h)
-      } else if (degree==0){
-        pval=rep(coeff[1],length(h))
-      }}
 
-    for (i in 1:(kn))
+    for (i in 2:(kn-1))
     {
       xval = x_values[(x_values >= tn[i]) & (x_values < tn[i + 1])]
-      if (degree>0)
-      {poly_loc <- coeff[i, ]} else{
-        poly_loc <- coeff[i]
-      }
+      poly_loc <- coeff[i, ]
 
-      # reverse our convention to match polyval convention
-      #pval<-c(pval,polyval(p=rev(poly_loc),xval) )
       h = xval - tn[i]
-      #shit to fit the local basis
+
       yval <- poly_eval(poly_loc, h)
       pval <- c(pval, yval)
     }
+    #xval = x_values[x_values == tn[kn + 1]]
 
+    #if (length(xval) > 0) {
+    #  h = tn[kn + 1] - tn[kn] # if the last knot is in x_values
+    #  yval<-poly_eval(poly_loc, h)
+    #  pval = c(pval,yval )
+    #}
 
-    xval = x_values[x_values == tn[kn + 1]]
-    if (length(xval) > 0) {
-      h = tn[kn + 1] - tn[kn] # if the last knot is in x_values
-      yval<-poly_eval(poly_loc, h)
-      pval = c(pval,yval )
-
-    }
     if (x_values[n_values] > tn[kn + 1]) {
-      message("Some x values greater than last knot, extrapolating")
+      message("Some x values greater than last knot, extrapolating")}
       # values after the last knot
-      post_k = x_values[(x_values > tn[kn + 1])]
+    post_k = x_values[(x_values >= tn[kn])] #include last interval
+    #print(post_k)
       h = post_k - tn[kn]
-      if(degree>0){
+#      if(degree>0){
         poly_loc <- coeff[kn, ] # extrapolate using the last piece
         yval<- poly_eval(poly_loc, h)
         pval <- c(pval, yval)
-      }
-      else if (degree==0){
+ #     }
+#      else if (degree==0){
 
-        pval<-c(pval,rep(coeff[kn],length(h) ))}
-    }
+ #       pval<-c(pval,rep(coeff[kn],length(h) ))}
+#    }
   }
 
   return(pval)
@@ -331,15 +427,17 @@ makpp <- function(coeff,
   coeff<-as.matrix(coeff)
   tn<-as.vector(tn)
 
-  kn<-length(tn)-2
+  kn<-length(tn)-1
 
-  if (kn!=dim(coeff)[1]){
-    if (kn==dim(coeff)[2]){coeff<-t(coeff)
-    if (verbose) message('Only transposed coefficients matrix matches knots. Transposing')}
+  if (kn!=dim(coeff)[2]){
+    coeff<-t(coeff)
+
+    if (verbose) message('Only transposed coefficients matrix matches knots. Transposing')
   }
-  else{
-    stop("Dimension of coefficients and number of knots do not match")
-    }
+  if (kn!=dim(coeff)[2]){
+      stop("Dimension of coefficients and number of knots do not match")
+  }
+
   degree<-dim(coeff)[2]
 
 #  if (length(tn) == 2) {
@@ -354,7 +452,7 @@ makpp <- function(coeff,
 # }
 
   # Creer l'objet PP
-  pp_obj <- list(coeff = coeff,
+  pp_obj <- list(coeff = t(coeff),
                  knot = tn,
                  degree = degree)
   class(pp_obj) <- "non_callable_pp"

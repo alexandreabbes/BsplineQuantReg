@@ -1,3 +1,7 @@
+#''
+#' Performs quantile/mean regression using constant B-splines with monotonicity constraints.
+#' No solver is needed, since for the degree 0, the B-splines in the basis are
+#' independent piece-wise constants.
 #'
 #' @param xtab Predictor vector (x)
 #' @param ytab Response vector (y)
@@ -13,13 +17,13 @@
 #' @param type_reg 'quantile' or 'mean_square' type of regression
 #' i.e form of the objective.
 #' @return A list containing coefficients, degree, and knots
+#'
 #' @export
 SplineConstantQuant <- function(xtab,
                               ytab,
                               knot=NULL,
                               tau=0.5,
                               monot = 0,
-                              solver = "CLARABEL",
                               weight = NULL,
                               verbose = FALSE,
                               type_reg='quantile') {
@@ -57,6 +61,8 @@ SplineConstantQuant <- function(xtab,
   if (verbose) {
     message("=== Constant Quantile Regression (degree = 1) ===")
     message(sprintf("Knots: %d, Basis functions: %d", kn, N))
+    if (type_reg=='mean_square') message('Mean square regression')
+    else message('Quantile regression')
   }
 
 
@@ -64,11 +70,12 @@ SplineConstantQuant <- function(xtab,
   if (verbose) {
     message("Monotonicity constraints:", paste(monot, collapse = " "))
   }
-  fonct<-function(x,tau){
-    print(type_reg)
-     if (type_reg=='mean_square'){print("mean square")
+  fonct<-function(x,tau, type){
+#    print(type_reg)
+     if (type=='mean_square'){
        return(mean(x))}
-    else {return(quantile(x,tau))}
+    else {
+    return(quantile(x,tau))}
 
 }
 
@@ -83,7 +90,7 @@ SplineConstantQuant <- function(xtab,
       if (s!=0 & i>1)
       coeff[i]<-s*max(s*fonct(local_weighted_ytab,tau),s*coeff[i-1])
       else
-      coeff[i]<-fonct(local_weighted_ytab,tau)
+      coeff[i]<-fonct(local_weighted_ytab,tau,type=type_reg)
       }
 
     Bspline<-list(
@@ -91,4 +98,7 @@ SplineConstantQuant <- function(xtab,
     degree = 0,
     knot = knot,
     result=NULL)
-  }
+}
+
+
+

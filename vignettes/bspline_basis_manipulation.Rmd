@@ -1,15 +1,6 @@
-title: "B-spline Basis Manipulation" 
+title: "B-spline Basis Manipulation"
 
-author: "Alexandre Abbes" date: "`r Sys.Date()`" 
-output: rmarkdown::html_vignette: 
-toc: true 
-toc_depth: 3 
-fig_width: 7 
-fig_height: 5
-vignette: >
-%\VignetteIndexEntry{B-spline Basis Manipulation} 
-%\VignetteEngine{knitr::rmarkdown} 
-%\VignetteEncoding{UTF-8} ---
+author: "Alexandre Abbes" date: "`r Sys.Date()`" output: rmarkdown::html_vignette: toc: true toc_depth: 3 fig_width: 7 fig_height: 5 vignette: \> %\VignetteIndexEntry{B-spline Basis Manipulation} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8} ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.width = 7, fig.height = 5)
@@ -70,7 +61,7 @@ The `view_basis()` function provides a quick visualization of all basis function
 
 ```{r view-basis-2}
 # Visualize the basis
-view_basis(basis)
+view_basis(basis_example)
 ```
 
 ### Visualizing Different Degrees

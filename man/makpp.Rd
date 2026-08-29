@@ -4,12 +4,12 @@
 \alias{makpp}
 \title{Build a piecewise polynomial (PP) form}
 \usage{
-makpp(coeff, tn = NULL, callable = FALSE, verbose = FALSE)
+makpp(coeff, tn = c(0, 1), callable = FALSE, verbose = FALSE)
 }
 \arguments{
-\item{coeff}{coefficients matrix or pp polynomial. Coefficient matrix (kn x (degree+1))}
+\item{coeff}{matrix (coefficents) or pp polynomial. Coefficient matrix (kn x (degree+1))}
 
-\item{tn}{a Knot vector of length kn+1. Needed if coefficient is not pp}
+\item{tn}{vector (knots) of length kn+1. Needed if coefficient is not pp}
 
 \item{callable}{Boolean; if TRUE, returns a callable function}
 

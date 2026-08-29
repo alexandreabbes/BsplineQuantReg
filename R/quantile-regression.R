@@ -85,7 +85,6 @@ quantile_spline <- function(xtab,
       knot,
       tau = tau,
       monot = monot,
-      solver = solver,
       weight = weight,
       verbose = verbose,
       type_reg=type_reg
