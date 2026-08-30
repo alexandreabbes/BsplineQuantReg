@@ -65,62 +65,13 @@ SplinePolynQuant <- function(xtab,
     cat(sprintf("knot: %d, Basis functions: %d\n", kn, N))
   }
 
-  # Handle constraints
-
-
-
-  #"contraintes convexes
-
-  # eliminate the null (unconstrained) case
-  if (any(convcons != 0)) {
-    if (length(convcons) == 1) {
-      convcons <- rep(convcons, (kn + 1))
-    }
-    if (length(convcons) < (kn + 1)) {
-      message("Not enough convexity constraints, completing with 0")
-      convcons <- c(convcons, rep(0, kn + 1 - length(convcons)))
-    }
-    if (verbose) {
-      message("Convexity constraints (Linear):", convcons, "\n")
-    }
-    }
-if (degree==5){
-  #3rd derivative constraints
-  if (any(der3cons != 0)) {
-    #if (dim(deriv_coeffs3)[2]!=N){
-    #prepare the values for matrix mult.      #calculation
-    # deriv_coeff3=t(deriv_coeffs3)}
-    if (length(der3cons) == 1) {
-      der3cons <- rep(der3cons, kn)
-    }
-    if (length(der3cons) < kn+1) {
-      message("not enough 3rd order constraints, completing with 0")
-      der3cons = c(der3cons, rep(0, kn+1 - length(der3cons)))
-    }
-    if (verbose) {
-      message("3rd order derivative constraints (constant):",
-              der3cons,
-              "\n")
-    }
-  }
-}
 
   # Build B-spline basis and derivative coefficients
-  #deriv_data <- bspline_to_deriv_coeffs_general(knot, degree = degree, x_values = xtab)
   sn <- c(rep(knot[1], degree), knot, rep(knot[kn + 1], degree))
 
-  # Build B-spline basis
   BB <- Bspline_base(sn, degree = degree)
-  #basis <- BB$base
   B<-bs_direct(BB,xtab)
-  #B <- deriv_data$d0
   B <- t(B)  # Design matrix: n x N
-
-  # Derivative coefficients
-#  deriv1_coeffs <- deriv_data$d1  # [kn, N, 4] for cubic derivative
-#  deriv2_coeffs <- deriv_data$d2  # [kn, N, 3] for quadratic second derivative
-#  deriv3_knot <- deriv_data$d3   # [kn+1, N] for linear third derivative at knot
-
   # Center data
   y_mean <- mean(ytab)
   ytab_centered <- ytab - y_mean
@@ -143,61 +94,116 @@ if (degree==5){
   }
   objective <- Minimize(weighted_loss)
 
-#  constraints <- list()
 
-  # 1. Monotonicity constraints (Karlin-Studden on cubic derivative)
-  # Derivative is cubic: P'(u) = a*u^3 + b*u^2 + c*u + d
-  #if (any(convcons!= 0)) {
+
+# Handle constraints
+
+
+if (degree==5){
+  #"contraintes convexes
+
+  # eliminate the null (unconstrained) case
+  if (any(convcons != 0)) {
+    if (length(convcons) == 1) {
+      convcons <- rep(convcons, (kn + 1))
+    }
+    if (length(convcons) < (kn + 1)) {
+      message("Not enough convexity constraints, completing with 0")
+      convcons <- c(convcons, rep(0, kn + 1 - length(convcons)))
+    }
+    if (verbose) {
+      message("Convexity constraints (Linear):", convcons, "\n")
+    }
+    }
+
+  #3rd derivative constraints
+  if (any(der3cons != 0)) {
+    #if (dim(deriv_coeffs3)[2]!=N){
+    #prepare the values for matrix mult.      #calculation
+    # deriv_coeff3=t(deriv_coeffs3)}
+    if (length(der3cons) == 1) {
+      der3cons <- rep(der3cons, kn)
+    }
+    if (length(der3cons) < kn+1) {
+      message("not enough 3rd order constraints, completing with 0")
+      der3cons = c(der3cons, rep(0, kn+1 - length(der3cons)))
+    }
+    if (verbose) {
+      message("3rd order derivative constraints (constant):",
+              der3cons,
+              "\n")
+    }
+  }
+
+
+
+  deriv_data <- bspline_to_deriv_coeffs_general(BB)
+
+  # Derivative coefficients
+  #deriv1_coeffs <- deriv_data$d1  # [kn, N, 4] for cubic derivative
+  deriv2_coeffs <- deriv_data$d2  # [kn, N, 3] for quadratic second derivative
+  deriv3_coeffs <- deriv_data$d3   # [kn+1, N] for linear third derivative at knot
+
+
+  constraints <- list()
+
+  # 1. convexity constraints (Karlin-Studden on cubic derivative)
+  # Second Derivative is cubic: P'(u) = a*u^3 + b*u^2 + c*u + d
+  if (any(convcons!= 0)) {
+    cat("constraints are applyed")
     # Create z variables for cubic constraints (one per interval)
-    #z0_vars <- list()
-    #z1_vars <- list()
+    z0_vars <- list()
+    z1_vars <- list()
 
-    #for (i in 1:kn) {
-      #if (monot[i] != 0) {
-        #z0_vars[[i]] <- Variable(1, name = paste0("z0_monot_", i))
-        #z1_vars[[i]] <- Variable(1, name = paste0("z1_monot_", i))
+    for (i in 1:kn) {
+      if (verbose){cat("Applying convexity on itervall ",i,"\n") }
+      if (convcons[i] != 0) {
+        z0_vars[[i]] <- Variable(1, name = paste0("z0_convcons_", i))
+        z1_vars[[i]] <- Variable(1, name = paste0("z1_convcons_", i))
 
-        # Coefficients of the derivative on interval i
-        # deriv1_coeffs[i, j, ] = [a3, a2, a1, a0] for a3*u^3 + a2*u^2 + a1*u + a0
-        #a3 <- sum(alpha * deriv1_coeffs[i, , 1])
-        #a2 <- sum(alpha * deriv1_coeffs[i, , 2])
-        #a1 <- sum(alpha * deriv1_coeffs[i, , 3])
-        #a0 <- sum(alpha * deriv1_coeffs[i, , 4])
+        #Coefficients of the derivative on interval i
+        #deriv2_coeffs[i, j, ] <- [a3, a2, a1, a0]  #for a3*u^3 + a2*u^2 + a1*u + a0
+        a3 <- sum(alpha * deriv2_coeffs[i, , 1])
+        a2 <- sum(alpha * deriv2_coeffs[i, , 2])
+        a1 <- sum(alpha * deriv2_coeffs[i, , 3])
+        a0 <- sum(alpha * deriv2_coeffs[i, , 4])
 
         # Apply sign of monotonicity
-        #s <- sign(monot[i])
+        s <- sign(convcons[i])
 
         # Karlin-Studden constraints for cubic
-        #karlin_constr <- apply_karlin_cubic(a3, a2, a1, a0, z0_vars[[i]], z1_vars[[i]], sign = s)
-        #constraints <- c(constraints, karlin_constr)
-    #  }
-   #
+        karlin_constr <- apply_karlin_cubic(a3, a2, a1, a0, z0_vars[[i]], z1_vars[[i]], sign = s)
+        constraints <- c(constraints, karlin_constr)
+      }
+    }
+  }
+}
   #
 
-  # 2. Convexity constraints (Karlin-Studden on quadratic second derivative)
+  # 2. Third derivative constraints (Karlin-Studden on quadratic second derivative)
   # Second derivative is quadratic: P''(u) = a*u^2 + b*u + c
-#  if (any(der3cons != 0)) {
-    #z_conv_vars <- list()
+  if (any(der3cons != 0)) {
+    z_der3_vars <- list()
 
-#    for (i in 1:kn) {
-  #     if (convcons[i] != 0) {
-  #       z_conv_vars[[i]] <- Variable(1, name = paste0("z_conv_", i))
-  #
-  #       # Coefficients of the second derivative on interval i
-  #       # deriv2_coeffs[i, j, ] = [a2, a1, a0] for a2*u^2 + a1*u + a0
-  #       a2 <- sum(alpha * deriv2_coeffs[i, , 1])
-  #       a1 <- sum(alpha * deriv2_coeffs[i, , 2])
-  #       a0 <- sum(alpha * deriv2_coeffs[i, , 3])
-  #
+    for (i in 1:kn) {
+       if (der3cons[i] != 0) {
+         z_der3_vars[[i]] <- Variable(1, name = paste0("z_conv_", i))
+
+         # Coefficients of the second derivative on interval i
+         # deriv2_coeffs[i, j, ] = [a2, a1, a0] for a2*u^2 + a1*u + a0
+         a2 <- sum(alpha * deriv3_coeffs[i, , 1])
+         a1 <- sum(alpha * deriv3_coeffs[i, , 2])
+         a0 <- sum(alpha * deriv3_coeffs[i, , 3])
+
   #       # Apply sign of convexity
-  #       s <- sign(convcons[i])
+         s <- sign(der3cons[i])
   #
   #       # Karlin-Studden constraints for quadratic
-  #       karlin_constr <- apply_karlin_quadratic(a2, a1, a0, z_conv_vars[[i]], sign = s)
-  #       constraints <- c(constraints, karlin_constr)
-  #     }
-  #   }
-  # }
+         karlin_constr <- apply_karlin_quadratic(a2, a1, a0, z_der3_vars[[i]], sign = s)
+         constraints <- c(constraints, karlin_constr)
+       }
+     }
+   }
 
   # 3. Third derivative constraints (linear at knot)
   # For quartic splines, third derivative is affine on each interval

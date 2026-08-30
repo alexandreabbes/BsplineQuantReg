@@ -102,53 +102,6 @@ spline_eval <- function(Bspline,
 
 
 
-bs_direct_bak <- function(Basis, x_values = NULL, verbose = FALSE) {
-  if (is.null(x_values)) {
-    message("no xvalue given, computing at knots")
-    return(Spline_der_knot(Basis))
-  }
-
-  knot = Basis$knot
-  degree = Basis$degree
-  nsplines = Basis$n_splines
-  base = Basis$base
-
-  n_values = length(x_values)
-  yvalues = matrix(0, nrow = nsplines, ncol = n_values)
-
-  # Pour chaque spline de la base
-  for (j in 1:nsplines) {
-    # Extraire les coefficients
-    coeff <- base[j, , ]
-
-    # Si c'est un tableau 3D, prendre la bonne dimension
-    if (length(dim(coeff)) == 3) {
-      coeff <- coeff[1, , ]
-    }
-
-    # Si c'est une matrice, prendre la première ligne
-    if (is.matrix(coeff) && nrow(coeff) > 1) {
-      coeff <- coeff[1, ]
-    }
-
-    # Forcer en vecteur
-    coeff <- as.vector(coeff)
-
-    # Créer le PP
-    if (length(knot) == 2) {
-      # Un seul intervalle
-      pp <- makpp(matrix(coeff, nrow = 1), tn = knot)
-    } else {
-      # Plusieurs intervalles
-      pp <- makpp(coeff, tn = knot)
-    }
-
-    # Évaluer
-    yvalues[j, ] <- evalpp(pp, x_values)
-  }
-
-  return(yvalues)
-}
 
 
 #' Direct evaluation of a B-spline basis

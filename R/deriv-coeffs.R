@@ -318,9 +318,11 @@ bspline_to_deriv_coeffs_lin <- function(tn,
 }
 
 
-bspline_to_deriv_coeffs_general <- function(knot,
-                                          degree = 5,
-                                          x_values = 0) {
+bspline_to_deriv_coeffs_general <- function(BB,
+                                          x_values = 0)
+  {
+  knot<-BB$knot
+  degree<-BB$degree
   kn <- length(knot) - 1
   N <- kn + degree
 
@@ -328,11 +330,13 @@ bspline_to_deriv_coeffs_general <- function(knot,
   sn <- c(rep(knot[1], degree), knot, rep(knot[kn + 1], degree))
 
   # Build B-spline basis
-  BB <- Bspline_base(sn, degree = degree)
-  basis <- BB$base
+  #BB <- Bspline_base(sn, degree = degree)
+
+  D1BB <-Bspline_base_deriv(BB,der = 1)
+  basis <- D1BB$base
 
   # Number of intervals in extended notation
-  n_intervals <- length(sn) - 1
+  #n_intervals <- kn - 1 +2*degree
 
   # Derivative coefficients
   # First derivative: cubic on each interval -> [a3, a2, a1, a0] for a3*u^3 + a2*u^2 + a1*u + a0
@@ -357,50 +361,43 @@ bspline_to_deriv_coeffs_general <- function(knot,
 
       # First derivative: P'(u) = a1 + 2*a2*u + 3*a3*u^2 + 4*a4*u^3
       # Normalized: a1 + (2*a2*h)*u + (3*a3*h^2)*u^2 + (4*a4*h^3)*u^3
-      deriv1_coeffs[nu - degree, j, ] <- c(4 * a4 * h^3, 3 * a3 * h^2, 2 * a2 * h, a1)
+      deriv2_coeffs[nu - degree, j, ] <- c(4 * a4 * h^3, 3 * a3 * h^2, 2 * a2 * h, a1)
 
       # Second derivative: P''(u) = 2*a2 + 6*a3*u + 12*a4*u^2
       # Normalized: (2*a2) + (6*a3*h)*u + (12*a4*h^2)*u^2
-      deriv2_coeffs[nu - degree, j, ] <- c(12 * a4 * h^2, 6 * a3 * h, 2 * a2)
+      deriv3_coeffs[nu - degree, j, ] <- c(12 * a4 * h^2, 6 * a3 * h, 2 * a2)
     }
 
     # Third derivative at knot (for linear constraints)
     # For quartic splines, third derivative is affine on each interval
     # We evaluate at knot for linear constraints
-    for (i in 1:(kn + 1)) {
-      # Evaluate at knot i
-      if (i <= kn) {
-        # Use polynomial on interval i
-        nu <- degree + i
-        h <- sn[nu + 1] - sn[nu]
-        a3 <- basis[j, nu, 2]
-        a4 <- basis[j, nu, 1]
-        # P'''(x) = 6*a3 + 24*a4*(x - t_k)
-        # At left knot i (x = t_k): P'''(t_k) = 6*a3
-        deriv3_knot[i, j] <- 6 * a3
-      } else {
-        # Last knot: use polynomial on last interval
-        #P'''(t_{kn+1}) = 6*a3 + 24*a4*(t_{kn+1} - t_k)
-        nu <- degree + kn
-        h <- sn[nu + 1] - sn[nu]
-        a3 <- basis[j, nu, 2]
-        a4 <- basis[j, nu, 1]
-        deriv3_knot[i, j] <- 6 * a3 + 24 * a4 * h
-      }
+    # for (i in 1:(kn + 1)) {
+    #   # Evaluate at knot i
+    #   if (i <= kn) {
+    #     # Use polynomial on interval i
+    #     nu <- degree + i
+    #     h <- sn[nu + 1] - sn[nu]
+    #     a3 <- basis[j, nu, 2]
+    #     a4 <- basis[j, nu, 1]
+    #     # P'''(x) = 6*a3 + 24*a4*(x - t_k)
+    #     # At left knot i (x = t_k): P'''(t_k) = 6*a3
+    #     deriv3_knot[i, j] <- 6 * a3
+    #   } else {
+    #     # Last knot: use polynomial on last interval
+    #     #P'''(t_{kn+1}) = 6*a3 + 24*a4*(t_{kn+1} - t_k)
+    #     nu <- degree + kn
+    #     h <- sn[nu + 1] - sn[nu]
+    #     a3 <- basis[j, nu, 2]
+    #     a4 <- basis[j, nu, 1]
+    #     deriv3_knot[i, j] <- 6 * a3 + 24 * a4 * h
+    #   }
     }
-  }
 
-  # Design matrix if x_values provided
-  if (length(x_values) != 1) {
-    yvalues <- bs_direct(BB, x_values)
-  } else {
-    yvalues <- 0
-  }
+
 
   return(list(
-    d0 = yvalues,
-    d1 = deriv1_coeffs,
+
     d2 = deriv2_coeffs,
-    d3 = deriv3_knot
+    d3 = deriv3_coeffs
   ))
 }
