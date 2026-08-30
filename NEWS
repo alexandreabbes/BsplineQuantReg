@@ -1,10 +1,12 @@
 Version=0.2.6
+##todo : refactorise the regression for all problems with the same solver structure exept degree 0
 ##added
 monotone quantile regression with piecewise constant functions (splines of degree 0)
 
 ##fixed:
 -evaluation of Bsplines of degree=0 and only 2 knots (1 intervall):
 simplify most of functions by creating first a zero array with all dimensions.
+-output of result value of the fit value for quartic and greater degrees
 
 Version=0.2.5 (08/2026)
 ##fixed

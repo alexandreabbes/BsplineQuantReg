@@ -205,22 +205,27 @@ if (degree==5){
    }
 }
   # Solve the problem using new 'CVXR' syntax
-
   problem <- Problem(objective, constraints)
 
   result <- NULL
-  solvers_to_try <- c(solver, "CLARABEL", "HIGHS", "ECOS", "OSQP", "SCS", "MOSEK")
+  fallback_result <- NULL
+  solvers_to_try <- c(solver, "CLARABEL", "HIGHS", "OSQP", "SCS", "ECOS")
+  solvers_to_try <- unique(solvers_to_try)  # Supprimer les doublons
 
-  for (s in unique(solvers_to_try)) {
+  for (s in solvers_to_try) {
     if (verbose)
       cat("Trying solver:", s, "\n")
 
-    # Use new 'CVXR' syntax: psolve()
-    result <- tryCatch({
-      # Solve the problem with new syntax
-      opt_val <- psolve(problem, solver = toupper(s), verbose = verbose)
+    # Vérifier la disponibilité de ECOS
+    if (s == "ECOS" &&
+        !requireNamespace("ECOSolveR", quietly = TRUE)) {
+      if (verbose)
+        cat("  ECOS not available (ECOSolveR missing)\n")
+      next
+    }
 
-      # Create a result list compatible with old expectations
+    result <- tryCatch({
+      opt_val <- psolve(problem, solver = toupper(s), verbose = verbose)
       list(
         value = opt_val,
         status = status(problem),
@@ -228,35 +233,73 @@ if (degree==5){
       )
     }, error = function(e) {
       if (verbose)
-        cat("Failed:", e$message, "\n")
+        cat("  Failed:", e$message, "\n")
       NULL
     })
 
+    # Vérifier si le solveur a réussi
     if (!is.null(result) && !is.null(result$alpha_value)) {
-      if (verbose)
-        cat("Solver succeeded:", s, "\n")
-      break
+      if (result$status == "optimal") {
+        if (verbose)
+          cat("  Solver succeeded with optimal status:", s, "\n")
+        break  # OK, on sort de la boucle
+      } else if (result$status == "optimal_inaccurate") {
+        if (verbose)
+          cat("  Solver returned optimal_inaccurate:", s, "\n")
+        fallback_result <- result
+        # Continuer à essayer d'autres solveurs pour un meilleur résultat
+      } else {
+        if (verbose)
+          cat("  Solver returned non-optimal status:",
+              result$status,
+              "\n")
+        fallback_result <- result
+      }
     }
   }
 
+  # Après la boucle, vérifier le résultat
   if (is.null(result) || is.null(result$alpha_value)) {
-    warning("Optimization did not converge with any solver")
-    return(NULL)
+    # Utiliser le fallback si disponible
+    if (!is.null(fallback_result)) {
+      result <- fallback_result
+      if (verbose)
+        cat("Using fallback result with status:", result$status, "\n")
+    } else {
+      warning("Optimisation did not converge with any available solver")
+      return(NULL)
+    }
+  }
+
+  # Si le résultat est optimal_inaccurate, on peut quand même l'utiliser avec un avertissement
+  if (result$status == "optimal_inaccurate") {
+    warning("Solution may be inaccurate. Try another solver or adjust settings.")
   }
 
   alpha_val <- result$alpha_value + y_mean
   result$y_mean <- y_mean
+
   if (verbose) {
-    cat("Status:", result$status, "\n")
-    cat("Objective value:", result$value, "\n")
+    message(
+      " Statut:",
+      result$status,
+      "\n",
+      "Valeur objectif:",
+      result$value,
+      "\n",
+      "Coefficients alpha (range):",
+      range(alpha_val),
+      "\n"
+    )
   }
 
-  # Return results
+
   return(list(
     coeff = alpha_val,
     degree = degree,
-    knot = t(knot),
-    result <- result
+    knot = knot,
+    result = result
   ))
+
 }
 
