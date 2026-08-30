@@ -97,8 +97,7 @@ SplinePolynQuant <- function(xtab,
 
 
 # Handle constraints
-
-
+  constraints <- list()
 if (degree==5){
   #"contraintes convexes
 
@@ -145,7 +144,7 @@ if (degree==5){
   deriv3_coeffs <- deriv_data$d3   # [kn+1, N] for linear third derivative at knot
 
 
-  constraints <- list()
+
 
   # 1. convexity constraints (Karlin-Studden on cubic derivative)
   # Second Derivative is cubic: P'(u) = a*u^3 + b*u^2 + c*u + d
@@ -177,7 +176,7 @@ if (degree==5){
       }
     }
   }
-}
+
   #
 
   # 2. Third derivative constraints (Karlin-Studden on quadratic second derivative)
@@ -204,12 +203,9 @@ if (degree==5){
        }
      }
    }
-
-  # 3. Third derivative constraints (linear at knot)
-  # For quartic splines, third derivative is affine on each interval
-  # We impose sign constraints at knot
-
+}
   # Solve the problem using new 'CVXR' syntax
+
   problem <- Problem(objective, constraints)
 
   result <- NULL
