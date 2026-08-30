@@ -210,7 +210,7 @@ if (degree==5){
   # We impose sign constraints at knot
 
   # Solve the problem using new 'CVXR' syntax
-  problem <- Problem(objective)#, constraints)
+  problem <- Problem(objective, constraints)
 
   result <- NULL
   solvers_to_try <- c(solver, "CLARABEL", "HIGHS", "ECOS", "OSQP", "SCS", "MOSEK")
