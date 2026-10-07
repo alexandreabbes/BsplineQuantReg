@@ -272,73 +272,72 @@ evalpp <- function(p, x_values) {
 #' @return A PP object or a callable function
 #' @export
 makpp <- function(coeff,
-                  tn=c(0,1),
+                  tn=NULL,
                   callable = FALSE,
                   verbose = FALSE) {
-  if (callable) {
-   if ( inherits(coeff,'callable_pp')){
+
+  if ( inherits(coeff,'callable_pp')){
+    if (callable) {
       if(verbose){
         cat("Already a 'callable_pp'")}
-        return(coeff)}
-   else{ pp<-get_parameters(coeff)
 
-
-        coeff<-pp$coeff
-        tn<-pp$knot
-        degree<-pp$degree
-        if (verbose)
-          cat("transform 'non_callable_pp' to 'callable_pp'\n")
-        # Retourner une fonction callable
-        eval_func <- function(x_values) {
-          evalpp(pp_obj, x_values)
-          }
-
-        # Ajouter les parametres comme attributs
-        attr(eval_func, "coeff") <- coeff
-        attr(eval_func, "knot") <- tn
-        attr(eval_func, "degree") <- degree
-        attr(eval_func, "pp_obj") <- pp_obj
-
-        class(eval_func) <- c("callable_pp", "function")
-        return(eval_func)
-        }
-  }
-  if (!callable){
-    if ( inherits(coeff,'non_callable_pp')){
+      return(coeff) }
+     else{ pp<-get_parameters(coeff)
+      coeff<-pp$coeff
+      tn<-pp$knot
+     if (verbose)
+      cat("transform 'non_callable_pp' to 'callable_pp'\n")}}
+   else if ( inherits(coeff,'non_callable_pp')){
+    { if (!callable) {
       if(verbose)
-          cat("Already a 'non_callable_pp'\n ")
-      return(coeff)}
+        cat("Already a 'non_callable_pp'\n ")
 
-    else{
-        }
-    }
-
+      return(coeff) }
+      else{ pp<-coeff
+      coeff<-pp$coeff
+      tn<-pp$knot
+      if (verbose)
+        cat("transform 'non_callable_pp' to 'callable_pp'\n")
+      }}
+   }
+   else{ #case coeff is given as a matrix
     coeff<-as.matrix(coeff)
     tn<-as.vector(tn)
+    kn<-length(tn)-1 # number of intervals
 
-    kn<-length(tn)-1
-
-  if (kn!=dim(coeff)[2])
-    {
-    coeff<-t(coeff)
-    if (verbose) message('Only transposed coefficients matrix matches knots. Transposing')
-  }
-  if (kn!=dim(coeff)[2]){
+    if (kn!=dim(coeff)[2]){
+       coeff<-t(coeff)
+       if (verbose) message('Only transposed coefficients matrix matches knots. Transposing')
+     }
+    if (kn!=dim(coeff)[2]){
       stop("Dimension of coefficients and number of knots do not match")
-  }
-  degree<-dim(coeff)[2]
+    }
+    degree<-dim(coeff)[1]-1
 
 
-  # Creer l'objet PP
-  pp_obj <- list(coeff = t(coeff),
+    # Creer l'objet PP
+    pp_obj <- list(coeff = t(coeff),
                  knot = tn,
                  degree = degree)
-  class(pp_obj) <- "non_callable_pp"
+    class(pp_obj) <- "non_callable_pp"
 
+    if (callable) {
+      # Retourner une fonction callable
+        eval_func <- function(x_values) {
+          evalpp(pp_obj, x_values)
+        }
 
+      # Ajouter les parametres comme attributs
+      attr(eval_func, "coeff") <- t(coeff)
+      attr(eval_func, "knot") <- tn
+      attr(eval_func, "degree") <- degree
+      attr(eval_func, "pp_obj") <- pp_obj
 
-
-  return(pp_obj)
+      class(eval_func) <- c("callable_pp", "function")
+      return(eval_func)
+    }
+    else  return(pp_obj)
+   }
 }
 
 
