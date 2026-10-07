@@ -1,6 +1,18 @@
+---
 title: "B-spline Basis Manipulation"
-
-author: "Alexandre Abbes" date: "`r Sys.Date()`" output: rmarkdown::html_vignette: toc: true toc_depth: 3 fig_width: 7 fig_height: 5 vignette: \> %\VignetteIndexEntry{B-spline Basis Manipulation} %\VignetteEngine{knitr::rmarkdown} %\VignetteEncoding{UTF-8} ---
+author: "Alexandre Abbes"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+    fig_width: 7
+    fig_height: 5
+vignette: >
+  %\VignetteIndexEntry{B-spline Basis Manipulation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, fig.width = 7, fig.height = 5)
@@ -270,8 +282,8 @@ y <- spline_eval(bs_function,x_plot)
 max(abs(y - y_pp))
 ```
 
-### Callable PP Objects
 
+### Callable PP Objects
 ```{r callable-pp}
 # Create a callable PP object
 pp_call <- Bsplinetopp(bs_function, callable = TRUE)

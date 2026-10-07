@@ -7,3 +7,6 @@ comprehensive         Comprehensive test of various constraints on an oscillatin
 degrees_comparison    Simultaneous comparison of constraints across degrees 1, 2, 3, and 4
 demo_der3             Demonstration of third-order derivative constraints
 derivative2           Demontration for the coherence of the derivative functions
+shock                 Regression with Discontinuity and Derivability Singularity
+shock_basis           same as shock, with singular B-spline basis display
+

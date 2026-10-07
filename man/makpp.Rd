@@ -4,7 +4,7 @@
 \alias{makpp}
 \title{Build a piecewise polynomial (PP) form}
 \usage{
-makpp(coeff, tn = c(0, 1), callable = FALSE, verbose = FALSE)
+makpp(coeff, tn = NULL, callable = FALSE, verbose = FALSE)
 }
 \arguments{
 \item{coeff}{matrix (coefficents) or pp polynomial. Coefficient matrix (kn x (degree+1))}

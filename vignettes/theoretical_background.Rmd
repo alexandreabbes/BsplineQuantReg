@@ -50,7 +50,7 @@ function (or pinball loss), and $\mathcal{F}$ is a class of functions
 The function $f(x)$ is assumed to satisfy one or more shape constraints:
 
 | Constraint | Mathematical Form | Meaning |
-|---------------------|---------------------------------|------------------|
+|------------------------|------------------------|------------------------|
 | Monotonicity | $f'(x) \geq 0$ (or $\leq 0$) | Increasing (or decreasing) |
 | Convexity | $f''(x) \geq 0$ (or $\leq 0$) | Convex (or concave) |
 | Third Derivative | $f'''(x) \geq 0$ (or $\leq 0$) | Controlling curvature evolution |
@@ -114,9 +114,6 @@ like CLARABEL, OSQP, ECOS, or SCS.
 ## 2. B-spline Construction with De Boor's Formula
 
 ### 2.1 B-spline Definition
-
-A B-spline of degree $d$ and knots \$t_0 \<t_1 \< \dots \< t_k \$ is
-defined recursively using the de Boor recursion formula.
 
 The construction uses the extended knot sequence instead of $t_i$, which
 is build with adding enough knots ($d$ for degree $d$) at each end of

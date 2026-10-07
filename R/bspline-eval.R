@@ -1,4 +1,4 @@
-# bs_direct, spline_eval, view_spline
+# bs_direct, spline_eval, view_spline, Bsplinetopp, view_basis
 
 
 #' Evaluate a B-spline
@@ -203,7 +203,6 @@ bs_direct <- function(Basis,
 #'
 #' @seealso \code{\link{makpp}}, \code{\link{evalpp}}, \code{\link{Bspline_base}}
 #' @export
-
 Bsplinetopp <- function(Bspline,
                         Bsbasis = NULL,
                         callable = FALSE,
