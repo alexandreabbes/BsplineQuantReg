@@ -1,3 +1,4 @@
+---
 title: "Shape Constraints with BsplineQuantReg"
 author: "Alexandre Abbes"
 date: "`r Sys.Date()`"
@@ -23,7 +24,7 @@ The package includes several demos that illustrate shape constraints:
 
 ```{r demos}
 # Example of available demos
-dev.new()
+#dev.new()
 demo(package = "BsplineQuantReg",temperature2)
 
 # Run specific demos:
@@ -167,7 +168,7 @@ plot(x, y, pch = 16, cex = 0.5, col = "gray",
 lines(x_eval, spline_eval(fit_mult, x_eval), col = "blue", lwd = 2)
 ```
 
-## Visualizing Constraint Effects
+## Recap: Visualizing Constraint Effects
 
 ```{r visualize-constraints}
 par(mfrow = c(2, 2))

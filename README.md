@@ -12,11 +12,11 @@ This package is available on CRAN.
 ## Features
 
 - Quantile regression for any tau in (0,1)
-- B-splines of degree 1 to 4 (linear to quartic)
-- Monotonicity constraints (increasing or decreasing)
-- Convexity constraints (convex or concave)
-- Third derivative constraints for cubic and quartic splines
+- B-splines of any degree( from 0) (including linear to quartic)
 - Karlin-Studden SOCP formulation for rigorous shape constraints
+- Monotonicity constraints (increasing or decreasing for degrees 0 to 4)
+- Convexity constraints (convex or concave for degrees 2 to 5)
+- Third derivative constraints for cubic and quartic splines
 - Partial constraints (per interval or per knot)
 - Polynomial coefficient export
 - Conversion between PP-form and B-spline representation
@@ -24,7 +24,7 @@ This package is available on CRAN.
 - View Bspline basis
 - Differentiable Bspline or Basis
 - Displays coefficients in human readable form, local/canonical basis
-- Robust knots multiplicity management (for lower regularity at knots, such as shocks)
+- Robust knots multiplicity management (for lower regularity at knots, such as shocks), compatible with constrained regression.
 
 ## Installation
 

@@ -50,7 +50,7 @@ function (or pinball loss), and $\mathcal{F}$ is a class of functions
 The function $f(x)$ is assumed to satisfy one or more shape constraints:
 
 | Constraint | Mathematical Form | Meaning |
-|------------------------|------------------------|------------------------|
+|----|----|----|
 | Monotonicity | $f'(x) \geq 0$ (or $\leq 0$) | Increasing (or decreasing) |
 | Convexity | $f''(x) \geq 0$ (or $\leq 0$) | Convex (or concave) |
 | Third Derivative | $f'''(x) \geq 0$ (or $\leq 0$) | Controlling curvature evolution |

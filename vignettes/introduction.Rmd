@@ -14,6 +14,168 @@ knitr::opts_chunk$set(
 )
 ```
 
+
+
 ```{r setup}
 library(BsplineQuantReg)
 ```
+
+The R-packege "Quantile regression with B-splines under shape constraints" is intended to perform quantile regression with polynomial splines. It follows the method described in Abbes(2025) <doi:10.5281/zenodo.17427913>, and initiated by He and Shi (1998) for quadratic splines, on the original idea of Koenker and Basset for linear regression.
+
+## Simple example
+
+``` {r simple example, fig.width=10, fig.height=7, out.width="100%"}
+
+
+ n_points <- 50
+  xtab = ((0:(n_points)) / (n_points))
+
+  # simple pscillating data
+  #ytab<- -3 * xtab +sin(3*2*xtab*3.14)+ 0.2 * rnorm(n_points+1)
+  #ytab= <- 2* xtab + 0.5 * sin(6 * pi * xtab) + 0.1 * rnorm(n_points+1)
+  ytab <- xtab * (1 - xtab) + 0.1 * rnorm(n_points + 1)
+  kn <- 8
+
+  n = 7
+
+  monot1 = c(rep(1, n), rep(0, (12 - n)))
+  monot2 = rep(1,12)
+  knot <- ((0:(kn + 5)) / (kn + 5))
+  
+  res <- quantile_spline(
+    xtab = xtab,
+    ytab = ytab,
+    knot,
+    tau = 0.5,
+    monot = 0,
+    degree = 3,
+    verbose = FALSE
+  )
+ res_part_croissant <- quantile_spline(
+    xtab = xtab,
+    ytab = ytab,
+    knot = knot,
+    tau = 0.5,
+    degree = 3,
+    monot = monot1,
+    convcons = 0,
+    verbose = FALSE
+  )
+ 
+ res_croissant <- quantile_spline(
+    xtab = xtab,
+    ytab = ytab,
+    knot = knot,
+    tau = 0.5,
+    degree = 3,
+    monot = 1,
+    convcons = 0,
+    verbose = FALSE
+  )
+ 
+ 
+par(mfrow = c(1, 3))
+x_eval=(0:200)/200
+  y_sans = spline_eval(res, x_eval)
+  y_part_croiss = spline_eval(res_part_croissant, x_eval)
+  y_croiss = spline_eval(res_croissant, x_eval)
+  
+    plot(
+    xtab,
+    ytab,
+    pch = 16,
+    cex = 0.5,
+    col = "black",
+    main = c("Without constraint")
+    )
+    lines(x_eval, y_sans, lwd = 2)  
+    
+  plot(
+    xtab,
+    ytab,
+    pch = 16,
+    cex = 0.5,
+    col = "black",
+    main = c("Mixed mootone :\n global increasing constraints
+                "
+    )
+  )
+  lines(x_eval, y_croiss, lwd = 2)  
+
+    
+    plot(
+    xtab,
+    ytab,
+    pch = 16,
+    cex = 0.5,
+    col = "black",
+    main = c("Mixed mootone :\n increasing constraints
+                \n on the first inter-knots"
+    )
+  )
+  lines(x_eval, y_part_croiss, lwd = 2)  
+
+
+```
+
+## Content
+
+***The initial version with cubic splines*** is now augmented with splines of degree 0 to 4 for constrained regression, and any degree for regression without monotone constraints. 
+
+**see the demo** *degrees_comparison*    Simultaneous comparison of constraints across degrees 1, 2, 3, and 4
+
+***Constraints for degrees 3*** (monotone), degree 4 (monotone and convex) and 5 (convex) use the Karlin-Studden SOCP characterization.
+
+**see the vignette** *theoretical_background* and *shape_constraints*.
+
+**see the demos**:
+-*monotonicity_basic*    Monotonicity constraints demo.
+-*convexity*             Convexity and concavity constraints demo.
+-*temperature*           Temperature anomaly analysis: uniform increasing vs mixed constraints (decreasing 1956-1973 only).
+-*temperature2*          Temperature anomaly analysis with alternative constraint configurations.
+-*logistic*              Quantile regression test on a logistic function.
+-*comprehensive*         Comprehensive test of various constraints on an oscillating function.
+
+***It can handle third derivatives constraints*** for the degrees 3 and 4.
+
+**see the demo**: *demo_der3* (Demonstration of third-order derivative constraints)
+
+
+
+***All B-spline and polynomial functions*** have been rewritten for consistency. This package provides an original B-spline library for conversion between PP-form and B-spline
+    representation, evaluation, differentiation, callable and
+    non-callable objects, print human readable pp forms, view basis,
+    all based on "De Boor\'s" theory. 
+    
+**See the corresponding vignettes** : *polynomial_library* and *bspline_basis_manipulation*.
+
+Differentiation of Bsplines can be operated on the spline (polynomial differentiation) or on the basis.
+
+**see the demo** *derivative2*  (Demonstration for the coherence of the derivative functions.)
+
+***It also extends to multiple knots*** to catch up singularities. This feature is robust in the package including for constrained regression.
+  
+** See the demos **   *shock*     (Regression with Discontinuity and Derivability Singularity) and  *shock_basis*  (same as shock, with singular B-spline basis display).
+    
+
+
+    
+## Graphical user interface
+
+An interactive Shiny GUI is available at
+https://cran.r-project.org/package=BsplineQuantRegGui
+and <https://github.com/<user>/BsplineQuantRegGUI>:
+```{r gui}
+# install.packages("BsplineQuantRegGui")
+#or 
+# install.packages("remotes")
+#remotes::install_github("<user>/BsplineQuantRegGUI")
+#BsplineQuantRegGUI::run_app()
+```
+
+The GUI lets you create a custom data set, upload a two-column dataset, choose the spline degree, knots, quantile level, and shape constraints (monotone, convex, …), and
+download the fitted curve and coefficients, with an executable R code.
+
+
+## An equivalent Python package is available
+    at <https://pypi.org/project/BsplineQuantRegpy/>.

@@ -98,11 +98,11 @@ change_polynomial_base_taylor(coeffs_a, a = 1, b = 0)
 # Returns c(1, -2, 1) → x^2 - 2x + 1
 ```
 
-## Piecewise Polynomial (PP) Form
+# Piecewise Polynomial (PP) Form
 
 The PP form represents a function defined piecewise by polynomials on different intervals.
 
-### Creating a PP Object
+## Creating a PP Object
 
 ```{r makpp}
 # Create a piecewise polynomial with two intervals
@@ -126,7 +126,7 @@ plot(x, y, type = "l", main = "Piecewise Polynomial")
 abline(v = knots, col = "red", lty = 2)
 ```
 
-### Non-Callable PP Objects
+## Non-Callable PP Objects
 
 ```{r non_callable_pp}
 # A non-callable PP object is a list with components:
@@ -143,7 +143,7 @@ pp$knot
 pp$degree
 ```
 
-### Callable PP Objects
+## Callable PP Objects
 
 A callable PP object can be evaluated directly like a function.
 
@@ -163,7 +163,160 @@ print(pp_call)
 plot(pp_call, xlim = c(0, 2))
 ```
 
-### displaying polynomial in a human readable form
+
+
+
+### Create a callable PP
+pp_call <- makpp(coeff, knots, callable = TRUE)
+class(pp_call)  # "callable_pp" "function"
+
+### Evaluate directly
+x <- seq(0, 2, length.out = 10)
+y <- pp_call(x)
+
+### Print shows information
+print(pp_call)
+
+### Can be used in plots
+plot(pp_call, xlim = c(0, 2))
+
+## Extrapolating values
+
+When evalpp() is called with x values outside the knot range (x \< knots[1] or x \> knots[length(knots)]), it automatically performs extrapolation by extension using the border polynomial piece (the first or last polynomial in the PP structure). For example, if the knot vector is c(0, 1, 2), points with x \< 0 will be evaluated using the polynomial from the first interval [0, 1], while points with x \> 2 will use the polynomial from the last interval [1, 2]. This is equivalent to "extending" the first and last piece of the spline. A warning message is printed to alert the user when extrapolation occurs.
+
+### PP with two intervals: x^2 on [0,1], 2x-1 on [1,2]
+coeff <- matrix(c(1, 0, 0, 0, 2, -1), nrow = 2, byrow = TRUE)
+knots <- c(0, 1, 2)
+pp <- makpp(coeff, knots, callable = TRUE)
+
+### Evaluate inside and outside the knot range
+x_test <- c(-0.5, 0.5, 1.5, 2.5)
+y_test <- pp(x_test)
+data.frame(x = x_test, y = y_test)
+### The values at -0.5 and 2.5 are extrapolated
+```
+
+### Extracting Parameters
+
+```{r get_parameters}
+### For callable PP objects, use get_parameters()
+params <- get_parameters(pp_call)
+print(params$degree)
+print(params$knot)
+print(params$coeff)
+
+### For non-callable PP, access directly
+pp=makpp(pp,callable=FALSE,verbose=TRUE)
+pp$degree
+pp$knot
+pp$coeff
+```
+
+
+
+
+## Advanced: PP Form Manipulation
+
+### Extracting a Single Interval Polynomial
+
+```{r extract_interval}
+### Get polynomial for interval i
+pp=makpp(pp,callable=FALSE)
+interval_poly <- pp$coeff[1, ]  ### First interval
+print(interval_poly)
+
+### Evaluate on a subinterval
+x_sub <- seq(0, 1, length.out = 20)
+y_sub <- poly_eval(interval_poly, x_sub)
+```
+
+### Combining PP Objects
+```{r combine_pp}
+# Create two PP objects and combine them
+# This is useful for constructing complex piecewise functions
+coeff1 <- matrix(c(1, 0), nrow = 1)
+coeff2 <- matrix(c(0, 1), nrow = 1)
+
+pp1 <- makpp(coeff1, c(0, 1))
+pp2 <- makpp(coeff2, c(1, 2))
+
+### Combine coefficients and knots
+combined_coeff <- rbind(coeff1, coeff2)
+combined_knots <- c(0, 1, 2)
+pp_combined <- makpp(combined_coeff, combined_knots)
+
+### Evaluate combined function
+x <- seq(0, 2, length.out = 100)
+y_combined <- evalpp(pp_combined, x)
+plot(x, y_combined, type = "l")
+abline(v = c(0, 1, 2), col = "red", lty = 2)
+```
+
+## Visualizing PP with Basis Functions
+
+```{r visualize_pp}
+### Create a PP with multiple pieces
+knots <- seq(0, 1, length.out = 5)
+degree <- 2
+n_pieces <- length(knots) - 1
+
+### Generate random coefficients
+coeff <- matrix(rnorm(n_pieces * (degree + 1)), nrow = n_pieces)
+
+pp <- makpp(coeff, knots, callable = TRUE)
+
+### Evaluate and plot
+x <- seq(0, 1, length.out = 200)
+y <- pp(x)
+
+plot(x, y, type = "l", lwd = 2,
+     main = "Random Piecewise Quadratic")
+abline(v = knots, col = "red", lty = 2)
+grid()
+```
+
+## Comparison: PP vs B-spline
+
+```{r pp_vs_bspline}
+### Create a B-spline and convert to PP form
+sn <- c(0, 0, 0, 0, 0.25, 0.5, 0.75, 1, 1, 1, 1)
+basis <- Bspline_base(sn, degree = 3)
+basis$coeff <- runif(basis$n_splines)
+
+### Convert to PP
+pp_from_bspline <- Bsplinetopp(basis)
+
+### Both represent the same function
+x <- seq(0, 1, length.out = 100)
+y_bspline <- spline_eval(basis, x)
+y_pp <- evalpp(pp_from_bspline, x)
+
+### They should match
+max(abs(y_bspline - y_pp))
+```
+
+#### Summary
+
+ | Feature | Function | Description | 
+ |---------|----------|-------------| 
+ | Polynomial multiplication | `polymul()` | Multiply two polynomials | 
+ | Polynomial addition | `polyadd()` | Add two polynomials | 
+ | Polynomial evaluation | `poly_eval()` | Evaluate at points | 
+ | Polynomial derivative | `polyderiv()` | Differentiate polynomial | 
+ | Taylor shift | `change_polynomial_base_taylor()` | Change expansion point | 
+ | PP creation | `makpp()` | Create PP form | 
+ | PP evaluation | `evalpp()` | Evaluate PP at points | 
+ | Callable PP | `makpp(callable = TRUE)` | PP as function | 
+ | Extract params | `get_parameters()` | Extract from callable |
+
+
+
+ All functions are implemented in pure R and follow matlab consistent conventions, making them robust and easy to use for B-spline manipulation and quantile regression. 
+
+
+
+
+# Displaying polynomial in a human readable form
 
 ## Introduction
 The `show_poly()` function displays a polynomial as a human-readable mathematical equation. It supports both canonical and local bases, and can convert between different expansion points using Taylor's formula.
@@ -235,21 +388,6 @@ show_poly(p, digits = 4)
 # "0.3333*x^2 - 0.2857*x + 0.2"
 ```
 
-### Negative Coefficients
-
-The function handles negative coefficients gracefully:
-
-```{r negative}
-# All coefficients negative
-p <- c(-3, -2, -1)  # -3x^2 - 2x - 1
-show_poly(p)
-# "-3*x^2 - 2*x - 1"
-
-# Mixed coefficients
-p <- c(3, -2, 1, -5)  # 3x^3 - 2x^2 + x - 5
-show_poly(p)
-# "3*x^3 - 2*x^2 + 1*x - 5"
-```
 
 ### Working with B-splines
 
@@ -272,7 +410,7 @@ cat("Piece 3: ", show_poly(pp$coeff[3, ], b = 0), "\n")
 
 
 ## Integration with show_pp()
-The `show_poly()` function is used internally by `show_pp()` and `show_pp()` to display piecewise polynomials:
+The `show_poly()` function is used internally by `show_pp()` to display piecewise polynomials:
 
 ```{r show_pp_integration}
 # Create a PP with two intervals
@@ -283,23 +421,6 @@ pp <- makpp(coeff, knot)
 # Display in local basis
 show_pp(pp, local = TRUE, digits = 3)
 ```
-
-## Summary
-
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `obj` | Polynomial coefficients (decreasing power order) | Required |
-| `a` | Base of input coefficients $(x-a)^k$ | 0 |
-| `b` | Base for output display $(x-b)^k$ | 0 |
-| `digits` | Number of significant digits | 4 |
-| `verbose` | Print additional information |FALSE |
-
-
-
-### Displaying PP Equations
-
-The package provides convenient functions to display PP objects as human-readable mathematical equations. The `show_pp()` and `show_pp()` functions format the polynomial expressions on each interval, with support for both canonical and local bases.
-
 ```{r show_pp}
 # Create a PP with two intervals
 knot <- c(0, 0.5, 1)
@@ -324,8 +445,10 @@ For spline objects, the conversion to PP is automatic:
 sn <- c(0, 0, 0, 0, 0.3, 0.6, 1, 1, 1, 1)
 basis <- Bspline_base(sn, degree = 3)
 basis$coeff <- c(1, -0.5, 2, 0.5, -1, 0.75)
+basis<-make_spline(basis)
 
 show_pp(basis, local = TRUE, verbose = TRUE)
+
 # PP Information:
 # Degree: 3
 # Knots: 0, 0.3, 0.6, 1
@@ -346,160 +469,13 @@ The display functions offer several customization options:
 
 
 
-### Callable PP Objects
+## Summary show_pp()
 
-A callable PP object can be evaluated directly like a function.
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `obj` | Polynomial coefficients (decreasing power order) | Required |
+| `a` | Base of input coefficients $(x-a)^k$ | 0 |
+| `b` | Base for output display $(x-b)^k$ | 0 |
+| `digits` | Number of significant digits | 4 |
+| `verbose` | Print additional information |FALSE |
 
-# Create a callable PP
-pp_call <- makpp(coeff, knots, callable = TRUE)
-class(pp_call)  # "callable_pp" "function"
-
-# Evaluate directly
-x <- seq(0, 2, length.out = 10)
-y <- pp_call(x)
-
-# Print shows information
-print(pp_call)
-
-# Can be used in plots
-plot(pp_call, xlim = c(0, 2))
-
-
-### Extrapolating values
-
-When evalpp() is called with x values outside the knot range (x \< knots[1] or x \> knots[length(knots)]), it automatically performs extrapolation by extension using the border polynomial piece (the first or last polynomial in the PP structure). For example, if the knot vector is c(0, 1, 2), points with x \< 0 will be evaluated using the polynomial from the first interval [0, 1], while points with x \> 2 will use the polynomial from the last interval [1, 2]. This is equivalent to "extending" the first and last piece of the spline. A warning message is printed to alert the user when extrapolation occurs.
-
-# PP with two intervals: x^2 on [0,1], 2x-1 on [1,2]
-coeff <- matrix(c(1, 0, 0, 0, 2, -1), nrow = 2, byrow = TRUE)
-knots <- c(0, 1, 2)
-pp <- makpp(coeff, knots, callable = TRUE)
-
-# Evaluate inside and outside the knot range
-x_test <- c(-0.5, 0.5, 1.5, 2.5)
-y_test <- pp(x_test)
-data.frame(x = x_test, y = y_test)
-# The values at -0.5 and 2.5 are extrapolated
-```
-
-### Extracting Parameters
-
-```{r get_parameters}
-# For callable PP objects, use get_parameters()
-params <- get_parameters(pp_call)
-print(params$degree)
-print(params$knot)
-print(params$coeff)
-
-# For non-callable PP, access directly
-pp=makpp(pp,callable=FALSE,verbose=TRUE)
-pp$degree
-pp$knot
-pp$coeff
-```
-
-## Advanced: PP Form Manipulation
-
-### Extracting a Single Interval Polynomial
-
-```{r extract_interval}
-# Get polynomial for interval i
-pp=makpp(pp,callable=FALSE)
-interval_poly <- pp$coeff[1, ]  # First interval
-print(interval_poly)
-
-# Evaluate on a subinterval
-x_sub <- seq(0, 1, length.out = 20)
-y_sub <- poly_eval(interval_poly, x_sub)
-```
-
-### Combining PP Objects
-
-```{r combine_pp}
-# Create two PP objects and combine them
-# This is useful for constructing complex piecewise functions
-coeff1 <- matrix(c(1, 0), nrow = 1)
-coeff2 <- matrix(c(0, 1), nrow = 1)
-
-pp1 <- makpp(coeff1, c(0, 1))
-pp2 <- makpp(coeff2, c(1, 2))
-
-# Combine coefficients and knots
-combined_coeff <- rbind(coeff1, coeff2)
-combined_knots <- c(0, 1, 2)
-pp_combined <- makpp(combined_coeff, combined_knots)
-
-# Evaluate combined function
-x <- seq(0, 2, length.out = 100)
-y_combined <- evalpp(pp_combined, x)
-plot(x, y_combined, type = "l")
-abline(v = c(0, 1, 2), col = "red", lty = 2)
-```
-
-### Visualizing PP with Basis Functions
-
-```{r visualize_pp}
-# Create a PP with multiple pieces
-knots <- seq(0, 1, length.out = 5)
-degree <- 2
-n_pieces <- length(knots) - 1
-
-# Generate random coefficients
-coeff <- matrix(rnorm(n_pieces * (degree + 1)), nrow = n_pieces)
-
-pp <- makpp(coeff, knots, callable = TRUE)
-
-# Evaluate and plot
-x <- seq(0, 1, length.out = 200)
-y <- pp(x)
-
-plot(x, y, type = "l", lwd = 2,
-     main = "Random Piecewise Quadratic")
-abline(v = knots, col = "red", lty = 2)
-grid()
-```
-
-## Comparison: PP vs B-spline
-
-```{r pp_vs_bspline}
-# Create a B-spline and convert to PP form
-sn <- c(0, 0, 0, 0, 0.25, 0.5, 0.75, 1, 1, 1, 1)
-basis <- Bspline_base(sn, degree = 3)
-basis$coeff <- runif(basis$n_splines)
-
-# Convert to PP
-pp_from_bspline <- Bsplinetopp(basis)
-
-# Both represent the same function
-x <- seq(0, 1, length.out = 100)
-y_bspline <- spline_eval(basis, x)
-y_pp <- evalpp(pp_from_bspline, x)
-
-# They should match
-max(abs(y_bspline - y_pp))
-```
-
-## Summary
-
-<!-- | Feature | Function | Description | -->
-
-<!-- |---------|----------|-------------| -->
-
-<!-- | Polynomial multiplication | `polymul()` | Multiply two polynomials | -->
-
-<!-- | Polynomial addition | `polyadd()` | Add two polynomials | -->
-
-<!-- | Polynomial evaluation | `poly_eval()` | Evaluate at points | -->
-
-<!-- | Polynomial derivative | `polyderiv()` | Differentiate polynomial | -->
-
-<!-- | Taylor shift | `change_polynomial_base_taylor()` | Change expansion point | -->
-
-<!-- | PP creation | `makpp()` | Create PP form | -->
-
-<!-- | PP evaluation | `evalpp()` | Evaluate PP at points | -->
-
-<!-- | Callable PP | `makpp(callable = TRUE)` | PP as function | -->
-
-<!-- | Extract params | `get_parameters()` | Extract from callable | -->
-
-<!-- All functions are implemented in pure R and follow matlab consistent conventions, making them robust and easy to use for B-spline manipulation and quantile regression. -->

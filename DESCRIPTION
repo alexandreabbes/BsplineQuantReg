@@ -10,7 +10,7 @@ Description: Quantile regression with B-splines under shape constraints.
     (monotone and convex) use the Karlin-Studden SOCP characterization
     for the sign of the polynomial, while other constraints applied
     at the knots are added as linear problems. The method for cubic
-    splines is described in 'Abbes (2026)' <doi:10.5281/zenodo.17427913>.
+    splines is described in 'Abbes (2025)' <doi:10.5281/zenodo.17427913>.
     Other formulations are simple consequences of the other given
     references. All B-spline and polynomial functions have been
     rewritten for consistency. This package provides an original

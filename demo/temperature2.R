@@ -16,7 +16,6 @@ cat("========================================\n")
 cat("Demo: Temperature Anomaly Trend Analysis\n")
 cat("========================================\n\n")
 
-
 if (!exists("degree")){degree=3}
 
 # Create temperature data (1880-1992)
@@ -81,45 +80,11 @@ y_full_inc <- spline_eval(fit_full_inc, x_eval)
 # Model 3: Partial monotonicity (only after 1970)
 # ============================================================
 br_year_1970 <- 1970
-monot_partial <- rep(0, length(knots) - 1)
-for (i in 1:length(monot_partial)) {
-  interval_end <- knots_years[i + 1]
-  if (interval_end > br_year_1970) {
-    monot_partial[i] <- 1
-  }
-}
-cat("\n=== 3. Partial monotonicity (increasing only after 1970) ===\n")
-cat("   Constrained intervals:", which(monot_partial == 1), "\n")
-fit_partial <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
-                                      monot = monot_partial, convcons = 0)
-y_partial <- spline_eval(fit_partial, x_eval)
+monot_partial <- c(0,0,0,0,1)
 
-# ============================================================
-# Model 4: Mixed constraints
-# Decreasing between 1945 and 1970, increasing elsewhere
-# ============================================================
-br_year_start <- 1945
-br_year_end <- 1970
+monot_mixed <- c(1,1,0,-1,1)
 
-monot_mixed <- rep(0, length(knots) - 1)
-for (i in 1:length(monot_mixed)) {
-  interval_start <- knots_years[i]
-  interval_end <- knots_years[i + 1]
-
-  if (interval_start >= br_year_end) {
-    monot_mixed[i] <- 1      # increasing after 1970
-  } else if (interval_end <= br_year_start) {
-    monot_mixed[i] <- 1      # increasing before 1945
-  } else if (interval_start >= br_year_start && interval_end <= br_year_end) {
-    monot_mixed[i] <- -1     # decreasing between 1945 and 1970
-  } else if (interval_start < br_year_start && interval_end > br_year_start) {
-    monot_mixed[i] <- 1      # increasing (partial interval before 1945)
-  } else if (interval_start < br_year_end && interval_end > br_year_end) {
-    monot_mixed[i] <- 1      # increasing (partial interval after 1970)
-  }
-}
-
-cat("\n=== 4. Mixed constraints ===\n")
+cat("\n=== 3. Mixed constraints ===\n")
 cat("   Decreasing between 1945 and 1970\n")
 cat("   Increasing elsewhere\n")
 cat("   Constraint vector:", monot_mixed, "\n")
@@ -129,7 +94,7 @@ fit_mixed <- quantile_spline(degree=degree,xtab, ytab, knots, tau = 0.5,
 y_mixed <- spline_eval(fit_mixed, x_eval)
 
 # ============================================================
-# Model 5: Multiple quantiles with mixed constraints
+# Model 4: Multiple quantiles with mixed constraints
 # ============================================================
 cat("\n=== 5. Multiple quantiles (0.1, 0.5, 0.9) with mixed constraints ===\n")
 tau_multi <- c(0.1, 0.5, 0.9)
