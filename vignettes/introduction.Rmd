@@ -1,5 +1,5 @@
 ---
-title: "introduction"
+title: "Introduction"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{introduction}
@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 library(BsplineQuantReg)
 ```
 
-The R-packege "Quantile regression with B-splines under shape constraints" is intended to perform quantile regression with polynomial splines. It follows the method described in Abbes(2025) <doi:10.5281/zenodo.17427913>, and initiated by He and Shi (1998) for quadratic splines, on the original idea of Koenker and Basset for linear regression.
+The R-package "Quantile regression with B-splines under shape constraints" is intended to perform quantile regression with polynomial splines. It follows the method described in Abbes(2025) <doi:10.5281/zenodo.17427913>, and initiated by He and Shi (1998) for quadratic splines, on the original idea of Koenker and Basset for linear regression.
 
 ## Simple example
 
@@ -118,64 +118,77 @@ x_eval=(0:200)/200
 
 ```
 
-## Content
+## Core content
 
-***The initial version with cubic splines*** is now augmented with splines of degree 0 to 4 for constrained regression, and any degree for regression without monotone constraints. 
+The initial version with cubic splines is now augmented with splines of degree 0 to 4 for constrained regression, and any degree for regression without monotone constraints.
 
-**see the demo** *degrees_comparison*    Simultaneous comparison of constraints across degrees 1, 2, 3, and 4
+- **Demo** `degrees_comparison` — simultaneous comparison of constraints across degrees 1, 2, 3, and 4.
 
-***Constraints for degrees 3*** (monotone), degree 4 (monotone and convex) and 5 (convex) use the Karlin-Studden SOCP characterization.
+Constraints for degree 3 (monotone), degree 4 (monotone and convex) and degree 5 (convex) use the **Karlin–Studden SOCP** characterization.
 
-**see the vignette** *theoretical_background* and *shape_constraints*.
+- **Vignettes** `theoretical_background`, `shape_constraints`
+- **Demos**
+  - `monotonicity_basic` — monotonicity constraints
+  - `convexity` — convexity and concavity constraints
+  - `temperature` — temperature anomaly analysis: uniform increasing vs mixed constraints (decreasing 1956–1973 only)
+  - `temperature2` — temperature anomaly analysis with alternative constraint configurations
+  - `logistic` — quantile regression test on a logistic function
+  - `comprehensive` — comprehensive test of various constraints on an oscillating function
 
-**see the demos**:
--*monotonicity_basic*    Monotonicity constraints demo.
--*convexity*             Convexity and concavity constraints demo.
--*temperature*           Temperature anomaly analysis: uniform increasing vs mixed constraints (decreasing 1956-1973 only).
--*temperature2*          Temperature anomaly analysis with alternative constraint configurations.
--*logistic*              Quantile regression test on a logistic function.
--*comprehensive*         Comprehensive test of various constraints on an oscillating function.
+**Third-derivative constraints** are supported for degrees 3 and 4.
 
-***It can handle third derivatives constraints*** for the degrees 3 and 4.
+- **Demo** `demo_der3` — demonstration of third-order derivative constraints.
 
-**see the demo**: *demo_der3* (Demonstration of third-order derivative constraints)
+## B-spline library
 
+All B-spline and polynomial functions have been rewritten for consistency. The package provides an original B-spline library for:
 
+- conversion between PP-form and B-spline representation,
+- evaluation and differentiation,
+- callable and non-callable objects,
+- printing human-readable pp forms,
+- viewing the basis,
 
-***All B-spline and polynomial functions*** have been rewritten for consistency. This package provides an original B-spline library for conversion between PP-form and B-spline
-    representation, evaluation, differentiation, callable and
-    non-callable objects, print human readable pp forms, view basis,
-    all based on "De Boor\'s" theory. 
-    
-**See the corresponding vignettes** : *polynomial_library* and *bspline_basis_manipulation*.
+all based on **De Boor's** theory.
 
-Differentiation of Bsplines can be operated on the spline (polynomial differentiation) or on the basis.
+- **Vignettes** `polynomial_library`, `bspline_basis_manipulation`
 
-**see the demo** *derivative2*  (Demonstration for the coherence of the derivative functions.)
+**Differentiation of B-splines** can be performed either on the spline (polynomial differentiation) or on the basis.
 
-***It also extends to multiple knots*** to catch up singularities. This feature is robust in the package including for constrained regression.
-  
-** See the demos **   *shock*     (Regression with Discontinuity and Derivability Singularity) and  *shock_basis*  (same as shock, with singular B-spline basis display).
-    
+- **Demo** `derivative2` — coherence of the derivative functions.
 
+The library also extends to **multiple knots** to handle singularities, robustly, including for constrained regression.
 
-    
+- **Demos**
+  - `shock` — regression with discontinuity and derivability singularity
+  - `shock_basis` — same as `shock`, with singular B-spline basis display
+
 ## Graphical user interface
 
-An interactive Shiny GUI is available at
-https://cran.r-project.org/package=BsplineQuantRegGui
-and <https://github.com/<user>/BsplineQuantRegGUI>:
-```{r gui}
+### An interactive Shiny GUI is available:
+
+- CRAN: <https://cran.r-project.org/package=BsplineQuantRegGui>
+- GitHub: <https://github.com/alexandreabbes/BsplineQuantRegGUI>
+
+```r
+# From CRAN:
 # install.packages("BsplineQuantRegGui")
-#or 
+
+# Or from GitHub:
 # install.packages("remotes")
-#remotes::install_github("<user>/BsplineQuantRegGUI")
-#BsplineQuantRegGUI::run_app()
+# remotes::install_github("<user>/BsplineQuantRegGUI")
+
+# Launch:
+# BsplineQuantRegGui::run_app()
 ```
 
-The GUI lets you create a custom data set, upload a two-column dataset, choose the spline degree, knots, quantile level, and shape constraints (monotone, convex, …), and
-download the fitted curve and coefficients, with an executable R code.
+The GUI lets you:
 
+- create a custom data set or upload a two-column dataset,
+- choose the spline degree, knots, quantile level, and shape constraints (monotone, convex, …),
+- visualise information about the spline, the basis, and the coefficients,
+- download the fitted curve and coefficients, including executable R code.
 
-## An equivalent Python package is available
-    at <https://pypi.org/project/BsplineQuantRegpy/>.
+### Python port
+
+An equivalent Python package is available at <https://pypi.org/project/BsplineQuantRegpy/>.

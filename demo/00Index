@@ -9,4 +9,3 @@ demo_der3             Demonstration of third-order derivative constraints
 derivative2           Demontration for the coherence of the derivative functions
 shock                 Regression with Discontinuity and Derivability Singularity
 shock_basis           same as shock, with singular B-spline basis display
-
