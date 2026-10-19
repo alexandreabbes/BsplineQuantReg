@@ -5,8 +5,8 @@ Version: 0.2.6
 Date: 2026-07-26
 Authors@R: person("Alexandre", "Abbes", email = "alexandre.abbes@proton.me", role = c("aut", "cre"))
 Description: Quantile regression with B-splines under shape constraints.
-    The initial version with cubic splines is now augmented with splines
-    of degree 1 to 4. Constraints for degrees 3 (monotone) and 4
+    The initial version with cubic splines, augmented with splines
+    of degree 1 to 4 is now able to handle all degrees (deg >=6 without any constraint). Constraints for degrees 3 (monotone) and 4
     (monotone and convex) use the Karlin-Studden SOCP characterization
     for the sign of the polynomial, while other constraints applied
     at the knots are added as linear problems. The method for cubic
