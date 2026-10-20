@@ -6,7 +6,6 @@ Version=0.2.6
 no constraints for degree>=6
 -Introduction.Rmd vignette
 
-
 ##fixed:
 -description file
 -evaluation of Bsplines of degree=0 and only 2 knots (1 intervall):
@@ -15,7 +14,6 @@ simplify most of functions by creating first a zero array with all dimensions.
 -transposed coeff output in makpp yielding errors
 -vignettes md code and content
 -temperature2 demo : mixed constraints were not properly applied
-
 
 Version=0.2.5 (08/2026)
 ##fixed
