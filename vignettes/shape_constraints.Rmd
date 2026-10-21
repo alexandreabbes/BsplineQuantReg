@@ -5,8 +5,11 @@ date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Shape Constraints with BsplineQuantReg}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
@@ -16,7 +19,12 @@ library(BsplineQuantReg)
 
 ## Introduction
 
-This vignette covers shape constraints in B-spline quantile regression using the Karlin-Studden SOCP formulation. Shape constraints allow you to incorporate prior knowledge about the function's behavior (monotonicity, convexity, etc.) into the estimation process.
+This vignette covers shape constraints in B-spline quantile regression
+using the Karlin-Studden SOCP formulation. Shape constraints allow you
+to incorporate prior knowledge about the function's behavior
+(monotonicity, convexity, etc.) into the estimation process.
+
+Shape constraint for quantile regression with cubic splines is initially the main purpose of this package, based on the paper of Abbes (2025). It has been extended to other degrees, and the package also allows to switch to ordinary mean square regression.
 
 ## Available Demos
 
@@ -25,21 +33,21 @@ The package includes several demos that illustrate shape constraints:
 ```{r demos}
 # Example of available demos
 #dev.new()
-demo(package = "BsplineQuantReg",temperature2)
-
 # Run specific demos:
-# demo("monotonicity")      - Increasing/decreasing constraints
-# demo("convexity")         - Convexity/concavity constraints  
-# demo("der3")              - Third derivative constraints
-# demo("comprehensive")     - All constraint types
-# demo("temperature")       - Real-world example with temperature data
+# demo(package = "BsplineQuantReg","monotonicity")      #- Increasing/decreasing constraints
+# demo(package = "BsplineQuantReg","convexity")         #- Convexity/concavity constraints  
+# demo(package = "BsplineQuantReg","der3")              #- Third derivative constraints
+# demo(package = "BsplineQuantReg","comprehensive")     #- All constraint types
+# demo(package = "BsplineQuantReg","temperature") #and
+#demo(package = "BsplineQuantReg",temperature2) #- Real-world example with temperature data
 ```
 
 ## Uniform Constraints
 
 ### Monotonicity Constraints
 
-Monotonicity constraints force the fitted function to be non-decreasing (`monot = 1`) or non-increasing (`monot = -1`).
+Monotonicity constraints force the fitted function to be non-decreasing
+(`monot = 1`) or non-increasing (`monot = -1`).
 
 ```{r monotonicity}
 # Generate data
@@ -70,7 +78,8 @@ legend("topleft", legend = c("Unconstrained", "Increasing", "Decreasing"),
 
 ### Convexity Constraints
 
-Convexity constraints force the second derivative to be non-negative (`convcons = 1`) or non-positive (`convcons = -1`).
+Convexity constraints force the second derivative to be non-negative
+(`convcons = 1`) or non-positive (`convcons = -1`).
 
 ```{r convexity}
 # Convex function
@@ -84,7 +93,8 @@ lines(x_eval, spline_eval(fit_convex, x_eval), col = "blue", lwd = 2)
 
 ### Third Derivative Constraints
 
-Third derivative constraints control the curvature of the second derivative. The control of its sign allows enforcing smoothness of the curvature.
+Third derivative constraints are not commonly  intuitive. They control the variations of the second
+derivative, that is to say the evolution of curvature. Some examples show that the control of its sign allows sometimes enforcing smoothness of the curvature, and strongly enforces smoothness of the curve.
 
 ```{r der3}
 # Cubic function with varying third derivative
@@ -96,19 +106,11 @@ plot(x, y_cubic, pch = 16, cex = 0.5, col = "gray", main = "Third Derivative Con
 lines(x_eval, spline_eval(fit_der3_pos, x_eval), col = "blue", lwd = 2)
 ```
 
-### Constraints by Degree
-
-| Degree | Monotonicity | Convexity | Third Derivative |
-|--------|--------------|-----------|------------------|
-| 1 (Linear) | +(linear) | X | X |
-| 2 (Quadratic) | + (Karlin) | +(constant) | X|
-| 3 (Cubic) | +(Karlin) | +(Karlin) | +(linear (constant)) |
-| 4 (Quartic) | +(Karlin) | +(Karlin) | +(linear) |
-'Karlin' means in fact 'quadratic' inequality.
 
 ## Partial Constraints
 
-Partial constraints apply monotonicity or convexity only on specific intervals, not the entire domain.
+Partial constraints apply monotonicity or convexity only on specific
+intervals, not the entire domain.
 
 ### Partial Monotonicity
 
@@ -137,6 +139,7 @@ plot(x, y, pch = 16, cex = 0.5, col = "gray", main = "Partial Convexity")
 lines(x_eval, spline_eval(fit_conv_partial, x_eval), col = "blue", lwd = 2)
 abline(v = knots[6], col = "red", lty = 2)  # Boundary of constrained region
 ```
+
 ## Mixed Constraints
 
 Multiple shape constraints can be applied simultaneously.
@@ -153,19 +156,21 @@ lines(x_eval, spline_eval(fit_both, x_eval), col = "blue", lwd = 2)
 
 ## Constraints with Multiple Knots
 
-When using knot multiplicities, constraints need to be adapted to the reduced regularity. 
+When using knot multiplicities, constraints need to be adapted to the
+reduced regularity. Constraints apply only on regular pieces : monotonicity is ensured on continuous pieces only.
 
 ```{r multiple-knots}
 # Create knots with multiplicity at a point
-sn_mult <- c(0, 0, 0, 0, 0.3, 0.5, 0.5,0.5,0.5, 0.7, 1, 1, 1, 1)
-basis_mult <- Bspline_base(sn_mult, degree = 3)
-knots_mult <- basis_mult$knot
+sn_mult <- c(0, 0, 0, 0, 0.3, 0.4,0.4,0.4, 0.5,0.5,0.5, 0.7, 1, 1, 1, 1)
+#basis_mult <- Bspline_base(sn_mult, degree = 3)
+knots_mult <- c(0, 0.3, 0.3,0.3,0.3,0.4, 0.5,0.7,0.7,0.7,0.7, 1)
 
 # Fit with constraints
 fit_mult <- quantile_spline(x, y, knots_mult, tau = 0.5, monot = 1)
 plot(x, y, pch = 16, cex = 0.5, col = "gray", 
      main = "Constraints with Multiple knots")
 lines(x_eval, spline_eval(fit_mult, x_eval), col = "blue", lwd = 2)
+
 ```
 
 ## Recap: Visualizing Constraint Effects
@@ -191,73 +196,46 @@ lines(x_eval, spline_eval(fit_both, x_eval), col = "blue", lwd = 2)
 
 par(mfrow = c(1, 1))
 ```
+
+
+
 ## Karlin-Studden SOCP Formulation
+The shape constraints are implemented using the **Karlin-Studden
+characterization** of non-negative polynomials of degree 2 or 3.
 
-The shape constraints are implemented using the **Karlin-Studden characterization** of non-negative polynomials of degree 2 or 3. 
+Depending on the degree of the spline (3 or 4), these constraints apply
+to the first or second derivative:
 
-Depending on the degree of the spline (3 or 4), these constraints apply to the first or second derivative:
+### Constraints by Degree
 
-| Spline Degree | Constraint Type | Polynomial Degree | Applied to |
-|---------------|-----------------|-------------------|------------|
-| 3 (Cubic) | Monotonicity | Quadratic (degree 2) | First derivative |
-| 3 (Cubic) | Convexity | Linear (degree 1) | Second derivative |
-| 4 (Quartic) | Monotonicity | Cubic (degree 3) | First derivative |
-| 4 (Quartic) | Convexity | Quadratic (degree 2) | Second derivative |
+| Degree        | Monotonicity | Convexity    | Third Derivative      |
+|---------------|--------------|--------------|-----------------------|
+| 0 (constant)  |\+(constant)  | X   | X            |
+| 1 (Linear)    | \+(linear)   | X            | X                     |
+| 2 (Quadratic) | \+ (Linear)  | \+(constant) | X                     |
+| 3 (Cubic)     | \+(Karlin)   | \+(Linear)   | \+(linear (constant)) |
+| 4 (Quartic)   | \+(Karlin)   | \+(Karlin)   | \+(linear)            |
+| 5 (quintic)   | X   | \+(Karlin)   | Not implemented       |
+| $\geq6$        | X   | X   | X       |
 
-**Other constraints** (third derivative, constraints at knots) are **linear** and are added as linear inequalities.
+'Karlin' means in fact 'quadratic' inequality.
 
-The complete set of constraints forms a **Second-Order Cone Program (SOCP)**. This SOCP formulation ensures **exact shape constraints**, unlike approximations that only enforce constraints at knots or at a finite set of points.
 
-The particular structure of the problem allows the use of the **CVXR** package, which handles this type of mixed quadratic/linear conic problems efficiently through its DCP (Disciplined Convex Programming) framework and supports multiple solvers (CLARABEL, OSQP, ECOS, SCS).
+**Other constraints**  pointwise constraints, at knots or not, are not implemented, but they would be implemented as simple linear inequalities.
 
-## Practical Considerations
+The complete set of constraints forms a **Second-Order Cone Program
+(SOCP)**. This SOCP formulation ensures **exact shape constraints**,
+unlike approximations that only enforce constraints at knots or at a
+finite set of points.
 
-### When to Use Shape Constraints
+The particular structure of the problem allows the use of the **CVXR**
+package, which handles this type of mixed quadratic/linear conic
+problems efficiently through its DCP (Disciplined Convex Programming)
+framework and supports multiple solvers (CLARABEL, OSQP, ECOS, SCS).
 
-| Constraint | When to Use |
-|------------|-------------|
-| Monotonicity | Demand curves, growth curves, dose-response |
-| Convexity | Cost functions, risk aversion, production functions |
-| Third derivative | Smoothing curvature, spline regularity |
-| Partial | Data with known local behavior |
-
-### Constraint Strength
-
-Constraints can be too strong if:
-- The data clearly violates the assumed shape
-- Too few knots leading to over-smoothing
-- Multiple constraints conflicting
-
-### Choosing the Degree
-
-| Degree | Smoothness | Flexibility |
-|--------|------------|-------------|
-| 1 | Piecewise linear | Low |
-| 2 | C¹ | Medium |
-| 3 | C² | High |
-| 4 | C³ | Very high |
 
 ## Summary
-
-The package provides:
-- **Uniform constraints**: Apply globally
-- **Partial constraints**: Apply on specific intervals
-- **Mixed constraints**: Multiple constraints simultaneously
-- **SOCP formulation**: Exact (not approximated) constraints
-- **multiple knots**: for lower regularity handling at knots (shocks)
-
-For more examples, see the demos:
-
-```{r}
-demo(package = "BsplineQuantReg")
-```
-```
-
-## Additional Sections You Could Add
-
-| Section | Content |
-|---------|---------|
-| **Verification** | How to check if constraints are satisfied |
-| **Comparison with cobs** | Differences in constraint implementation |
-| **Real Examples** | Temperature, economics, biology applications |
-| **Troubleshooting** | Common issues and solutions |
+The package provides: - **Uniform constraints**: Apply globally -
+**Partial constraints**: Apply on specific intervals - **Mixed
+constraints**: Multiple constraints simultaneously - **SOCP
+formulation**: Exact (not approximated) constraints on the whole intervals.

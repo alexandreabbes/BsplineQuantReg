@@ -7,3 +7,4 @@
 ^\.claude$
 ^\.github$
 ^fix_doc.R
+^\inst\docker$
