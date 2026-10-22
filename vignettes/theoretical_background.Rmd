@@ -50,7 +50,7 @@ function (or pinball loss), and $\mathcal{F}$ is a class of functions
 The function $f(x)$ is assumed to satisfy one or more shape constraints:
 
 | Constraint | Mathematical Form | Meaning |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | Monotonicity | $f'(x) \geq 0$ (or $\leq 0$) | Increasing (or decreasing) |
 | Convexity | $f''(x) \geq 0$ (or $\leq 0$) | Convex (or concave) |
 | Third Derivative | $f'''(x) \geq 0$ (or $\leq 0$) | Controlling curvature evolution |
@@ -158,6 +158,9 @@ $(t - s_\nu)^l$ for each interval $\nu$.
 
 ### 2.4 Implementation Details
 
+From version 0.2.6, the degree can be any non negative integer as in the
+reality of Bsplines.
+
 The package provides several functions for B-spline manipulation:
 
 | Function               | Purpose                               |
@@ -183,6 +186,27 @@ a knot with multiplicity $m$ and degree $d$:
 
 The package supports multiple knots, allowing the user to control the
 smoothness of the spline at specific points.
+
+```{r}         
+## 2.6 Visual illustration of knot multiplicity
+
+# We compare a quartic (degree 4) B-spline basis with simple knots
+# and the same basis where the central knot is repeated 4 times.
+degree <- 4
+knots_simple <- c(0,0,0,0,0, 0.25, 0.5, 0.75,1,1,1,1, 1)
+knots_mult   <- c(0,0,0,0,0, 0.25, 0.5, 0.5, 0.5, 0.5, 0.75, 1,1,1,1,1)
+
+# Basis with simple knots
+B_simple <- Bspline_base( knots_simple,degree)
+
+# Basis with a multiplicity-4 knot at 0.5
+B_mult <- Bspline_base(knots_mult, degree)
+
+view_basis(B_simple)
+view_basis(B_mult)
+
+
+```
 
 ## References
 

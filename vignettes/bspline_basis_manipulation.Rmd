@@ -405,7 +405,7 @@ der_knots <- Spline_der_knot(basis, der = 1)
 print(head(der_knots))
 ```
 
-## Simple Example: Coherence of Derivative Evaluation Methods (Degree 5)
+## Simple Example for higher degree: Coherence of Derivative Evaluation Methods (Degree 5)
 
 ```{r}
 # Create a degree 5 B-spline

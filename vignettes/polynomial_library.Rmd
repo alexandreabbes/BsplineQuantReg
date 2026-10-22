@@ -408,9 +408,32 @@ cat("Piece 2: ", show_poly(pp$coeff[2, ], b = 0), "\n")
 cat("Piece 3: ", show_poly(pp$coeff[3, ], b = 0), "\n")
 ```
 
+## Summary show_poly()
+
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `obj` | Polynomial coefficients (decreasing power order) | Required |
+| `a` | Base of input coefficients $(x-a)^k$ | 0 |
+| `b` | Base for output display $(x-b)^k$ | 0 |
+| `digits` | Number of significant digits | 4 |
+| `verbose` | Print additional information |FALSE |
+
+
 
 ## Integration with show_pp()
 The `show_poly()` function is used internally by `show_pp()` to display piecewise polynomials:
+
+
+The display functions "show_pp()" offer several customization options:
+
+    local: Control the basis (TRUE for local, FALSE for canonical)
+
+    digits: Number of significant digits (default: 4)
+
+    verbose: Display additional PP information
+
+
+
 
 ```{r show_pp_integration}
 # Create a PP with two intervals
@@ -458,24 +481,5 @@ show_pp(basis, local = TRUE, verbose = TRUE)
 # [0.300, 0.600] -4.63(x-0.3)^3 + ... 
 # [0.600, 1.000] ...
 ```
-Customization Options
-The display functions offer several customization options:
 
-    local: Control the basis (TRUE for local, FALSE for canonical)
-
-    digits: Number of significant digits (default: 4)
-
-    verbose: Display additional PP information
-
-
-
-## Summary show_pp()
-
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `obj` | Polynomial coefficients (decreasing power order) | Required |
-| `a` | Base of input coefficients $(x-a)^k$ | 0 |
-| `b` | Base for output display $(x-b)^k$ | 0 |
-| `digits` | Number of significant digits | 4 |
-| `verbose` | Print additional information |FALSE |
 
