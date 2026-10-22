@@ -238,4 +238,4 @@ framework and supports multiple solvers (CLARABEL, OSQP, ECOS, SCS).
 The package provides: - **Uniform constraints**: Apply globally -
 **Partial constraints**: Apply on specific intervals - **Mixed
 constraints**: Multiple constraints simultaneously - **SOCP
-formulation**: Exact (not approximated) constraints on the whole intervals.
+formulation**: Exact (not approximated) constraints on the whole intervals. Constraints concern **monotone** or **convex** 

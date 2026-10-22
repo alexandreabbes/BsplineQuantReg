@@ -1,6 +1,6 @@
 # Dockerfile
 
-FROM rocker/r-base:4.4.0
+FROM rocker/r-base:4.5.0
 
 # Installer les dépendances système
 RUN apt-get update && apt-get install -y \
