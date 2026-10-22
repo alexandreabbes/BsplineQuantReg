@@ -14,7 +14,7 @@ Description: Quantile regression with B-splines under shape constraints.
     while other constraints are added as linear problems. The method for 
     monotone constraints of cubic splines is described in Abbes (2025)
     <doi:10.5281/zenodo.17427913>. For quartic splines, see other
-    references given in the README. All B-spline and polynomial functions
+    references. All B-spline and polynomial functions
     have been rewritten for consistency. This package provides a fully
     independent original B-spline library for conversion between PP-form
     and B-spline representation, evaluation, differentiation, callable
