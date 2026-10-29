@@ -47,7 +47,8 @@ spline_eval <- function(Bspline,
   degree = Bspline$degree
   coeff = Bspline$coeff
   if (verbose) {
-    cat("Evaluation de la spline:\n", print(Bspline))
+    cat("Evaluation of the spline:\n")
+    print(Bspline)
   }
   if (is.null(x_values)) {
     message("no x_value given, compute at the knots")
@@ -203,18 +204,15 @@ bs_direct <- function(Basis,
 #'
 #' @seealso \code{\link{makpp}}, \code{\link{evalpp}}, \code{\link{Bspline_base}}
 #' @export
-Bsplinetopp <- function(Bspline,
-                        Bsbasis = NULL,
-                        callable = FALSE,
-                        verbose = FALSE) {
-  #Convert a B-spline to a PP-polynomial
+Bsplinetopp<-function (Bspline, Bsbasis = NULL, callable = FALSE, verbose = FALSE)
+{
   if (inherits(Bspline, "callable_spline")) {
     Bspline = get_parameters(Bspline)
   }
-  coeff = Bspline$coeff
+  coeff = (Bspline$coeff)
   degree = Bspline$degree
   tn <- Bspline$knot
-  sn <- c(rep(tn[1], degree), tn, rep(rev(tn)[1], degree)) #extended knots
+  sn <- c(rep(tn[1], degree), tn, rep(rev(tn)[1], degree))
   if (!is.null(Bspline$base)) {
     BB <- Bspline$base
   }
@@ -222,12 +220,15 @@ Bsplinetopp <- function(Bspline,
     Bsbasis <- Bspline_base(sn, degree = degree, verbose = verbose)
     BB <- Bsbasis$base
   }
-  PP <- array(0 , dim = c(length(tn) - 1, degree + 1))
+  PP <- array(0, dim = c(length(tn) - 1, degree + 1))
   for (nu in 1:(length(tn) - 1)) {
-    PP[nu, ] <- t(BB[, nu + degree , ]) %*% coeff
+    PP[nu, ] <- t(BB[, nu + degree, ])%*%coeff
   }
+  if (dim(PP)[1]==dim(PP)[2])  PP<-t(PP)
   PP <- makpp(PP, tn, callable = callable)
+  return(PP)
 }
+
 
 
 

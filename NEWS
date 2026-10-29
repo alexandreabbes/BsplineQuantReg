@@ -1,12 +1,24 @@
-Version=0.2.6
+Version=0.2.7
+=============
 
-##added
+## fixed
+
+-some vignettes (cosmetic, details)
+-error caused by verbose=TRUE in spline_eval
+-bad transpositon of coeff in Bsplinetopp when the matrix of coeff is squared
+-verbose comment in makepp
+
+Version=0.2.6 (10/2026)
+=============
+## added
+
 -monotone quantile regression with piecewise constant functions (splines of degree 0)
 -regression for polynomials of degrees >=5. Constraints  for degree 5: only convexity and degree 3 derivative.
 no constraints for degree>=6
 -Introduction.Rmd vignette
 
-##fixed:
+## fixed:
+
 -description file
 -evaluation of Bsplines of degree=0 and only 2 knots (1 intervall):
 simplify most of functions by creating first a zero array with all dimensions.
@@ -16,25 +28,28 @@ simplify most of functions by creating first a zero array with all dimensions.
 -temperature2 demo : mixed constraints were not properly applied
 
 Version=0.2.5 (08/2026)
-##fixed
+## fixed
 -multiple knots when degree=1 and constraints: inconstistant dividing -> multiplying  by the delta_knots. 0 when  multiple knots  caused error)
-##change
+## change
 -multiply derivative coefficients by h, h^2,h^3 for cubic regression
 
 Version=0.2.4
-##change
--update the view basis function
--Update the name of the logical variable in view_basis
--re-organise functions in files
--add vignettes
--add "show" function for polynomial and pp/spline on each interval, base local/canonical
+## change:
 
-##fixed
+- update the view basis function
+- Update the name of the logical variable in view_basis
+- re-organise functions in files
+- add vignettes
+- add "show" function for polynomial and pp/spline on each interval, base local/canonical
+
+## fixed
+
 -p_norm(x,2) instaed of norm2 for mean square
 -print.non_callable_pp
 
 
 Version=0.2.3 (08/2026)
+=======================
 ##changes
 - Update README.md with the anouncement of the gui and its docker on github
 - Add possibility to chose the type of regression (quantile or mean square)
@@ -62,7 +77,7 @@ or non-callable output
 
 
 Version=0.2.1 (07/2026)
-=============
+=======================
 ## Bug Fixes
 - Deprecated notation in CVXR
 - Small bug preventing the regression when the number of knots is minimal

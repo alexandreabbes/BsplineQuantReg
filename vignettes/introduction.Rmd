@@ -96,7 +96,7 @@ x_eval=(0:200)/200
     pch = 16,
     cex = 0.5,
     col = "black",
-    main = c("Mixed mootone :\n global increasing constraints
+    main = c("Mixed monotone :\n global increasing constraints
                 "
     )
   )

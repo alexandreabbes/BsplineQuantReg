@@ -24,7 +24,7 @@ implemented in the `BsplineQuantReg` package. We cover two main topics:
 
 1.  **Quantile regression with shape constraints** using the
     Karlin-Studden SOCP formulation
-2.  **B-spline construction** via De Boor's recursion formula
+2.  **B-spline construction** via De Boor\'s recursion formula
 
 The theoretical framework combines: - Quantile regression (Koenker &
 Bassett, 1978) - B-spline approximation (de Boor, 1978) -
@@ -111,7 +111,7 @@ The DCP (Disciplined Convex Programming) framework in CVXR ensures the
 problem is convex and translates it into a form suitable for solvers
 like CLARABEL, OSQP, ECOS, or SCS.
 
-## 2. B-spline Construction with De Boor's Formula
+## 2. B-spline Construction
 
 ### 2.1 B-spline Definition
 
@@ -136,9 +136,9 @@ $$N_{i,d}(t) = \frac{t - t_i}{t_{i+d} - t_i} N_{i,d-1}(t) + \frac{t_{i+d+1} - t}
 
 with the convention $0/0 = 0$.
 
-### 2.3 De Boor's Algorithm for Coefficient Computation
+### 2.3 Algorithm for Coefficient Computation
 
-The package implements De Boor's algorithm to compute the polynomial
+The package implements the well known algorithm to compute the polynomial
 coefficients of each B-spline basis function on each interval. For a
 B-spline of degree $d$ with $n$ basis functions, the algorithm proceeds
 recursively:
@@ -209,25 +209,23 @@ view_basis(B_mult)
 ```
 
 ## References
-
+- Abbes, A. (2026). Quantile Regression with Cubic Polynomial Splines
+  under Shape Constraints with Applications. Zenodo.  <doi:10.5281/zenodo.17427913>
+- Koenker, R., & Bassett, G. (1978). Regression Quantiles. *Econometrica*, 46(1), 33-50.
 - de Boor, C. (1978). *A Practical Guide to Splines*. Springer-Verlag.
 - Karlin, S., & Studden, W. J. (1966). *Tchebycheff Systems: With
   Applications in Analysis and Statistics*. Interscience.
 - Papp, D., & Alizadeh, F. (2014). Shape-Constrained Estimation Using
-  Nonnegative Splines. *Journal of Computational and Graphical
-  Statistics*, *23*(1), 211–231.
+  Nonnegative Splines. *Journal of Computational and Graphical  Statistics*, *23*(1), 211–231.
   <https://doi.org/10.1080/10618600.2012.707343>
-- Koenker, R., & Bassett, G. (1978). Regression Quantiles.
-  *Econometrica*, 46(1), 33-50.
-- Abbes, A. (2026). Quantile Regression with Cubic Polynomial Splines
-  under Shape Constraints with Applications. Zenodo.
-  <doi:10.5281/zenodo.17427913>
+
+
 
 ## Further Reading
 
 For more details on the implementation and examples, see the other
 vignettes:
 
-- `vignette("introduction", package = "BsplineQuantReg")`
-- `vignette("shape-constraints", package = "BsplineQuantReg")`
-- `vignette("basis-manipulation", package = "BsplineQuantReg")` \`\`\`
+- vignette('introduction', package = 'BsplineQuantReg')
+- vignette('shape_constraints', package = 'BsplineQuantReg')
+- vignette('bspline_basis_manipulation', package = 'BsplineQuantReg')

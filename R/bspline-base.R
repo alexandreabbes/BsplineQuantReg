@@ -64,6 +64,154 @@ Omega <- function(s, j, o)
 #' @export
 #'
 #'
+Bspline_base2 <- function(sn,
+                         degree = 3,
+                         der = 0,
+                         verbose = FALSE)
+{
+  if (verbose) {
+    message(
+      "Constructing the B-spline basis, \n Degree = ",
+      degree,
+      " \n Extended knots partition: ",
+      paste(sn,collapse = ',')
+    )
+  }
+
+  tn <- tryCatch({
+    sn[(degree + 1):(length(sn) - degree)]
+  }, error = function(e) {
+    stop("Error extracting knots: ", e$message)
+  }) #effective knot partition
+  kn = length(tn) - 1 # tn is the list of knot without the extended partition.
+  n_ext_intervals <- kn + 2 * degree #Nb extended intervals
+  n_splines <- kn + degree
+  B <- array(0, dim = c((degree + 1), n_splines, n_ext_intervals, (degree +
+                                                                     1))) # B is the initial B-spline basis : piecewise constant
+
+  for (i in (degree + 1):(kn + degree)) {
+    B[1, i, i, degree + 1] <- 1
+  }#in decreasing convention
+  if (degree > 0) {
+    for (o in (2:(degree + 1)))
+      #first Bspline base
+      #to be computed: order2=degree 1.
+    {
+      #k : dimension of local basis=deg+1
+      for (j in (1:(n_splines))) {
+        #go through the elements of the basis
+        for (nu in ((degree + 1):(n_ext_intervals)))
+          #go through the  pieces of the spline of order l
+        {
+          #Bjnu<-B[(o-1),j,nu,1:(o-1)] #inc. convention
+          Bjnu <- reduce_pol(B[(o - 1), j, nu, (degree + 1 - (o - 1)):(degree +
+                                                                         1)])#dec. convention
+          if ((j + 1) > n_splines) {
+            Bjpnu = 0
+            wjp1nu = 0
+          }
+          else
+          {
+            #Bjp1nu=B[(o-1),(j+1),nu,1:(o-1)] #inc. convention
+            Bjp1nu = reduce_pol(B[(o - 1), (j + 1), nu, (degree - o + 2):(degree +
+                                                                            1)]) #decr. convention
+            #wjp1o=polyadd(c(1,0),-Omega(sn,(j+1),o))}#inc convent.
+            wjp1o = polyadd(c(0, 1), -Omega(sn, (j + 1), o))
+          }
+
+          wjo = Omega(sn, j, o)
+
+          term1 = polymul(Bjnu, wjo)
+          term2 = polymul(Bjp1nu, wjp1o)
+
+          sumterm = polyadd(term1, term2)
+          if (length(sumterm)<o){sumterm<-c(sumterm,rep(0,o-length(sumterm)))}
+          #cat(sumterm,'\n',o,j,nu,degree,'\n')# for debug only
+          B[o, j, nu, (degree - o + 2):(degree + 1)] <- sumterm
+        }
+      }
+    }
+  }
+
+  #changement de base
+  # because the coefficients of each polynomial piece
+  #are computed on the canonical basis 1,x,x^2...x^degree
+  Bn = array(0, dim(B))
+  for (o in 1:(degree + 1)) {
+    for (j in 1:n_splines)
+    {
+      for (nu in 1:n_ext_intervals)
+      {
+        Bn[o, j, nu, ] <- change_polynomial_base_taylor(B[o, j, nu, ], 0, sn[nu])
+      }
+    }
+  }
+
+
+  Base0 = array(0, c(n_splines, n_ext_intervals, degree + 1))
+  BaseL = array(0, c(n_splines, n_ext_intervals, degree + 1))
+  Base0[, , ] = B[(degree + 1), , , ]  #basis x^i at each knot
+  BaseL[, , ] = Bn[(degree + 1), , , ] #Local basis (x-t_nu)^i at knot nu
+  Base0 = round(Base0, 10)
+  BaseL = round(BaseL, 10)
+  basis <- list(
+    base = BaseL ,
+    base0 = Base0,
+    ext_knot = sn,
+    knot = tn,
+    degree = degree,
+    n_splines = (n_splines),
+    deriv_order = 0
+  )
+  class(basis) <- c('bspline_basis', class(basis))
+  if (der == 0) {
+    return(basis)
+  } else
+  {
+    return(Bspline_base_deriv(basis, der))
+  }
+
+}
+
+
+
+
+#' Build B-spline basis in piecewise polynomial form
+#' Computes local polynomial coefficients for each B-spline basis function
+#' on each interval. Polynomials are expressed in the canonical basis
+#' Uses De Boor's recursion formula.
+#' @param sn Extended knot vector (including endpoint repetitions)
+#' This means if t0..tkn it the set of knot
+#' then sn should be given as a vector with  "degree" times t_0 and t_kn
+#' at the beginning
+#'  and the ends.  its length is number of intervals+1+2*degree.
+#' @param degree 'B-spline' degree (default = 3 for cubic)
+#' @param der Derivative order (0 = original basis)
+#' @param verbose boolean FALSE (default) or TRUE.
+#' @return A list containing:
+#'   \item{base}{Coefficients in the local bases, in the form of an 3-d array [j,nu,coeff],
+#'    j : the number of the spline in the basis,
+#'   nu: the number of the interval in the extended notation,
+#'   coeff : the coefficients in decreasing order
+#'   Decresing (matlab) convention on the local bases (t-s_nu)^l, l=3.2.1
+#'   base[j,,] is a matrix of piecewise polynomial function compatible with the pp-form.}
+#'   \item{base0}{Coefficients in canonical basis (centered at 0) (1, t, t^2, t^3) centered at the interval origin.}
+#'   \item{ext_knot}{Extended knot vector}
+#'   \item{knot}{Effective knot partition including ends)}
+#'   \item{degree}{Spline degree}
+#'   \item{n_splines}{Number of basis functions}
+#'   \item{deriv_order}{Applied derivative order}
+#' @examples
+#' sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
+#' basis <- Bspline_base(sn, degree=3)
+#' x=(0:(5*100))/100
+#' y=bs_direct(basis,x)
+#' matplot(x,t(y))
+#' #or simple:
+#' #view_basis(basis)
+#' @export
+#'
+#'
 Bspline_base <- function(sn,
                          degree = 3,
                          der = 0,
@@ -74,7 +222,7 @@ Bspline_base <- function(sn,
       "Constructing the B-spline basis, \n Degree = ",
       degree,
       " \n Extended knots partition: ",
-      sn
+      paste(sn, collapse=",")
     )
   }
 

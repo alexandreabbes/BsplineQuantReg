@@ -27,7 +27,6 @@ to incorporate prior knowledge about the function's behavior
 Shape constraint for quantile regression with cubic splines is initially the main purpose of this package, based on the paper of Abbes (2025). It has been extended to other degrees, and the package also allows to switch to ordinary mean square regression.
 
 ## Available Demos
-
 The package includes several demos that illustrate shape constraints:
 
 ```{r demos}
