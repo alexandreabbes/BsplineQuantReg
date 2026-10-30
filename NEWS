@@ -1,5 +1,7 @@
 Version=0.2.7
 =============
+## change
+- vignette polynomial_library add plot while fixing the problem of Bsplinetopp
 
 ## fixed
 

@@ -275,14 +275,14 @@ grid()
 
 ## Comparison: PP vs B-spline
 
-```{r pp_vs_bspline}
+```{r pp_vs_bspline, fig.cap="B-spline evaluation and PP-form evaluation coincide on [0,1]."}
 ### Create a B-spline and convert to PP form
 sn <- c(0, 0, 0, 0, 0.25, 0.5, 0.75, 1, 1, 1, 1)
-tn<- c( 0, 0.25, 0.5, 0.75, 1)
-coeff <- 10*rnorm(7,1)
-Bspline<-list(coeff=coeff,knot=tn,degree=3)
+tn <- c(0, 0.25, 0.5, 0.75, 1)
+set.seed(42)                         # reproducible
+coeff <- 10 * rnorm(7, 1)
+Bspline <- list(coeff = coeff, knot = tn, degree = 3)
 Bspline <- make_spline(Bspline)
-
 
 ### Convert to PP
 pp_from_bspline <- Bsplinetopp(Bspline)
@@ -290,10 +290,22 @@ pp_from_bspline <- Bsplinetopp(Bspline)
 ### Both represent the same function
 x <- seq(0, 1, length.out = 100)
 y_bspline <- spline_eval(Bspline, x)
-y_pp <- evalpp(pp_from_bspline, x)
+y_pp     <- evalpp(pp_from_bspline, x)
 
 ### They should match
-max(abs(y_bspline - y_pp))
+cat("Max |B-spline - PP| =", max(abs(y_bspline - y_pp)), "\n")
+
+### Plot with legend
+plot(x, y_bspline, lwd = 2, col = "black",
+     xlab = "x", ylab = "f(x)",
+     main = "B-spline vs PP-form evaluation")
+lines(x, y_pp, type = "l", lwd = 2, col = "red", lty = 2)
+grid()
+legend("topright",
+       legend = c("B-spline evaluation (spline_eval)",
+                  "PP-form evaluation (evalpp)"),
+       col = c("black", "red"),
+       lty = c(1, 2), lwd = 2, bty = "n")
 ```
 
 #### Summary
