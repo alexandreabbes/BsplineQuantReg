@@ -2,38 +2,45 @@ Version=0.2.7
 =============
 ## change
 - vignette polynomial_library add plot while fixing the problem of Bsplinetopp
+- add a parameter "knot"" in makpp equal to the preceding "tn"
+- translation in show_poly() help.
+- add a function to derive pp objects
+- in spline_eval(Bspline,xx), if Bspline is a basis, not re-compute the basis.
+- Transfer the basis attributes to callable and non-callable splines, get_parameter() is adapted, and all output are now aligned.
+-modify the ylim in basis_view()
 
 ## fixed
-
--some vignettes (cosmetic, details)
--error caused by verbose=TRUE in spline_eval
--bad transpositon of coeff in Bsplinetopp when the matrix of coeff is squared
--verbose comment in makepp
+- some vignettes (mostly cosmetic, details)
+- error caused by verbose=TRUE in spline_eval
+- bad transpositon of coeff in Bsplinetopp when the matrix of coeff is squared
+- verbose comment in makepp
+- remove waste bspline_base2 useseless function (old debug purpose, forgotten)
+- some mistake in Bspline_base() function help
 
 Version=0.2.6 (10/2026)
 =============
 ## added
 
--monotone quantile regression with piecewise constant functions (splines of degree 0)
--regression for polynomials of degrees >=5. Constraints  for degree 5: only convexity and degree 3 derivative.
+- monotone quantile regression with piecewise constant functions (splines of degree 0)
+- regression for polynomials of degrees >=5. Constraints  for degree 5: only convexity and degree 3 derivative.
 no constraints for degree>=6
--Introduction.Rmd vignette
+- Introduction.Rmd vignette
 
 ## fixed:
 
--description file
--evaluation of Bsplines of degree=0 and only 2 knots (1 intervall):
+- description file
+- evaluation of Bsplines of degree=0 and only 2 knots (1 intervall):
 simplify most of functions by creating first a zero array with all dimensions.
--output of result value of the fit value for quartic and greater degrees
--transposed coeff output in makpp yielding errors
--vignettes md code and content
--temperature2 demo : mixed constraints were not properly applied
+- output of result value of the fit value for quartic and greater degrees
+- transposed coeff output in makpp yielding errors
+- vignettes md code and content
+- temperature2 demo : mixed constraints were not properly applied
 
 Version=0.2.5 (08/2026)
 ## fixed
--multiple knots when degree=1 and constraints: inconstistant dividing -> multiplying  by the delta_knots. 0 when  multiple knots  caused error)
+- multiple knots when degree=1 and constraints: inconstistant dividing -> multiplying  by the delta_knots. 0 when  multiple knots  caused error)
 ## change
--multiply derivative coefficients by h, h^2,h^3 for cubic regression
+- multiply derivative coefficients by h, h^2,h^3 for cubic regression
 
 Version=0.2.4
 ## change:

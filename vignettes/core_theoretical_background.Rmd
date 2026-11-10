@@ -1,0 +1,276 @@
+---
+title: "Theoretical Background"
+author: "Alexandre Abbes"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+
+vignette: >
+  %\VignetteIndexEntry{Theoretical Background}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup_theory, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 7, fig.height = 5)
+library(BsplineQuantReg)
+```
+
+## Introduction
+
+One provides here  a short theoretical background for the methods
+implemented in the 'BsplineQuantReg' package. We cover two main topics:
+
+1. **Quantile regression with shape constraints** using the
+   Karlin–Studden SOCP formulation.
+2. **B-spline construction** via De Boor's recursion formula.
+
+The theoretical framework combines:
+
+- Quantile regression (Koenker & Bassett, 1978);
+- B-spline approximation (de Boor, 1978);
+- Shape-constrained estimation via non-negative polynomials
+  (Karlin & Studden, 1966).
+
+<!-- slide: 1 — Introduction -->
+
+## 1. Quantile constrained regression
+
+### 1.1 Quantile regression
+
+Quantile regression aims to estimate the conditional quantile function
+$Q_{Y|X}(\tau|x)$ for a given quantile level $\tau \in (0,1)$. The
+problem can be formulated as:
+
+$$
+\min_{f \in \mathcal{F}} \sum_{i=1}^{n} \rho_{\tau}(y_i - f(x_i))
+$$
+
+where $\rho_{\tau}(u) = u(\tau - \mathbf{1}_{u < 0})$ is the check
+function (or pinball loss), and $\mathcal{F}$ is a class of functions
+(here, B-splines with shape constraints).
+
+<!-- slide: 2 — 1.1 Quantile regression -->
+
+### 1.2 Shape constraints
+
+The function $f(x)$ is assumed to satisfy one or more shape constraints:
+
+| Constraint | Mathematical form | Meaning |
+|------------|-------------------|---------|
+| Monotonicity | $f'(x) \geq 0$ (or $\leq 0$) | Increasing (or decreasing) |
+| Convexity | $f''(x) \geq 0$ (or $\leq 0$) | Convex (or concave) |
+| Third derivative | $f'''(x) \geq 0$ (or $\leq 0$) | Controlling curvature evolution |
+
+<!-- slide: 3 — 1.2 Shape constraints -->
+
+### 1.3 Karlin–Studden characterization
+
+Karlin–Studden (1966) provide a characterization of non-negative
+polynomials on an interval. Papp and Alizadeh (2014) have translated
+this into an equivalent formulation with symmetric matrices: for a
+polynomial $p(u)$ of degree $n$ on $[0,1]$:
+
+**Even degree** ($n = 2k$)  and **Odd degree** ($n = 2k+1$) behave differently.
+But for both : $p(u) \geq 0$ iff there exist positive
+  semi-definite matrices $\mathbf{X}$ and $\mathbf{Y}$ of size
+  $(k+1) \times (k+1)$ satisfying linear constraints with the
+  coefficients of $p$.
+  
+
+  
+### For cubic splines (degree 3) (resp. quartic, degree 4)
+
+- Monotonicity: $f'(u) = a u^2 + b u + c \geq 0$ on each interval
+   (resp. $f'(u) = a u^3 + b u^2 + c u + d \geq 0$ on each interval))
+- Convexity is linear
+   (resp $f''(u) = a' u^2 + b' u + c' \geq 0$ ) 
+
+These are polynomials of degree $2k$ or $2k+1$ with $k = 1$. The
+positivity is characterized by a $2 \times 2$ positive matrix: an SOCP
+constraint.
+
+Other constraints (convexity, third derivative ) have a linear or constant expression in
+terms of the coefficients of $p$.
+
+<!-- slide: 4 — 1.3 Karlin–Studden characterization -->
+
+### 1.4 SOCP formulation and CVXR implementation
+
+The shape-constrained quantile regression problem can be written as:
+
+$$
+\min_{\boldsymbol{\alpha}, \mathbf{z}} \sum_{i=1}^{n} \rho_{\tau}(y_i - \mathbf{B}(x_i)^\top \boldsymbol{\alpha})
+$$
+
+subject to:
+
+$$
+\text{SOC constraints for monotonicity, convexity, etc.}
+$$
+
+$$
+\text{Linear constraints for third derivative, knots}
+$$
+
+This is a **Second-Order Cone Program (SOCP)** that can be solved
+efficiently using interior-point methods.
+
+### The package uses **CVXR** to model the SOCP problem:
+
+1. **Variables**: B-spline coefficients $\boldsymbol{\alpha}$ and
+   auxiliary variables $\mathbf{z}$.
+2. **Objective**: quantile loss function
+   $\sum \rho_{\tau}(y_i - \mathbf{B}(x_i)^\top \boldsymbol{\alpha})$.
+3. **Constraints**:
+   - Karlin–Studden SOC constraints for monotonicity and convexity;
+   - linear constraints for third derivative;
+   - knot constraints for convexity/concavity.
+
+The DCP (Disciplined Convex Programming) framework in CVXR ensures the
+problem is convex and translates it into a form suitable for solvers
+like CLARABEL, OSQP, ECOS, or SCS.
+
+<!-- slide: 5 — 1.4 SOCP formulation and CVXR -->
+
+## 2. B-spline construction
+
+### 2.1 B-spline definition
+
+The construction uses the extended knot sequence instead of $t_i$,
+which is built by adding enough knots ($d$ for degree $d$) at each end
+of the sequence. For a spline of degree $d$ with $m$ intervals, the
+extended knot sequence is:
+
+$$
+\mathbf{s} = \{ \underbrace{t_0, \ldots, t_0}_{d+1}, t_1, \ldots, t_{m-1}, \underbrace{t_m, \ldots, t_m}_{d+1} \}
+$$
+
+The extended knots ensure the B-spline basis functions are properly
+defined at the boundaries. This is why the `Bspline_base()` function
+has an entry with the extended knot sequence.
+
+### 2.2 Construction
+
+**Order 0 (constant):**
+
+$$
+N_{i,0}(t) = \begin{cases} 1 & t_i \leq t < t_{i+1} \\ 0 & \text{otherwise} \end{cases}
+$$
+
+**Higher order (degree $d$):**
+
+$$
+N_{i,d}(t) = \frac{t - t_i}{t_{i+d} - t_i} N_{i,d-1}(t) + \frac{t_{i+d+1} - t}{t_{i+d+1} - t_{i+1}} N_{i+1,d-1}(t)
+$$
+
+with the convention $0/0 = 0$.
+
+<!-- slide: 6 — 2.1 B-spline definition -->
+
+### 2.3 Algorithm for coefficient computation
+
+The package implements the well-known algorithm to compute the
+polynomial coefficients of each B-spline basis function on each
+interval. For a B-spline of degree $d$ with $n$ basis functions, the
+algorithm proceeds recursively:
+
+**Step 1**: start with constant B-splines (degree 0): $N_{i,0}(t)$ are
+piecewise constants.
+
+**Step 2**: for degree $k = 1$ to $d$, for each basis function $j$ and
+interval $\nu$, compute the coefficients using the recurrence:
+
+$$
+N_{j,k}(t) = \omega_{j,k}(t) N_{j,k-1}(t) + (1 - \omega_{j+1,k}(t)) N_{j+1,k-1}(t)
+$$
+
+where $\omega_{j,k}(t) = \dfrac{t - s_j}{s_{j+k} - s_j}$.
+
+**Step 3**: store the polynomial coefficients in the local basis
+$(t - s_\nu)^l$ for each interval $\nu$.
+
+<!-- slide: 7 — 2.3 Algorithm for coefficient computation -->
+
+### 2.4 Implementation details
+
+From version 0.2.6, the degree can be any non-negative integer, as in
+the general theory of B-splines.
+
+The package provides several functions for B-spline manipulation:
+
+| Function | Purpose |
+|----------|---------|
+| `Bspline_base()` | Build the B-spline basis coefficients |
+| `Bspline_base_deriv()` | Compute derivative basis |
+| `bs_direct()` | Evaluate the basis at points |
+| `spline_eval()` | Evaluate the full spline |
+| `Bsplinetopp()` | Convert to piecewise polynomial form |
+
+<!-- slide: 8 — 2.4 Implementation details -->
+
+### 2.5 (Advanced) Knot multiplicity and regularity
+
+The regularity of a B-spline at a knot depends on its multiplicity. For
+a knot with multiplicity $m$ and degree $d$:
+
+| Multiplicity $m$ | Regularity | Meaning |
+|------------------|------------|---------|
+| 1 | $C^{d-1}$ | Full smoothness |
+| 2 | $C^{d-2}$ | One derivative lost |
+| 3 | $C^{d-3}$ | Two derivatives lost |
+| $d$ | $C^0$ | Continuous only |
+| $d+1$ | Discontinuous | Function not continuous |
+
+The package supports multiple knots, allowing the user to control the
+smoothness of the spline at specific points.
+
+<!-- slide: 9 — 2.5 Knot multiplicity and regularity -->
+
+### 2.6 Visual illustration of knot multiplicity
+
+We compare a quartic (degree 4) B-spline basis with simple knots and
+the same basis where the central knot is repeated 4 times.
+
+```{r multiplicity-illustration, fig.width=10, fig.height=4, out.width="100%"}
+degree <- 4
+knots_simple <- c(0, 0, 0, 0, 0, 0.25, 0.5, 0.75, 1, 1, 1, 1, 1)
+knots_mult <- c(0, 0, 0, 0, 0, 0.25, 0.5, 0.5, 0.5, 0.5, 0.75, 1, 1, 1, 1, 1)
+
+par(mfrow = c(1, 2))
+B_simple <- Bspline_base(knots_simple, degree)
+B_mult <- Bspline_base(knots_mult, degree)
+
+view_basis(B_simple)
+view_basis(B_mult)
+```
+
+<!-- slide: 10 — 2.6 Visual illustration of knot multiplicity -->
+
+## References
+
+- Abbes, A. (2026). *Quantile Regression with Cubic Polynomial Splines
+  under Shape Constraints with Applications*. Zenodo.
+  <doi:10.5281/zenodo.17427913>
+- Koenker, R., & Bassett, G. (1978). Regression Quantiles.
+  *Econometrica*, 46(1), 33–50.
+- de Boor, C. (1978). *A Practical Guide to Splines*. Springer-Verlag.
+- Karlin, S., & Studden, W. J. (1966). *Tchebycheff Systems: With
+  Applications in Analysis and Statistics*. Interscience.
+- Papp, D., & Alizadeh, F. (2014). Shape-Constrained Estimation Using
+  Nonnegative Splines. *Journal of Computational and Graphical
+  Statistics*, 23(1), 211–231.
+  <https://doi.org/10.1080/10618600.2012.707343>
+
+## Further reading
+
+For more details on the implementation and examples, see the other
+vignettes:
+
+- `vignette("introduction", package = "BsplineQuantReg")`
+- `vignette("shape_constraints", package = "BsplineQuantReg")`
+- `vignette("bspline_basis_manipulation", package = "BsplineQuantReg")`
+
+<!-- slide: 11 — References and further reading -->

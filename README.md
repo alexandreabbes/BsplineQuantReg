@@ -1,4 +1,4 @@
-# BsplineQuantReg
+# BsplineQuantReg v0.2.7
 
 [![CRAN status](https://www.r-pkg.org/badges/version/BsplineQuantReg)](https://cran.r-project.org/package=BsplineQuantReg)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17427913.svg)](https://doi.org/10.5281/zenodo.17427913)
@@ -7,7 +7,6 @@
 ## **Constrained Quantile Regression with B-Splines (Degrees 1 to 4)**
 
 This package is available on CRAN.
-
 
 ## Features
 
@@ -37,7 +36,7 @@ install.packages("BsplineQuantReg")
 ### From GitHub (development version)
 
 ```r
-devtools::install_github("alexandreabbes/BsplineQuantReg")
+remotes::install_github("alexandreabbes/BsplineQuantReg")
 ```
 
 ## System Requirements
@@ -77,7 +76,7 @@ Windows users do not need to install Rust separately. The package uses pre-compi
 
 ## Graphical Interface (Shiny)
 
-This package includes an interactive Shiny interface that allows you to manage most of the functions without writing code.
+The package 'BsplineQuantRegGui' provides the interactive Shiny interface that allows you to manage most of the functions without writing code.
 
 ### Launch the GUI
 ```r
@@ -110,8 +109,8 @@ The interface will open in your default browser.
 
 ### Docker Deployment
 A Docker image is available for easy deployment:
-bash
-bash```
+
+```{bash}
 docker pull ghcr.io/alexandreabbes/bsplinequantreggui:latest
 docker run -p 3838:3838 ghcr.io/alexandreabbes/bsplinequantreggui:latest
 ```

@@ -5,8 +5,8 @@
 #'
 #' Evaluates a spline (linear combination of B-splines) at given points.
 #'
-#' @param Bspline Spline object (list with coefficients on the 'Bspline' basis, degree, extended knot)
-#' A 'Bspline' can also be rendered callable witk 'make_spline(BSpline)'
+#' @param Bspline Spline object (list with coefficients on the 'Bspline' basis, degree, extended knot). If Bspline has the
+#' attributes of a basis (Bsline$base, and Bspline$$ext_knot), then this basis is used and not re-computed.
 #' @param x_values Vector of evaluation points. By default, evaluation is calculated
 #' at the knots
 #' @param der integer 0 (defalut)...degree is the order of derivative
@@ -37,7 +37,7 @@ spline_eval <- function(Bspline,
                         verbose = FALSE)
 {
   if (is.function(Bspline) && inherits(Bspline, "callable_spline")) {
-    # Already callable, retrieve the parameters
+    if (verbose) {message(" Already a callable spline, retrieving the parameters")}
     param <- get_parameters(Bspline)
     if(verbose){print(param)}
     Bspline<-param
@@ -57,7 +57,13 @@ spline_eval <- function(Bspline,
   #Bvalues=bs(x_values,knot=knot,degree)  "can be used instead of the following lines
   #to accelerate the calculations
   # values at knots by default
-  if (is.null(Bvalues))
+  if (!is.null(Bspline$base))  #BB is a basisaccelerates the calculations
+    {if (verbose) {message('Bspline has already a basis attribute. Not re-computing')}
+      D_BB <- Bspline_base_deriv(Bspline, der)
+      D_Bvalues <- bs_direct(D_BB, x_values)
+    }
+  else
+  if (is.null(Bvalues) && is.null(Bspline$base))
     # if the values of the basis
     #are not provided, or do not match the spline coefficients
     #then compute them
@@ -75,6 +81,7 @@ spline_eval <- function(Bspline,
     D_Bvalues <- bs_direct(D_BB, x_values = x_values, verbose = verbose)
   } else{
     if (inherits(Bvalues, "bspline_basis")) {
+      if (verbose) {message('Using the basis given as argument. Not re-computing')}
       #case basis
       BB <- Bvalues
       #We trust the dimensions, knots, are compatible
@@ -82,11 +89,11 @@ spline_eval <- function(Bspline,
         D_Bvalues = bs_direct(BB, x_values)
       } else{
         D_BB <- Bspline_base_deriv(BB, der)
-        D_Bvalues <- D_BB$base
+        #D_Bvalues <- D_BB$base
         D_Bvalues <- bs_direct(D_BB, x_values)
       }
     }
-    else{
+    else {
       #case values
       D_Bvalues <- Bvalues
     }
@@ -100,9 +107,6 @@ spline_eval <- function(Bspline,
 
   return(yvalues)
 }
-
-
-
 
 
 #' Direct evaluation of a B-spline basis
@@ -255,7 +259,7 @@ view_basis <- function(BB,
   if (length(x_values) == 1) {
     k <- range(BB$knot)
     margin <- 0.01 * diff(k)
-    x_values <- seq(k[1] - margin, k[2] + margin, length.out = 200)
+    x_values <- seq(k[1], k[2], length.out = 200)
   }
 
   yvalues <- bs_direct(BB, x_values)
@@ -275,7 +279,8 @@ view_basis <- function(BB,
     xlab = "x",
     ylab = "Basis values",
     main = main,
-    lty = 1
+    lty = 1,
+    ylim=c(-0.2,1.2)
   )
   #col = colors, lty = 1)
 

@@ -28,153 +28,6 @@ Omega <- function(s, j, o)
   }
 }
 
-#' Build B-spline basis in piecewise polynomial form
-#' Computes local polynomial coefficients for each B-spline basis function
-#' on each interval. Polynomials are expressed in the canonical basis
-#' Uses De Boor's recursion formula.
-#' @param sn Extended knot vector (including endpoint repetitions)
-#' This means if t0..tkn it the set of knot
-#' then sn should be given as a vector with  "degree" times t_0 and t_kn
-#' at the beginning
-#'  and the ends.  its length is number of intervals+1+2*degree.
-#' @param degree 'B-spline' degree (default = 3 for cubic)
-#' @param der Derivative order (0 = original basis)
-#' @param verbose boolean FALSE (default) or TRUE.
-#' @return A list containing:
-#'   \item{base}{Coefficients in the local bases, in the form of an 3-d array [j,nu,coeff],
-#'    j : the number of the spline in the basis,
-#'   nu: the number of the interval in the extended notation,
-#'   coeff : the coefficients in decreasing order
-#'   Decresing (matlab) convention on the local bases (t-s_nu)^l, l=3.2.1
-#'   base[j,,] is a matrix of piecewise polynomial function compatible with the pp-form.}
-#'   \item{base0}{Coefficients in canonical basis (centered at 0) (1, t, t^2, t^3) centered at the interval origin.}
-#'   \item{ext_knot}{Extended knot vector}
-#'   \item{knot}{Effective knot partition including ends)}
-#'   \item{degree}{Spline degree}
-#'   \item{n_splines}{Number of basis functions}
-#'   \item{deriv_order}{Applied derivative order}
-#' @examples
-#' sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
-#' basis <- Bspline_base(sn, degree=3)
-#' x=(0:(5*100))/100
-#' y=bs_direct(basis,x)
-#' matplot(x,t(y))
-#' #or simple:
-#' #view_basis(basis)
-#' @export
-#'
-#'
-Bspline_base2 <- function(sn,
-                         degree = 3,
-                         der = 0,
-                         verbose = FALSE)
-{
-  if (verbose) {
-    message(
-      "Constructing the B-spline basis, \n Degree = ",
-      degree,
-      " \n Extended knots partition: ",
-      paste(sn,collapse = ',')
-    )
-  }
-
-  tn <- tryCatch({
-    sn[(degree + 1):(length(sn) - degree)]
-  }, error = function(e) {
-    stop("Error extracting knots: ", e$message)
-  }) #effective knot partition
-  kn = length(tn) - 1 # tn is the list of knot without the extended partition.
-  n_ext_intervals <- kn + 2 * degree #Nb extended intervals
-  n_splines <- kn + degree
-  B <- array(0, dim = c((degree + 1), n_splines, n_ext_intervals, (degree +
-                                                                     1))) # B is the initial B-spline basis : piecewise constant
-
-  for (i in (degree + 1):(kn + degree)) {
-    B[1, i, i, degree + 1] <- 1
-  }#in decreasing convention
-  if (degree > 0) {
-    for (o in (2:(degree + 1)))
-      #first Bspline base
-      #to be computed: order2=degree 1.
-    {
-      #k : dimension of local basis=deg+1
-      for (j in (1:(n_splines))) {
-        #go through the elements of the basis
-        for (nu in ((degree + 1):(n_ext_intervals)))
-          #go through the  pieces of the spline of order l
-        {
-          #Bjnu<-B[(o-1),j,nu,1:(o-1)] #inc. convention
-          Bjnu <- reduce_pol(B[(o - 1), j, nu, (degree + 1 - (o - 1)):(degree +
-                                                                         1)])#dec. convention
-          if ((j + 1) > n_splines) {
-            Bjpnu = 0
-            wjp1nu = 0
-          }
-          else
-          {
-            #Bjp1nu=B[(o-1),(j+1),nu,1:(o-1)] #inc. convention
-            Bjp1nu = reduce_pol(B[(o - 1), (j + 1), nu, (degree - o + 2):(degree +
-                                                                            1)]) #decr. convention
-            #wjp1o=polyadd(c(1,0),-Omega(sn,(j+1),o))}#inc convent.
-            wjp1o = polyadd(c(0, 1), -Omega(sn, (j + 1), o))
-          }
-
-          wjo = Omega(sn, j, o)
-
-          term1 = polymul(Bjnu, wjo)
-          term2 = polymul(Bjp1nu, wjp1o)
-
-          sumterm = polyadd(term1, term2)
-          if (length(sumterm)<o){sumterm<-c(sumterm,rep(0,o-length(sumterm)))}
-          #cat(sumterm,'\n',o,j,nu,degree,'\n')# for debug only
-          B[o, j, nu, (degree - o + 2):(degree + 1)] <- sumterm
-        }
-      }
-    }
-  }
-
-  #changement de base
-  # because the coefficients of each polynomial piece
-  #are computed on the canonical basis 1,x,x^2...x^degree
-  Bn = array(0, dim(B))
-  for (o in 1:(degree + 1)) {
-    for (j in 1:n_splines)
-    {
-      for (nu in 1:n_ext_intervals)
-      {
-        Bn[o, j, nu, ] <- change_polynomial_base_taylor(B[o, j, nu, ], 0, sn[nu])
-      }
-    }
-  }
-
-
-  Base0 = array(0, c(n_splines, n_ext_intervals, degree + 1))
-  BaseL = array(0, c(n_splines, n_ext_intervals, degree + 1))
-  Base0[, , ] = B[(degree + 1), , , ]  #basis x^i at each knot
-  BaseL[, , ] = Bn[(degree + 1), , , ] #Local basis (x-t_nu)^i at knot nu
-  Base0 = round(Base0, 10)
-  BaseL = round(BaseL, 10)
-  basis <- list(
-    base = BaseL ,
-    base0 = Base0,
-    ext_knot = sn,
-    knot = tn,
-    degree = degree,
-    n_splines = (n_splines),
-    deriv_order = 0
-  )
-  class(basis) <- c('bspline_basis', class(basis))
-  if (der == 0) {
-    return(basis)
-  } else
-  {
-    return(Bspline_base_deriv(basis, der))
-  }
-
-}
-
-
-
 
 #' Build B-spline basis in piecewise polynomial form
 #' Computes local polynomial coefficients for each B-spline basis function
@@ -192,8 +45,7 @@ Bspline_base2 <- function(sn,
 #'   \item{base}{Coefficients in the local bases, in the form of an 3-d array [j,nu,coeff],
 #'    j : the number of the spline in the basis,
 #'   nu: the number of the interval in the extended notation,
-#'   coeff : the coefficients in decreasing order
-#'   Decresing (matlab) convention on the local bases (t-s_nu)^l, l=3.2.1
+#'   coeff : the coefficients in decreasing (matlab) order convention on the local bases (t-s_nu)^l, l=3.2.1
 #'   base[j,,] is a matrix of piecewise polynomial function compatible with the pp-form.}
 #'   \item{base0}{Coefficients in canonical basis (centered at 0) (1, t, t^2, t^3) centered at the interval origin.}
 #'   \item{ext_knot}{Extended knot vector}
@@ -295,7 +147,6 @@ Bspline_base <- function(sn,
     }
   }
 
-
   Base0 = array(0, c(n_splines, n_ext_intervals, degree + 1))
   BaseL = array(0, c(n_splines, n_ext_intervals, degree + 1))
   Base0[, , ] = B[(degree + 1), , , ]  #basis x^i at each knot
@@ -318,7 +169,6 @@ Bspline_base <- function(sn,
   {
     return(Bspline_base_deriv(basis, der))
   }
-
 }
 
 
@@ -404,135 +254,173 @@ Bspline_base_deriv <- function(Bsbasis,
 #' @param Bspline A list containing at least (knot, coefficients, degree)
 #'        like the one returned by quantile_spline or one of the degree-specific functions.
 #'        If it already contains a 'spline' element, returns the object unchanged.
+#'        If Bspline containts extra attributes from a spine basis they are passed to the spline object.
 #' @param verbose Boolean. If TRUE : output the attributes of the 'Bspline'
 #' @param callable is a Boolean flag that allows to return a simple
 #'        spline list with class 'non_callable_spline'.
 #' @return Either a callable function can be called as `Bspline(x)`, with
 #'         class ('callable_spline'), and all parameters as attributes
 #'         or the list of parameters with an additional 'non_callable_spline' classe.
-#'
+#'@example
+#'# 2 ways for creating a bspline:
+#'#1. using a basis
+#'sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
+#'basis <- Bspline_base(sn, degree = 3)
+#'coeff <- runif(basis$n_splines)
+#'basis$coeff<-coeff
+#'basis<-make_spline(basis)
+#'#2. directly
+#'tn <- c(0,1,2,3,4,5)
+#'spline<-make_spline(list(knot=tn,coeff=coeff,degree=3))
+#'x=(0:100)/100
+#'#Coincidence:
+#'cat("evaluation difference:\n sum(abs(spline(x)-basis(x)))=", sum(abs(spline(x)-basis(x))) )
 #' @export
+#'
+#'
 make_spline <- function(Bspline,
                         verbose = FALSE,
                         callable = TRUE) {
+
+  # --- Non-callable branch ---------------------------------------------------
   if (!callable) {
-    #erase the callable status
-    if (inherits(Bspline, "non_callable_spline"))
-    {
-      #non callable from non callable
-      message ("Already a non_callable_spline object")
-      if (verbose) {
-        print(Bspline)
-      }
+
+    # Case 1: already non_callable_spline
+    if (inherits(Bspline, "non_callable_spline")) {
+      message("Already a non_callable_spline object")
+      if (verbose) print(Bspline)
       return(Bspline)
     }
-    else if (inherits(Bspline, "callable_spline")) {
+
+    # Case 2: callable_spline -> extract parameters (keeps basis attributes)
+    if (inherits(Bspline, "callable_spline")) {
       NCspline_obj <- get_parameters(Bspline)
       class(NCspline_obj) <- c("non_callable_spline", "list")
-      if (verbose) {
-        print(NCspline_obj)
-      }
+      if (verbose) print(NCspline_obj)
       return(NCspline_obj)
     }
-    else {
-      #nothing to non callable
-      for (i in (1:3)) {
-        if (!is.element(c("knot", "degree", "coeff")[i], names(Bspline)))
-        {
-          message(c("missing ", c("knot", "degree", "coeff")[i], " in input"))
-          return(NULL)
-        }
+
+    # Case 3: bare list -> check required fields
+    required <- c("knot", "degree", "coeff")
+    for (nm in required) {
+      if (!is.element(nm, names(Bspline))) {
+        message("missing ", nm, " in input")
+        return(NULL)
       }
-      NCspline_obj <- Bspline
-      class(NCspline_obj) <- c("non_callable_spline", "list")
-      return(NCspline_obj)
-      if (verbose) {
-        print(NCspline_obj)
-      }
+    }
+    NCspline_obj <- Bspline
+    class(NCspline_obj) <- c("non_callable_spline", "list")
+    if (verbose) print(NCspline_obj)
+    return(NCspline_obj)
+  }
+
+  # --- Callable branch -------------------------------------------------------
+  # Case 1: already callable_spline
+  if (is.function(Bspline) && inherits(Bspline, "callable_spline")) {
+    message("Already a callable spline object")
+    if (verbose) print(Bspline)
+    return(Bspline)
+  }
+
+  # Case 2: bare list -> check required fields
+  required <- c("knot", "degree", "coeff")
+  for (nm in required) {
+    if (!is.element(nm, names(Bspline))) {
+      message("missing ", nm, " in input")
+      return(NULL)
     }
   }
 
-  if (callable)
-  {
-    #Callable from callable
-    if (is.function(Bspline) &&
-        inherits(Bspline, "callable_spline"))
-    {
-      # Deja une callable, l'utiliser directement
-      message("Already a callable spline object")
-      return(Bspline)
-      if (verbose) {
-        print(Bspline)
-      }
-    }
-    else
-    {
-      # Callable from non_callable
-      #Extract components
-      for (i in (1:3)) {
-        if (!is.element(list("knot", "degree", "coeff")[i], names(Bspline)))
-        {
-          message(c("missing ", c("knot", "degree", "coeff")[i], " in input"))
-          return(NULL)
-        }
-      }
-      coeff <- Bspline$coeff
-      degree <- Bspline$degree
-      knot <- Bspline$knot
-      result <- Bspline$result # keep other parameters
-      # Create the callable function
-      spline_func <- function(x_values) {
-        # Build the spline object structure expected by spline_eval
-        spline_obj <- list(
-          coeff = coeff,
-          degree = degree,
-          knot = knot,
-          result = result
-        )
-        # Evaluate the spline
-        spline_eval(Bspline, x_values)
-      }
-      # Attach parameters as attributes (accessible via attr())
-      attr(spline_func, "degree") <- degree
-      attr(spline_func, "knot") <- knot
-      attr(spline_func, "coeff") <- coeff
+  # Extract the required fields
+  coeff  <- Bspline$coeff
+  degree <- Bspline$degree
+  knot   <- Bspline$knot
+  result <- Bspline$result
 
-      # Store the full 'Bspline' as an attribute
-      attr(spline_func, "result") <- result
+  # Collect *all other* elements (basis, ext_knot, n_splines, ...)
+  # to preserve them as attributes of the callable function
+  extra <- Bspline[setdiff(names(Bspline),
+                           c("knot", "degree", "coeff", "result"))]
 
-      # Set class for print method
-      class(spline_func) <- c("callable_spline", "function")
-      if (verbose) {
-        print(spline_func)
-      }
-      return(spline_func)
-    }
+  # Build the callable function
+  spline_func <- function(x_values) {
+    spline_eval(Bspline, x_values)
   }
+
+  # Attach required attributes
+  attr(spline_func, "degree") <- degree
+  attr(spline_func, "knot")   <- knot
+  attr(spline_func, "coeff")  <- coeff
+  attr(spline_func, "result") <- result
+
+  # Attach extra attributes (basis, ext_knot, n_splines, ...)
+  for (nm in names(extra)) {
+    attr(spline_func, nm) <- extra[[nm]]
+  }
+
+  class(spline_func) <- c("callable_spline", "function")
+  if (verbose) print(spline_func)
+  return(spline_func)
 }
 
 
 #' Get parameters from a callable spline or a callable pp object
 #'
+#' Retrieves the parameters attached to a callable spline or a callable
+#' PP object. All attributes attached by "make_spline()" are returned,
+#' including the optional basis elements ("base", "ext_knot"
+#' "n_splines", "deriv_order", etc.) when they are present.
 #' @param x A callable spline object
-#' @return A list with degree, knots, coefficients, and 'Bspline' object
+#' @return A list with degree, knots, coefficients, and 'Bspline' object.
 #' @export
 get_parameters <- function(x) {
+
+  # --- Non-callable objects: normalise to the same structure ---
   if (inherits(x, "non_callable_spline") ||
-      inherits(x, "non_callable_pp"))
-  {return(x)}
-  else if (!inherits(x, "callable_spline") &&
+      inherits(x, "non_callable_pp")) {
+
+    params <- list(
+      degree = x$degree,
+      knot   = x$knot,
+      coeff  = x$coeff,
+      result = x$result          # NULL if absent
+    )
+
+    # Extra fields (basis, ext_knot, n_splines, ...), if present
+    extra_names <- setdiff(names(x),
+                           c("degree", "knot", "coeff", "result"))
+    for (nm in extra_names) {
+      params[[nm]] <- x[[nm]]
+    }
+    return(params)
+  }
+
+  # --- Reject invalid objects ---
+  if (!inherits(x, "callable_spline") &&
       !inherits(x, "callable_pp")) {
-    message("Object is neither a callable spline
-            or a callable pp")
+    message("Object is neither a callable spline or a callable pp")
     return(NULL)
   }
-  else
-    list(
-      degree = attr(x, "degree"),
-      knot = attr(x, "knot"),
-      coeff = attr(x, "coeff"),
-      result = attr(x, "result")
-    )
+
+  # --- Callable objects: standard parameters ---
+  params <- list(
+    degree = attr(x, "degree"),
+    knot   = attr(x, "knot"),
+    coeff  = attr(x, "coeff"),
+    result = attr(x, "result")
+  )
+
+  # Extra attributes attached by make_spline
+  extra_names <- setdiff(
+    names(attributes(x)),
+    c("degree", "knot", "coeff", "result", "class",
+      "srcref", "srcfile", "wholeSrcref")
+  )
+  for (nm in extra_names) {
+    params[[nm]] <- attr(x, nm)
+  }
+
+  params
 }
 
 

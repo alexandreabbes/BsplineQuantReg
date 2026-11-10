@@ -266,15 +266,18 @@ evalpp <- function(p, x_values) {
 #' If callable = TRUE, returns a function that evaluates the PP.
 #'
 #' @param coeff matrix (coefficents) or pp polynomial. Coefficient matrix (kn x (degree+1))
-#' @param tn  vector (knots) of length kn+1. Needed if coefficient is not pp
+#' @param tn  (old notation) vector (knots) of length kn+1. Needed if coefficient is not pp
+#' @param knot  same as tn. if both are provided only knot is used. If only tn or knot is given, that one is used.
 #' @param callable Boolean; if TRUE, returns a callable function
 #' @param verbose Boolean
 #' @return A PP object or a callable function
 #' @export
 makpp<-function(coeff,
+         knot=NULL,
          tn=NULL,
          callable = FALSE,
          verbose = FALSE) {
+  if (!is.null(knot)) tn<-knot
 
   if ( inherits(coeff,'callable_pp')){
     if (callable) {

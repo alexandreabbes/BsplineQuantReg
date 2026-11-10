@@ -1,0 +1,395 @@
+---
+title: "Shape constraints in 'BslineQuantReg'"
+author: "Alexandre Abbes"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+editor_options: 
+  markdown: 
+    wrap: 72
+vignette: >
+  %\VignetteIndexEntry{Shape constraints in 'BslineQuantReg'}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup-shape_constraints, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 7, fig.height = 5)
+library(BsplineQuantReg)
+```
+
+## Introduction
+
+This vignette covers shape constraints in B-spline quantile regression
+using the Karlin-Studden SOCP formulation. Shape constraints allow you
+to incorporate prior knowledge about the function's behavior
+(monotonicity, convexity, etc.) into the estimation process.
+
+Shape constraint for quantile regression with cubic splines is initially the main purpose of this package, based on the paper of Abbes (2025). It has been extended to other degrees, and the package also allows to switch to ordinary mean square regression.
+
+## Available Demos
+The package includes several demos that illustrate shape constraints:
+
+\tiny
+```{r demos}
+# Example of available demos
+#dev.new()
+# Run specific demos:
+# demo(package = "BsplineQuantReg","monotonicity")      #- Increasing/decreasing constraints
+# demo(package = "BsplineQuantReg","convexity")         #- Convexity/concavity constraints  
+# demo(package = "BsplineQuantReg","der3")              #- Third derivative constraints
+# demo(package = "BsplineQuantReg","comprehensive")     #- All constraint types
+# demo(package = "BsplineQuantReg","temperature") #and
+#demo(package = "BsplineQuantReg",temperature2) #- Real-world example with temperature data
+```
+
+## Uniform Constraints
+
+### Monotonicity Constraints : example code
+
+Monotonicity constraints force the fitted function to be non-decreasing
+(`monot = 1`) or non-increasing (`monot = -1`).
+\tiny
+```{r monotonicity}
+# Generate data
+set.seed(42)
+n <- 100
+x <- seq(0, 1, length.out = n)
+y <- 2*x + 0.5*sin(4*pi*x) + 0.1*rnorm(n)
+knots <- quantile(x, probs = seq(0, 1, length.out = 10))
+# Unconstrained
+fit_uncon <- quantile_spline(x, y, knots,
+                             tau = 0.5)
+# Increasing constraint
+fit_inc <- quantile_spline(x, y, knots, tau = 0.5,
+                           monot = 1)
+# Decreasing constraint
+fit_dec <- quantile_spline(x, y, knots, tau = 0.5,
+                           monot = -1)
+```
+
+### Monotonicity Constraints : example view
+```{r,  echo=FALSE}
+# Compare
+x_eval <- seq(0, 1, length.out = 200)
+plot(x, y, pch = 16, cex = 0.5, col = "gray", main = "Monotonicity Constraints")
+lines(x_eval, spline_eval(fit_uncon, x_eval), col = "red", lwd = 2, lty = 2)
+lines(x_eval, spline_eval(fit_inc, x_eval), col = "blue", lwd = 2)
+lines(x_eval, spline_eval(fit_dec, x_eval), col = "green", lwd = 2)
+legend("topleft", legend = c("Unconstrained", "Increasing", "Decreasing"),
+       col = c("red", "blue", "green"), lty = c(2, 1, 1), lwd = 2)
+```
+
+### Convexity Constraints: code example
+
+Convexity constraints force the second derivative to be non-negative
+(`convcons = 1`) or non-positive (`convcons = -1`).
+
+```{r convexity}
+# Convex function
+y_conv <- (x - 0.5)^2 + 0.05 * rnorm(n)
+
+fit_convex   <- quantile_spline(x, y_conv, knots, 
+                                tau = 0.5, convcons = 1)
+fit_uncon_v  <- quantile_spline(x, y_conv, knots,
+                                tau = 0.5, convcons = 0)
+
+```
+
+
+### Convexity Constraints: example view
+```{r, echo=FALSE}
+
+# True curve, on the evaluation grid
+y_conv_true <- (x_eval - 0.5)^2
+
+plot(x, y_conv, pch = 16, cex = 0.5, col = "gray",
+     main = "Convexity constraint",
+     xlab = "x", ylab = "y")
+
+# True curve (dashed grey)
+lines(x_eval, y_conv_true, col = "gray40", lwd = 2, lty = 2)
+
+# Constrained fit (blue)
+lines(x_eval, spline_eval(fit_convex, x_eval), col = "blue", lwd = 2)
+
+# Unconstrained fit (black)
+lines(x_eval, spline_eval(fit_uncon_v, x_eval), col = "black", lwd = 2)
+
+legend("topright",
+       legend = c("True curve", "Constrained (convcons = 1)", "Unconstrained"),
+       col = c("gray40", "blue", "black"),
+       lty = c(2, 1, 1), lwd = 2, bty = "n")
+
+```
+
+### Third Derivative Constraints: code example
+
+Third derivative constraints are not commonly  intuitive. They control the variations of the second
+derivative, that is to say the evolution of curvature. Some examples show that the control of its sign allows sometimes enforcing smoothness of the curvature, and strongly enforces smoothness of the curve.
+\tiny
+
+```{r der3}
+# Cubic function with varying third derivative
+y_cubic <- x^3 - 1.5 * x^2 + 0.5 * x + 0.05 * rnorm(n)
+
+fit_der3_pos <- quantile_spline(x, y_cubic, knots, tau = 0.5, der3cons = 1)
+fit_der3_nc  <- quantile_spline(x, y_cubic, knots, tau = 0.5, der3cons = 0)
+```
+
+
+### Third Derivative Constraints: example view
+```{r, echo=FALSE}
+# True curve, on the evaluation grid
+y_cubic_true <- x_eval^3 - 1.5 * x_eval^2 + 0.5 * x_eval
+
+plot(x, y_cubic, pch = 16, cex = 0.5, col = "gray",
+     main = "Third derivative constraint",
+     xlab = "x", ylab = "y")
+
+# True curve (dashed grey)
+lines(x_eval, y_cubic_true, col = "gray40", lwd = 2, lty = 2)
+
+# Constrained fit (blue)
+lines(x_eval, spline_eval(fit_der3_pos, x_eval), col = "blue", lwd = 2)
+
+# Unconstrained fit (black)
+lines(x_eval, spline_eval(fit_der3_nc, x_eval), col = "black", lwd = 2)
+
+legend("topright",
+       legend = c("True curve", "Constrained (der3cons = 1)", "Unconstrained"),
+       col = c("gray40", "blue", "black"),
+       lty = c(2, 1, 1), lwd = 2, bty = "n")
+
+```
+
+
+## Partial Constraints
+
+Partial constraints apply monotonicity or convexity only on specific
+intervals, not the entire domain.
+
+### Partial Monotonicity
+\small
+
+```{r partial-monot}
+# Increasing only on first half
+# Increasing only on the first half
+monot_partial <- c(rep(1, 5), rep(0, 4))
+
+fit_partial <- quantile_spline(x, y, knots, tau = 0.5,
+                               monot = monot_partial)
+fit_uncon_p <- quantile_spline(x, y, knots, tau = 0.5, monot = 0)
+```
+
+### partial monotonicity view
+
+```{r, echo=FALSE}
+# True curve, on the evaluation grid
+y_true <- 2 * x_eval + 0.5 * sin(4 * pi * x_eval)
+
+plot(x, y, pch = 16, cex = 0.5, col = "gray",
+     main = "Partial monotonicity (first intervals)",
+     xlab = "x", ylab = "y")
+
+# True curve (dashed grey)
+lines(x_eval, y_true, col = "gray40", lwd = 2, lty = 2)
+
+# Constrained fit (blue)
+lines(x_eval, spline_eval(fit_partial, x_eval),
+      col = "blue", lwd = 2)
+
+# Unconstrained fit (black)
+lines(x_eval, spline_eval(fit_uncon_p, x_eval),
+      col = "black", lwd = 2)
+
+# Boundary of the constrained region
+abline(v = knots[6], col = "red", lty = 2, lwd = 1.5)
+
+legend("topleft",
+       legend = c("True curve", "Partial monotonicity",
+                  "Unconstrained", "Constraint boundary"),
+       col = c("gray40", "blue", "black", "red"),
+       lty = c(2, 1, 1, 2), lwd = c(2, 2, 2, 1.5), bty = "n")
+```
+
+### Partial Convexity
+
+```{r partial-convex}
+# Convex on the right half only
+conv_partial <- rep(0, length(knots))
+for (i in seq_along(knots)) {
+  if (knots[i] > 0.5) conv_partial[i] <- 1
+}
+
+fit_conv_partial <- quantile_spline(x, y, knots, tau = 0.5,
+                                    convcons = conv_partial)
+fit_uncon_pc     <- quantile_spline(x, y, knots, tau = 0.5,
+                                    convcons = 0)
+```
+
+### Partial Convexity : the view
+
+```{r, echo=FALSE}
+# True curve, on the evaluation grid
+y_true <- 2 * x_eval + 0.5 * sin(4 * pi * x_eval)
+
+plot(x, y, pch = 16, cex = 0.5, col = "gray",
+     main = "Partial convexity (right half)",
+     xlab = "x", ylab = "y")
+
+# True curve (dashed grey)
+lines(x_eval, y_true, col = "gray40", lwd = 2, lty = 2)
+
+# Constrained fit (blue)
+lines(x_eval, spline_eval(fit_conv_partial, x_eval), col = "blue", lwd = 2)
+
+# Unconstrained fit (black)
+lines(x_eval, spline_eval(fit_uncon_pc, x_eval), col = "black", lwd = 2)
+
+# Boundary of the constrained region
+abline(v = knots[6], col = "red", lty = 2, lwd = 1.5)
+
+legend("topleft",
+       legend = c("True curve", "Partial convexity",
+                  "Unconstrained", "Constraint boundary"),
+       col = c("gray40", "blue", "black", "red"),
+       lty = c(2, 1, 1, 2), lwd = c(2, 2, 2, 1.5), bty = "n")
+```
+
+
+## Mixed Constraints
+
+### mixed constraints: the code
+Multiple shape constraints can be applied simultaneously.
+
+```{r}
+# Increasing AND convex
+fit_both   <- quantile_spline(x, y, knots, tau = 0.5,
+                              monot = 1, convcons = 1)
+fit_uncon_m <- quantile_spline(x, y, knots, tau = 0.5,
+                               monot = 0, convcons = 0)
+
+
+fit_both <- quantile_spline(x, y, knots, tau = 0.5, 
+                            monot = 1, convcons = 1)
+```
+
+### mixed constraints: The view
+```{r, echo=FALSE}
+# True curve, on the evaluation grid
+y_true <- 2 * x_eval + 0.5 * sin(4 * pi * x_eval)
+
+plot(x, y, pch = 16, cex = 0.5, col = "gray",
+     main = "Mixed constraints: increasing and convex",
+     xlab = "x", ylab = "y")
+
+# True curve (dashed grey)
+lines(x_eval, y_true, col = "gray40", lwd = 2, lty = 2)
+
+# Constrained fit (blue)
+lines(x_eval, spline_eval(fit_both, x_eval), col = "blue", lwd = 2)
+
+# Unconstrained fit (black)
+lines(x_eval, spline_eval(fit_uncon_m, x_eval), col = "black", lwd = 2)
+
+legend("topleft",
+       legend = c("True curve", "Increasing + convex", "Unconstrained"),
+       col = c("gray40", "blue", "black"),
+       lty = c(2, 1, 1), lwd = 2, bty = "n")
+```
+
+
+## Constraints with Multiple Knots
+
+When using knot multiplicities, constraints need to be adapted to the
+reduced regularity. Constraints apply only on regular pieces : monotonicity is ensured on continuous pieces only.
+
+```{r multiple-knots}
+# Create knots with multiplicity at a point
+sn_mult <- c(0, 0, 0, 0, 0.3, 0.4,0.4,0.4, 0.5,
+             0.5,0.5, 0.7, 1, 1, 1, 1)
+#basis_mult <- Bspline_base(sn_mult, degree = 3)
+knots_mult <- c(0, 0.3, 0.3,0.3,0.3,0.4, 
+                0.5,0.7,0.7,0.7,0.7, 1)
+```
+
+###  Constraints with Multiple Knots : view
+\tiny
+```{r, out.height="80%"} 
+# Fit with constraints
+fit_mult <- quantile_spline(x, y, knots_mult, tau = 0.5, monot = 1)
+plot(x, y, pch = 16, cex = 0.5, col = "gray", 
+     main = "Constraints with Multiple knots")
+lines(x_eval, spline_eval(fit_mult, x_eval), col = "blue", lwd = 2)
+
+```
+
+## Recap: Visualizing Constraint Effects
+
+```{r visualize-constraints, echo=FALSE}
+par(mfrow = c(2, 2))
+
+# No constraints
+plot(x, y, pch = 16, cex = 0.4, col = "gray", main = "Unconstrained")
+lines(x_eval, spline_eval(fit_uncon, x_eval), col = "red", lwd = 2)
+
+# Monotonicity
+plot(x, y, pch = 16, cex = 0.4, col = "gray", main = "Monotonicity")
+lines(x_eval, spline_eval(fit_inc, x_eval), col = "blue", lwd = 2)
+
+# Convexity
+plot(x, y, pch = 16, cex = 0.4, col = "gray", main = "Convexity")
+lines(x_eval, spline_eval(fit_convex, x_eval), col = "blue", lwd = 2)
+
+# Mixed
+plot(x, y, pch = 16, cex = 0.4, col = "gray", main = "Mixed")
+lines(x_eval, spline_eval(fit_both, x_eval), col = "blue", lwd = 2)
+
+par(mfrow = c(1, 1))
+```
+
+
+
+
+
+## Karlin-Studden SOCP Formulation
+The shape constraints are implemented using the **Karlin-Studden
+characterization** of non-negative polynomials of degree 2 or 3.
+
+Depending on the degree of the spline (3 or 4), these constraints apply
+to the first or second derivative:
+
+### Constraints by Degree: table
+\footnotesize
+
+- **Degree 0** (constant): monotonicity (constant). No convexity, no third derivative.
+- **Degree 1** (linear): monotonicity (linear). No convexity, no third derivative.
+- **Degree 2** (quadratic): monotonicity (linear), convexity (constant). No third derivative.
+- **Degree 3** (cubic): monotonicity (Karlin), convexity (linear), third derivative (linear or constant).
+- **Degree 4** (quartic): monotonicity (Karlin), convexity (Karlin), third derivative (linear).
+- **Degree 5** (quintic): convexity (Karlin). No monotonicity, third derivative not implemented.
+- **Degree $\geq 6$**: no constraint available.
+
+"Karlin" here means "quadratic" inequality.
+
+### Constraints by Degree: Comment
+**Other constraints**  pointwise constraints, at knots or not, are not implemented, but they would be implemented as simple linear inequalities.
+
+The complete set of constraints forms a **Second-Order Cone Program
+(SOCP)**. This SOCP formulation ensures **exact shape constraints**,
+unlike approximations that only enforce constraints at knots or at a
+finite set of points.
+
+The particular structure of the problem allows the use of the **CVXR**
+package, which handles this type of mixed quadratic/linear conic
+problems efficiently through its DCP (Disciplined Convex Programming:
+\tiny  see for instance https://www.cvxpy.org/tutorial/dcp/)). \normalsize
+framework and supports multiple solvers (CLARABEL, OSQP, ECOS, SCS).
+
+
+## Summary
+The package provides: - **Uniform constraints**: Apply globally -
+**Partial constraints**: Apply on specific intervals - **Mixed
+constraints**: Multiple constraints simultaneously - **SOCP
+formulation**: Exact (not approximated) constraints on the whole intervals. Constraints concern **monotone** or **convex** 

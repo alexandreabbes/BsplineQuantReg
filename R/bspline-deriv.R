@@ -6,7 +6,6 @@
 #' of the derivative of order 'der' in the B-spline basis of degree d-der.
 #' Uses the standard algorithm for differentiating bsplines
 #'
-#'
 #' @param bspline callable_spline or non_callable_spline class list
 #'  or function, or list with variable names 'degree', 'knot' ,'coeff'.
 #' @param der Derivative order (default = 1)
@@ -148,3 +147,102 @@ Spline_der_knot <- function(Bsbase, der = 1)
   return(t(Der2_knot))
 }
 
+
+
+#' Differentiate a piecewise polynomial (PP) object
+#'
+#' Computes the derivative of order `der` of a piecewise polynomial
+#' object, piece by piece. Each piece is differentiated independently
+#' with `polyderiv()`, and the degree of the resulting PP object is
+#' `max(degree - der, 0)`.
+#'
+#' The input can be either a non-callable PP object (`non_callable_pp`)
+#' or a callable PP object (`callable_pp`). The output preserves the
+#' callable status of the input.
+#'
+#' @param pp A PP object, either `non_callable_pp` or `callable_pp`,
+#'   with components `coeff` (matrix of coefficients, one row per
+#'   interval) and `knot` (knot vector), and `degree` (polynomial
+#'   degree). Coefficients are stored in **decreasing power order** on
+#'   each interval.
+#' @param der Integer, order of the derivative (default = 1). Must be a
+#'   non-negative integer.
+#'
+#' @return A PP object of the same callable status as the input, with:
+#'   \item{coeff}{matrix of differentiated coefficients, one row per
+#'     interval, with `max(degree - der, 0) + 1` columns;}
+#'   \item{knot}{unchanged knot vector;}
+#'   \item{degree}{`max(degree - der, 0)`.}
+#'
+#'   If `der` exceeds the degree of the PP object, the function returns
+#'   a **constant** PP object of degree 0, with a single column of zeros
+#'   and the same knot vector. If `der == 0`, the object is returned
+#'   unchanged.
+#'
+#' @details
+#' The differentiation is performed independently on each piece, using
+#' the local polynomial representation of the PP object. No regularity
+#' is enforced at the knots: if the original PP object is discontinuous
+#' (or has discontinuous derivatives) at a knot, the differentiated
+#' object will exhibit the same discontinuity. This is a deliberate
+#' choice: `pp_deriv()` computes the **piecewise** derivative, not a
+#' smooth approximation.
+#'
+#' Two edge cases are handled explicitly:
+#'
+#' - If `der == 0`, the object is returned unchanged.
+#' - If `der > degree`, the function returns a constant PP object of
+#'   degree 0, with coefficients all equal to zero. This avoids the
+#'   `NULL` return value of `polyderiv()` when the derivative order
+#'   exceeds the polynomial degree.
+#'
+#' @examples
+#' # A PP object with two pieces: x^2 on [0, 1], 2x - 1 on [1, 2]
+#' coeff <- matrix(c(1, 0, 0,
+#'                   0, 2, -1), nrow = 2, byrow = TRUE)
+#' pp <- makpp(coeff, c(0, 1, 2))
+#'
+#' # First derivative: 2x on [0, 1], 2 on [1, 2]
+#' pp1 <- pp_deriv(pp, der = 1)
+#'
+#' # Second derivative: 2 on [0, 1], 0 on [1, 2]
+#' pp2 <- pp_deriv(pp, der = 2)
+#'
+#' # Third derivative: exceeds the degree, returns a constant zero PP
+#' pp3 <- pp_deriv(pp, der = 3)
+#'
+#' @seealso \code{\link{polyderiv}}, \code{\link{makpp}},
+#'   \code{\link{evalpp}}, \code{\link{get_parameters}}
+#'
+#' @export
+pp_deriv <- function(pp, der = 1) {
+  dpp <- get_parameters(pp)
+  is_callable <- inherits(pp, "callable_pp")
+
+  coeff  <- as.matrix(dpp$coeff)
+  degree <- dpp$degree
+  k      <- nrow(coeff)
+
+  # Edge case: derivative order exceeds polynomial degree
+  if (der > degree) {
+    dpp$coeff  <- matrix(0, nrow = k, ncol = 1)
+    dpp$degree <- 0
+    return(makpp(dpp$coeff, dpp$knot, callable = is_callable))
+  }
+
+  # Edge case: zero-th derivative
+  if (der == 0) {
+    return(makpp(coeff, dpp$knot, callable = is_callable))
+  }
+
+  # General case: differentiate each piece independently
+  coeff_der <- matrix(0, nrow = k, ncol = degree + 1 - der)
+  for (i in seq_len(k)) {
+    coeff_der[i, ] <- polyderiv(coeff[i, ], der)
+  }
+
+  dpp$coeff  <- coeff_der
+  dpp$degree <- degree - der
+
+  makpp(dpp$coeff, dpp$knot, callable = is_callable)
+}

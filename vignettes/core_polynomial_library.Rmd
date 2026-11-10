@@ -1,0 +1,537 @@
+---
+title: "Polynomial Library in BsplineQuantReg"
+author: "Alexandre Abbes"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Polynomial Library in BsplineQuantReg}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+lang: en-GB
+---
+
+```{r setup_polynomial, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 7, fig.height = 5)
+library(BsplineQuantReg)
+```
+
+## Introduction
+
+The 'BsplineQuantReg' package provides a comprehensive set of tools for
+polynomial manipulation, implemented in pure R with a consistent
+interface. All polynomial functions follow the Matlab **decreasing
+power order convention**, where a polynomial
+$p(x) = a_0 + a_1 x + a_2 x^2$ is represented as `c(a_2, a_1, a_0)`.
+This convention is also used in most libraries for polynomials in R and
+Python.
+
+This library written in pure R provides most
+polynomial operations needed for spline and B-spline manipulations,
+such as addition, multiplication, derivatives, piecewise polynomials
+and evaluation.
+
+### content
+
+\small
+
+This part covers:
+
+- Basic polynomial operations (addition, multiplication, evaluation,
+  differentiation);
+- Piecewise polynomial (PP) form;
+- Callable and non-callable PP objects;
+- Extracting parameters from PP objects.
+
+<!-- slide: 1 — Introduction -->
+
+## Basic polynomial operations
+
+### Polynomial multiplication
+
+```{r polymul}
+# (1 + x) * (1 + x) = x^2 + 2x + 1
+p1 <- c(1, 1)  # x + 1
+p2 <- c(1, 1)  # x + 1
+product <- polymul(p1, p2)
+print(product)  # c(1, 2, 1) -> x^2 + 2x + 1
+
+# (x^2 + 2x + 1) * (x - 1) = x^3 + x^2 - x - 1
+p3 <- c(1, 2, 1)  # x^2 + 2x + 1
+p4 <- c(1, -1)    # x - 1
+polymul(p3, p4)
+```
+
+<!-- slide: 2 — Polynomial multiplication -->
+
+### Polynomial addition
+
+```{r polyadd}
+# (1 + x) + (1 - x) = 2
+polyadd(c(1, 1), c(1, -1))
+
+# (x^2 + 1) + (x + 1) = x^2 + x + 2
+polyadd(c(1, 0, 1), c(1, 1))
+```
+
+<!-- slide: 3 — Polynomial addition -->
+
+### Polynomial evaluation
+
+\tiny
+
+```{r poly_eval, fig.width=8, fig.height=5, out.width="80%"}
+# P(x) = x^2 + x + 1
+p <- c(1, 1, 1)  # x^2 + x + 1
+poly_eval(p, c(0, 1, 2))  # returns c(1, 3, 7)
+
+# Evaluate at many points and plot
+x <- seq(-2, 2, length.out = 10)
+y <- poly_eval(c(-1, 0, 1), x)  # - x^2+1
+plot(x, y, type = "l", main = "- x^2+1")
+```
+
+<!-- slide: 4 — Polynomial evaluation -->
+
+### Polynomial differentiation 
+
+```{r polyderiv}
+# P(x) = x^2 -> P'(x) = 2x
+p <- c(1, 0, 0)  # x^2
+polyderiv(p, der = 1)  # c(2, 0) -> 2x
+
+# Second derivative: P''(x) = 2
+polyderiv(p, der = 2)  # c(2)
+
+# Higher order derivatives
+p <- c(4, 3, 2, 1)  # 4x^3 + 3x^2 + 2x + 1
+polyderiv(p, der = 2)  # 24x + 6
+```
+
+<!-- slide: 5 — Polynomial differentiation -->
+
+### Polynomial reduction
+
+Removing the useless 0 at the beginning of the coefficients ensures that the effective degree = length-1.
+
+\small
+
+```{r reduce_pol}
+# Remove leading zeros
+reduce_pol(c(0, 0, 1, 2, 1))  # c(1, 2, 1) -> x^2 + 2x + 1
+reduce_pol(c(0, 0, 0, 5))     # c(5) -> constant polynomial
+# Reduction after addition
+
+p1<-c(4,1,3,2)
+p2<-c(-4,-1,2,-1)
+p<-polyadd(p1,p2)
+cat("automatic reduction after addition: \n", p) # 0,0,5,2
+```
+
+<!-- slide: 6 — Polynomial reduction -->
+
+### Taylor basis change
+
+```{r change_polynomial_base_taylor}
+# Convert (x-1)^2 to expansion around 0
+# (x-1)^2 = x^2 - 2x + 1
+coeffs_a <- c(1, 0, 0)  # (x-1)^2 in basis centered at a=1
+change_polynomial_base_taylor(coeffs_a, a = 1, b = 0)
+# Returns c(1, -2, 1) -> x^2 - 2x + 1
+```
+
+
+**fundamental tool** : when computing recursively the local coefficients of the Bsplines at degree $n$, the different parts of the Bspline at degree $n-1$ and the function $\omega$  are first written on the canonical basis.
+The result is more interesting when each piece on the inter-knot $[t_\nu, t_{\nu+1}]$ is given on its **local basis $(t-t_\nu)^i, ~i=0,1..,n$**.
+
+<!-- slide: 7 — Taylor basis change -->
+
+## Piecewise polynomial (PP) form
+
+
+
+### Creating a PP object: code
+The PP form represents a function defined piecewise by polynomials on different intervals.
+
+
+```{r makpp, fig.width=8, fig.height=5, out.width="80%"}
+# Create a piecewise polynomial with two intervals
+# Interval 1: x^2 on [0, 1]
+# Interval 2: 2x - 1 on [1, 2]
+coeff <- matrix(c(
+  1, 0, 0,   # x^2
+  0, 2, -1   # 2x - 1
+), nrow = 2, byrow = TRUE)
+
+knots <- c(0, 1, 2)
+```
+
+### Creating a PP object: the pp (piecewise polynomial) object
+```{r}
+pp <- makpp(coeff, knot = knots)
+print(pp)
+```
+
+### Ploting the result
+
+\tiny
+```{r}
+# Evaluate the PP form
+x <- seq(0, 2, length.out = 100)
+y <- evalpp(pp, x)
+
+plot(x, y, type = "l", main = "Piecewise polynomial")
+abline(v = knots, col = "red", lty = 2)
+```
+
+<!-- slide: 8 — Creating a PP object -->
+
+### Callable and Non-callable PP objects
+
+PP object, as well as Bspline objets, have 2 differents evaluation mode. The values on "x" can be computed through "evalpp(PP, x)".  But callable object can be evaluated more simply with as functions with the syntax: "PP(x)".
+
+One passes from one state to the other with "makpp(PP, callable=...)":  "callable=TRUE" or "callable=FALSE".
+
+### Non callable PP objects 
+
+ A non-callable PP object is a list with components, with the class "non_callable":
+ 
+ - coeff: matrix of polynomial coefficients
+ - knot: knot positions
+ - degree: polynomial degree
+
+\tiny
+
+```{r non_callable_pp}
+pp <- makpp(coeff, knots, callable = FALSE)
+class(pp)  # "non_callable_pp"
+
+# Access components
+pp
+```
+
+<!-- slide: 9 — Non-callable PP objects -->
+
+### Callable PP objects : construction example code
+
+A callable PP object can be evaluated directly like a function.
+
+```{r callable_pp}
+pp_call <- makpp(coeff, knots, callable = TRUE)
+class(pp_call)  # "callable_pp" "function"
+```
+
+```{r callable-pp-eval}
+x <- seq(0, 2, length.out = 10)
+paste(x,collapse = ",")
+y <- pp_call(x)
+paste(y,ollapse = ",")
+
+```
+
+### Callable PP objects : the informations
+
+```{r callable-pp-print}
+print(pp_call)
+```
+
+### Callable PP objects : the plot
+```{r callable-pp-plot, fig.width=8, fig.height=5, out.width="80%"}
+plot(pp_call, xlim = c(0, 2))
+```
+
+<!-- slide: 10 — Callable PP objects -->
+
+### Extrapolating values
+
+When `evalpp()` is called with `x` values outside the knot range
+($x < \text{knots}[1]$ or $x > \text{knots}[\text{length(knots)}]$), it
+automatically performs extrapolation by extension using the border
+polynomial piece (the first or last polynomial in the PP structure).
+For example, if the knot vector is `c(0, 1, 2)`, points with $x < 0$ will be
+evaluated using the polynomial from the first interval $[0, 1]$, while
+points with $x > 2$ will use the polynomial from the last interval
+$[1, 2]$.
+
+This is equivalent to "extending" the first and last piece of
+the spline. A warning message is printed to alert the user when
+extrapolation occurs.
+
+### Extrapolating values : example
+```{r extrapolate-pp}
+coeff <- matrix(c(1, 0, 0, 0, 2, -1), nrow = 2, byrow = TRUE)
+knots <- c(0, 1, 2)
+pp <- makpp(coeff, knots, callable = TRUE)
+
+x_test <- c(-0.5, 0.5, 1.5, 2.5)
+y_test <- pp(x_test)
+data.frame(x = x_test, y = y_test)
+# The values at -0.5 and 2.5 are extrapolated
+```
+
+<!-- slide: 11 — Extrapolating values -->
+
+### Extracting parameters
+
+```{r get_parameters}
+# For callable PP objects, use get_parameters()
+params <- get_parameters(pp_call)
+print(params$degree)
+print(params$knot)
+print(params$coeff)
+
+# For non-callable PP, access directly
+# first transform into a non-callable pp
+pp <- makpp(pp_call, callable = FALSE, verbose = TRUE)
+pp$degree
+pp$knot
+pp$coeff
+```
+
+<!-- slide: 12 — Extracting parameters -->
+
+## More examples: PP form manipulation
+
+### Extracting a single interval polynomial
+
+```{r extract_interval}
+# Get polynomial for interval i
+pp <- makpp(pp_call, callable = FALSE)
+interval_poly <- pp$coeff[1, ]  # first interval
+print(interval_poly)
+
+# Evaluate on a subinterval
+x_sub <- seq(0, 1, length.out = 20)
+y_sub <- poly_eval(interval_poly, x_sub)
+```
+
+<!-- slide: 13 — Extracting a single interval polynomial -->
+
+
+### Create and visualising PP : new example code
+
+```{r visualize_pp, fig.width=8, fig.height=5, out.width="80%"}
+knots <- seq(0, 1, length.out = 5)
+degree <- 2
+n_pieces <- length(knots) - 1
+
+set.seed(2)
+coeff <- matrix(c(20, 5, 1) * rnorm(n_pieces * (degree + 1)),
+                nrow = n_pieces)
+
+pp <- makpp(coeff, knot = knots, callable = TRUE)
+
+x <- seq(0, 1, length.out = 200)
+y <- pp(x)
+```
+
+
+### Create and visualising PP : new example view
+\tiny
+```{r, echo=FALSE}
+plot(x, y, type = "l", lwd = 2,
+     main = "Random piecewise quadratic")
+abline(v = knots, col = "red", lty = 2)
+grid()
+```
+
+
+<!-- slide: 15 — Example of visualising PP -->
+
+### Comparison: PP vs B-spline : "bslinetopp()", example code
+
+```{r pp_vs_bspline, fig.cap="B-spline evaluation and PP-form evaluation coincide on [0,1].", fig.width=8, fig.height=5, out.width="80%"}
+sn <- c(0, 0, 0, 0, 0.25, 0.5, 0.75, 1, 1, 1, 1)
+tn <- c(0, 0.25, 0.5, 0.75, 1)
+set.seed(42)
+coeff <- 10 * rnorm(7, 1)
+Bspline <- list(coeff = coeff, knot = tn, degree = 3)
+Bspline <- make_spline(Bspline)
+
+pp_from_bspline <- Bsplinetopp(Bspline)
+
+x <- seq(0, 1, length.out = 100)
+y_bspline <- spline_eval(Bspline, x)
+y_pp      <- evalpp(pp_from_bspline, x)
+
+```
+
+
+### PP vs B-spline : visualisation
+```{r,  echo=FALSE, fig.cap="Comparison PP vs Bspline evaluation for the same base object" }
+cat("Max |B-spline - PP| =", max(abs(y_bspline - y_pp)), "\n")
+plot(x, y_bspline, lwd = 2, col = "black",
+     xlab = "x", ylab = "f(x)",
+     main = "B-spline vs PP-form evaluation")
+lines(x, y_pp, lwd = 2, col = "red", lty = 2)
+grid()
+legend("topright",
+       legend = c("B-spline evaluation (spline_eval)",
+                  "PP-form evaluation (evalpp)"),
+       col = c("black", "red"),
+       lty = c(1, 2), lwd = 2, bty = "n")
+```
+
+<!-- slide: 16 — Comparison: PP vs B-spline -->
+
+### Summary of basic polynomial operations
+
+\small
+
+| Feature | Function | Description |
+|---------|----------|-------------|
+| Polynomial multiplication | "polymul()" | Multiply two polynomials |
+| Polynomial addition | "polyadd()" | Add two polynomials |
+| Polynomial evaluation | "poly_eval()" | Evaluate at points |
+| Polynomial derivative | "polyderiv()" | Differentiate polynomial |
+| Taylor shift | "change_polynomial_base_taylor()" | Change expansion point |
+| PP creation | "makpp()" | Create PP form |
+| PP evaluation | "evalpp()" | Evaluate PP at points |
+| Callable PP | "makpp(callable = TRUE)" | PP as function |
+| Extract params | "get_parameters()" | Extract from callable |
+
+<!-- slide: 17 — Summary of basic polynomial operations -->
+
+
+
+## Displaying polynomials in a human-readable form
+
+The `show_poly()` function displays a polynomial as a human-readable
+mathematical equation. It supports both canonical and local bases, and
+can convert between different expansion points using Taylor's formula.
+
+A polynomial $P(x) = \sum_{i=0}^d c_i (x-a)^i$ represented by
+coefficients `c(c_d, c_{d-1}, ..., c_0)` (decreasing power order) can be
+displayed in any basis $(x-b)^i$.
+
+<!-- slide: 18 — Displaying polynomials: introduction -->
+
+### Basic usage
+
+#### Canonical basis (default)
+
+By default, `show_poly()` displays the polynomial in the canonical basis
+$1, x, x^2, \dots$:
+
+```{r show-poly-canonical}
+# P(x) = 3x^3 - 2x^2 + x - 5
+p <- c(3, -2, 1, -5)
+show_poly(p)
+```
+
+<!-- slide: 19 — Canonical basis (default) -->
+
+#### Display in local basis
+
+Assuming we have a polynomial given on the canonical basis $x^i$.
+To display it in the local basis $(x-b)^i$, use the `b`
+parameter:
+
+```{r local_basis}
+# P(x) = 3(x-2)^3 - 2(x-2)^2 + (x-2) - 5
+p <- c(3, -2, 1, -5)
+show_poly(p, b = 2)
+```
+
+<!-- slide: 20 — Display in local basis -->
+
+#### Converting between bases
+By default, "show_poly(p, b = 2)" assumes that p is given on the canonical basis.
+
+The `a` parameter specifies the basis in which the coefficients are
+given. The function automatically converts using
+"change_polynomial_base_taylor()":
+
+```{r convert_bases}
+# Coefficients are in basis (x-2)^k, display in canonical basis
+p <- c(3, -2, 1, -5)  # in basis (x-2)^i
+show_poly(p, a = 2, b = 0)
+```
+
+<!-- slide: 21 — Converting between bases -->
+
+### Examples with different bases
+
+#### Positive and negative centres
+
+```{r centers}
+# Center at positive value
+p <- c(1, 0, 2)  # (x-3)^2 + 2
+show_poly(p, b = 3)
+
+# Center at negative value
+p <- c(1, 0, 2)  # (x+2)^2 + 2
+show_poly(p, b = -2)
+```
+
+<!-- slide: 22 — Positive and negative centres -->
+
+### Controlling output format: number of digits
+
+```{r digits}
+p <- c(1/3, -2/7, 1/5)
+show_poly(p, digits = 2)
+show_poly(p, digits = 7)
+```
+
+<!-- slide: 23 — Controlling output format -->
+
+
+## Integration with show_pp()
+
+The `show_poly()` function is used internally by `show_pp()` to display piecewise polynomials:
+
+The display functions "show_pp()" offer several customization options: 
+
+- *local*: Control the basis (TRUE for local, FALSE for canonical)
+- *digits*: Number of significant digits (default: 4)
+- *verbose*: Display additional PP information
+  
+### Integration with show_pp() code example
+```{r show_pp_integration}
+# Create a PP with two intervals
+knot <- c(0, 0.5, 1)
+coeff <- matrix(c(1, 2, 0.5, 0, 1, -1), nrow = 2, ncol = 3, byrow = TRUE)
+pp <- makpp(coeff, knot)
+
+# Display in local basis
+show_pp(pp, local = TRUE, digits = 3)
+```
+
+### Integration with show_pp() new example
+
+```{r show_pp}
+# Create a PP with two intervals
+knots <- c(0, 0.5, 1)
+coeff <- matrix(c(1, 2, 0.5, 0, 1, -1), nrow = 2, ncol = 3, byrow = TRUE)
+pp <- makpp(coeff, knot=knots)
+
+# Display in canonical basis (1, x, x², ...)
+show_pp(pp, local = FALSE)
+```
+### Integration with show_pp() example with spline
+For spline objects, the conversion to PP is automatic:
+```{r}
+# Create a B-spline and display its polynomial form
+sn <- c(0, 0, 0, 0, 0.3, 0.6, 1, 1, 1, 1)
+basis <- Bspline_base(sn, degree = 3)
+basis$coeff <- c(1, -0.5, 2, 0.5, -1, 0.75)
+basis<-make_spline(basis)
+
+show_pp(basis, local = TRUE, verbose = TRUE)
+```
+
+### show_poly with B-splines: decompose the use of "show_pp()"
+```{r}
+#convert to pp
+pp<-Bsplinetopp(basis)
+# Display each piece and compare with show_pp()
+cat("Piece 1: ", show_poly(pp$coeff[1, ], b = 0), "\n")
+cat("Piece 2: ", show_poly(pp$coeff[2, ], b = 0), "\n")
+cat("Piece 3: ", show_poly(pp$coeff[3, ], b = 0), "\n")
+
+```
+
+
