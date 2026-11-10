@@ -462,6 +462,7 @@ Step by step : differentiating the Bspline basis, then evaluate the basis at the
 with these values and the same coefficients $\alpha_i$ as those of $f(x)$ in its writing on the basis.
 
 ### Third method: description
+**Third method: description**
 $\pi_{d,j}$ be the $j$-th spline of degree $d$, and $\pi_{d,j}'$ be the $j$-th spline of degree $d-1$ 
 $$
 f'(x)=\sum_{j=1}^{N-1} \alpha_j \pi_{d,j}'(x) = \sum_{j=1}^{N} \alpha_j' \pi_{d-1,j}(x), 
@@ -471,6 +472,7 @@ Formula for $\pi_{d,j}'$: that derived by de Boor, implemented in "Bspline_deriv
 $$\alpha_i'=\frac{\alpha_{j+1}-\alpha_j}{(t_{i+d}-t_i)/d}$$
 
 ### The fourth method : description
+**The fourth method**
 When computing its PP-form, the spline is written as a sum of disjointed piecewise polynomials of degree $d$.
 
 $$
@@ -485,9 +487,8 @@ The simplest method is to use "spline_eval()" with the "der" argument.
 This function calculates the derivative of the B-spline basis, then the
 values of the differentiated basis, and finally evaluates the function.
 
-```{r eval-deriv, fig.cap="A random cubic B-spline function and its first three derivatives.", fig.width=8, fig.height=8, out.width="80%"}
-bs_function <- basis
-bs_function$coeff <- rnorm(basis$n_splines)
+```{r eval-deriv, fig.cap="A random cubic B-spline function and its first three derivatives.", fig.width=8, fig.height=8, out.width="80%", echo=TRUE}
+bs_function<-bs # bs is  the preceding example 
 
 x_plot <- seq(0, 5, length.out = 100)
 y  <- spline_eval(bs_function, x_plot, der = 0)
@@ -518,8 +519,9 @@ This method follows the same path as "spline_eval()":
 
 ```{r step-by-step, fig.cap="Step-by-step derivative evaluation: all methods coincide.", fig.width=8, fig.height=8, out.width="80%", echo=TRUE}
 # Step 1: Compute the derivative basis (derivative order = 1)
-basis_der1 <- Bspline_base_deriv(bs_function, der = 1)
+basis_der1 <- Bspline_base_deriv(basis, der = 1)
 # Step 2: Evaluate the derivative basis at points using bs_direct
+
 x_plot <- seq(0, 5, length.out = 100)
 Bvalues_der1 <- bs_direct(basis_der1, x_plot)
 ```
@@ -529,16 +531,16 @@ Bvalues_der1 <- bs_direct(basis_der1, x_plot)
 \small
 ```{r splibe_code, echo=TRUE}
 # Step 3: Compute the derivative values using matrix multiplication
-y_der1 <- t(Bvalues_der1) %*% bs_function$coeff
+y_der1 <- t(Bvalues_der1) %*% basis$coeff
 
 # Step 4: Compare with spline_eval (direct method)
 cat("Maximum difference:", max(abs(y_der1 - y1)), "\n")
 basis_der2 <- Bspline_base_deriv(basis, der = 2)
 Bvalues_der2 <- bs_direct(basis_der2, x_plot)
-y_der2 <- t(Bvalues_der2) %*% bs_function$coeff
+y_der2 <- t(Bvalues_der2) %*% basis$coeff
 basis_der3 <- Bspline_base_deriv(basis, der = 3)
 Bvalues_der3 <- bs_direct(basis_der3, x_plot)
-y_der3 <- t(Bvalues_der3) %*% bs_function$coeff
+y_der3 <- t(Bvalues_der3) %*% basis$coeff
 ```
 
 ```{r}
@@ -602,7 +604,7 @@ its derivative is simply the derivative of each $p_\nu$. The function
    PP object is callable).
 
 ### Method 4: Differentiating the PP-form with "pp_deriv()" : the code
-```{r pp-deriv-code ,echo=FALSE}
+```{r pp-deriv-code ,echo=TRUE}
 # Convert the B-spline to PP-form (non-callable, for clarity)
 pp <- Bsplinetopp(bs_function, callable = FALSE)
 
@@ -665,6 +667,7 @@ legend("topright", legend = c("1st", "2nd", "3rd"),
 ## Derivatives at knots
 Use  `Spline_der_knot()` function to compute derivative values at knot
 points rapidly. This is a very simple function, but with limited use.
+
 ```{r der-knot}
 der_knots <- Spline_der_knot(basis, der = 1)
 print(head(der_knots))
