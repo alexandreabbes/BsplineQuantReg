@@ -265,7 +265,7 @@ evalpp <- function(p, x_values) {
 #' Creates a PP structure from polynomial coefficients and knots.
 #' If callable = TRUE, returns a function that evaluates the PP.
 #'
-#' @param coeff matrix (coefficents) or pp polynomial. Coefficient matrix (kn x (degree+1))
+#' @param coeff matrix (coefficients) or pp polynomial. Coefficient matrix (kn x (degree+1))
 #' @param tn  (old notation) vector (knots) of length kn+1. Needed if coefficient is not pp
 #' @param knot  same as tn. if both are provided only knot is used. If only tn or knot is given, that one is used.
 #' @param callable Boolean; if TRUE, returns a callable function
@@ -363,18 +363,21 @@ makpp<-function(coeff,
 #' @param a : the base in which the coefficients are given is (x-a)^i,
 #' default 0 for canonical
 #' @param b : the base for output is (x-b)^i, default b=0
-#' @param digits Nombre de chiffres significatifs à afficher
+#' @param digits Number of significant digits to display
 #' @return the polynomial written on the base (x-b)^i
 #' @export
 #'
 #' @examples
 #' # Simple polynomial
-#' p <- c(3, -2, 1)  # 3 - 2x + x^2
+#' p <- c(1, -2, 3)  # x^2 - 2x + 3
 #' show_poly(p) # or
 #' show_poly(p,a=0, b=0)
 #' # base not zero
-#' p <- c(3, -2, 1)  # 3 - 2(x-2) + (x-2)^2
+#' p <- c(1, -2, 3)  # (x-2)^2 - 2(x-2) + 3
 #' show_poly(p, a=2, b=2)
+#' #change basis
+#' p <- c(1, -2, 3)  # x^2 - 2x + 3
+#' show_poly(p, a=0, b=2)
 show_poly <- function(obj,
                        a=0,
                        b=0,
@@ -399,9 +402,9 @@ show_poly <- function(obj,
       c_i<-paste0(round(obj[j],digits),collapse="")
 
       if (j>1){
-      pol<-paste0(pol,if (c_i>=0)"+",c_i, if (fact!="") "*",fact,collapse="")
+      pol<-paste0(pol,if (obj[j]>=0)"+",c_i, if (fact!="") "*",fact,collapse="")
       }
-      else pol<-paste0(c_i,"*",fact,collapse="")
+      else pol<-paste0(c_i, if (fact!="")"*",fact,collapse="")
     }
     return(pol)
 }
@@ -446,10 +449,11 @@ show_poly <- function(obj,
 #' # [0.500, 1.000] -1(x-0.5)^2 + 1(x-0.5) + 0
 #'
 #' # With a spline
-#' sn <- c(0,0,0,0,1,2,3,4,5,5,5,5)
-#' basis <- Bspline_base(sn, degree = 3)
-#' basis$coeff <- runif(basis$n_splines)
-#' show_pp(basis, local = TRUE, verbose = TRUE)
+#' tn <- c(0,1,2,3,4,5)
+#' coeff <- runif(length(tn)+2)
+#' spline<-make_spline(list(knot=tn,coeff=coeff,degree=3))
+#'
+#' show_pp(spline, local = TRUE, verbose = TRUE)
 #' }
 #'
 #' @seealso \code{\link{show_poly}}, \code{\link{Bsplinetopp}}, \code{\link{makpp}}
