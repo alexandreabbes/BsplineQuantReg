@@ -27,8 +27,7 @@ A list containing:
   \item{base}{Coefficients in the local bases, in the form of an 3-d array [j,nu,coeff],
    j : the number of the spline in the basis,
   nu: the number of the interval in the extended notation,
-  coeff : the coefficients in decreasing order
-  Decresing (matlab) convention on the local bases (t-s_nu)^l, l=3.2.1
+  coeff : the coefficients in decreasing (matlab) order convention on the local bases (t-s_nu)^l, l=3.2.1
   base[j,,] is a matrix of piecewise polynomial function compatible with the pp-form.}
   \item{base0}{Coefficients in canonical basis (centered at 0) (1, t, t^2, t^3) centered at the interval origin.}
   \item{ext_knot}{Extended knot vector}

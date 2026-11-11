@@ -216,13 +216,13 @@ pp
 
 ### Callable PP objects : construction example code
 
-A callable PP object can be evaluated directly like a function.
-
+A **callable PP object** can be evaluated directly like a function.
+\small
 ```{r callable_pp}
 pp_call <- makpp(coeff, knots, callable = TRUE)
 class(pp_call)  # "callable_pp" "function"
 ```
-
+\tiny
 ```{r callable-pp-eval}
 x <- seq(0, 2, length.out = 10)
 paste(x,collapse = ",")
@@ -274,20 +274,23 @@ data.frame(x = x_test, y = y_test)
 <!-- slide: 11 — Extrapolating values -->
 
 ### Extracting parameters
-
+\small
+ For **callable PP** objects, use "get_parameters()"
 ```{r get_parameters}
-# For callable PP objects, use get_parameters()
 params <- get_parameters(pp_call)
 print(params$degree)
 print(params$knot)
 print(params$coeff)
-
-# For non-callable PP, access directly
-# first transform into a non-callable pp
+print(pp)
+```
+### Extracting parameters for non-callable pp
+**non-callable PP** objets are lists: access directly the parameters
+```{r}
 pp <- makpp(pp_call, callable = FALSE, verbose = TRUE)
 pp$degree
 pp$knot
 pp$coeff
+print(pp)
 ```
 
 <!-- slide: 12 — Extracting parameters -->

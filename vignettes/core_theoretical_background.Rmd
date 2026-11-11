@@ -176,7 +176,7 @@ The package implements the well-known algorithm to compute the
 polynomial coefficients of each B-spline basis function on each
 interval. For a B-spline of degree $d$ with $n$ basis functions, the
 algorithm proceeds recursively:
-
+### 2.3 Algorithm for coefficient computation : three steps
 **Step 1**: start with constant B-splines (degree 0): $N_{i,0}(t)$ are
 piecewise constants.
 
@@ -213,8 +213,7 @@ The package provides several functions for B-spline manipulation:
 
 ### 2.5 (Advanced) Knot multiplicity and regularity
 
-The regularity of a B-spline at a knot depends on its multiplicity. For
-a knot with multiplicity $m$ and degree $d$:
+The regularity of a B-spline at a knot depends on its multiplicity. For a knot with multiplicity $m$ and degree $d$:
 
 | Multiplicity $m$ | Regularity | Meaning |
 |------------------|------------|---------|

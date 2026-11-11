@@ -4,7 +4,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17427913.svg)](https://doi.org/10.5281/zenodo.17427913)
 [![CRAN downloads](https://cranlogs.r-pkg.org/badges/BsplineQuantReg)](https://cran.r-project.org/package=BsplineQuantReg)
 
-## **Constrained Quantile Regression with B-Splines (Degrees 1 to 4)**
+## **Constrained Quantile Regression with B-Splines (Degrees 0,1,2,3,4,... )**
 
 This package is available on CRAN.
 
@@ -36,7 +36,7 @@ install.packages("BsplineQuantReg")
 ### From GitHub (development version)
 
 ```r
-remotes::install_github("alexandreabbes/BsplineQuantReg")
+remotes::install_github("alexandreabbes/bsplinequantreg")
 ```
 
 ## System Requirements
@@ -110,7 +110,7 @@ The interface will open in your default browser.
 ### Docker Deployment
 A Docker image is available for easy deployment:
 
-```{bash}
+```bash
 docker pull ghcr.io/alexandreabbes/bsplinequantreggui:latest
 docker run -p 3838:3838 ghcr.io/alexandreabbes/bsplinequantreggui:latest
 ```
@@ -122,9 +122,6 @@ Then open http://localhost:3838 in your browser.
 ```r
 # Install from GitHub
 remotes::install_github("alexandreabbes/bsplinequantreggui")
-
-# Or with pak
-pak::pkg_install("alexandreabbes/bsplinequantreggui")
 ```
 
 
@@ -153,8 +150,7 @@ https://github.com/alexandreabbes/Constrained-Quantile-Regression-with-cubic-spl
 `
 ## Performance Notice
 This R package is intended for demonstration, prototyping, and educational purposes.
-Due to the current implementation (pure R with CVXR) the package is  almost 5 times slower than its Python counterpart (benchmark test), but much (10 times 
-maybe) faster than the matlab one.
+Due to the current implementation (pure R with CVXR) the package is  almost 5 times slower than its Python counterpart (benchmark test), but much (10 times maybe) faster than the matlab one.
 B-spline quantile regression with constraints involves solving SOCP problems, and the R implementation does not yet leverage optimized linear algebra libraries.
 
 
@@ -208,5 +204,5 @@ If you use this package in your research, please cite:
 
 ## Bug Reports
 
-Please report issues on GitHub: https://github.com/alexandreabbes/BsplineQuantReg/issues
+Please report issues on GitHub: https://github.com/alexandreabbes/bsplinequantreg/issues
 ```
