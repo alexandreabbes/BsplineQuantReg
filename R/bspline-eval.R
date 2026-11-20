@@ -271,6 +271,8 @@ view_basis <- function(BB,
   if (is.null(main))
     main <- paste("B-spline Basis (degree", BB$degree, ")")
   # Graphique
+    ylim_min<-min(-0.2,min(yvalues) )
+    ylim_max<-max(1.2,max(yvalues) )
   matplot(
     x_values,
     t(yvalues),
@@ -280,7 +282,7 @@ view_basis <- function(BB,
     ylab = "Basis values",
     main = main,
     lty = 1,
-    ylim=c(-0.2,1.2)
+    ylim=c(ylim_min,ylim_max)
   )
   #col = colors, lty = 1)
 

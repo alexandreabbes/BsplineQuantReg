@@ -16,6 +16,7 @@ Version=0.2.7
 - verbose comment in makepp
 - remove waste bspline_base2 useseless function (old debug purpose, forgotten)
 - some mistake in Bspline_base() function help
+- view_basis() adapt ylim to the yvalues
 
 Version=0.2.6 (10/2026)
 =============
