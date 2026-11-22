@@ -5,10 +5,9 @@
 
 #' Quantile regression with general polynomial splines and shape constraints
 #'
-#' Performs quantile regression using quartic (degree 4) B-splines with
-#' monotonicity (Karlin-Studden constraints on the cubic derivative),
-#' convexity (Karlin-Studden constraints on the quadratic second derivative),
-#' and third derivative constraints (linear at knot).
+#' Performs quantile regression using any degree with constraints only when
+#' degree>=5. In that case, only convexity and third derivative constraints
+#' areconsidered (Karlin-Studden constraints on the cubic and quadratic polynomials)
 #'
 #' @param xtab Predictor vector (x)
 #' @param ytab Response vector (y)
@@ -19,7 +18,7 @@
 #'        1 = convex, -1 = concave, 0 = unconstrained
 #' @param der3cons Not yet implemented Third derivative constraint vector at knot:
 #'        1 = positive third derivative, -1 = negative, 0 = unconstrained
-#' @param solver 'CVXR' solver to use (default = "OSQP")
+#' @param solver 'CVXR' solver to use (default = "CLARABEL")
 #' @param weight Observation weights (default = 1 for all)
 #' @param verbose Logical; if TRUE, print progress messages
 #' @param type_reg 'quantile' or 'mean_square' type of regression
@@ -78,13 +77,13 @@ SplinePolynQuant <- function(xtab,
 
   # Optimization variables
   alpha <- Variable(N)
-  z_vars <- list()
+
 
   # Objective function
   residuals <- ytab_centered - B %*% alpha
 
   if (type_reg=='mean_square'){
-    weighted_loss <- p_norm(residuals,2)
+    weighted_loss <- sum(weight * residuals^2 )
   }
   else{#if (type_reg=='quantile'){
     #quantile
@@ -121,7 +120,7 @@ if (degree==5){
     #prepare the values for matrix mult.      #calculation
     # deriv_coeff3=t(deriv_coeffs3)}
     if (length(der3cons) == 1) {
-      der3cons <- rep(der3cons, kn)
+      der3cons <- rep(der3cons, kn+1)
     }
     if (length(der3cons) < kn+1) {
       message("not enough 3rd order constraints, completing with 0")
@@ -135,22 +134,27 @@ if (degree==5){
   }
 
 
+  if (any(convcons!= 0 ) || any(der3cons!= 0 )   ){
+    if (verbose) cat("constraints are applied")
 
   deriv_data <- bspline_to_deriv_coeffs_general(BB)
 
   # Derivative coefficients
-  #deriv1_coeffs <- deriv_data$d1  # [kn, N, 4] for cubic derivative
-  deriv2_coeffs <- deriv_data$d2  # [kn, N, 3] for quadratic second derivative
-  deriv3_coeffs <- deriv_data$d3   # [kn+1, N] for linear third derivative at knot
+  # deriv1_coeffs <- deriv_data$d1  # [kn, N, 4] for first derivative at knots # unused
+  deriv2_coeffs <- deriv_data$d2  # [kn, N, 3] for  second derivative at knots
+  deriv3_coeffs <- deriv_data$d3   # [kn+1, N] for  third derivative at knots
+}
 
 
 
 
   # 1. convexity constraints (Karlin-Studden on cubic derivative)
   # Second Derivative is cubic: P'(u) = a*u^3 + b*u^2 + c*u + d
-  if (any(convcons!= 0)) {
-    cat("constraints are applyed")
-    # Create z variables for cubic constraints (one per interval)
+if (any(convcons!= 0)) {
+     # Create z variables for cubic constraints (one per interval)
+
+
+
     z0_vars <- list()
     z1_vars <- list()
 

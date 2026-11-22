@@ -50,12 +50,6 @@ On Linux systems, the packages `CVXR` and `CLARABEL` require the Rust compiler a
 sudo apt-get install cargo rustc
 ```
 
-#### Fedora and other linux dist.
-
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -
-source ~/.cargo/env
-```
 
 #### Verify installation:
 
@@ -64,11 +58,8 @@ rustc --version
 cargo --version
 ```
 
-After installing Rust and Cargo, restart R and install the package:
+After installing Rust and Cargo, restart R and install the package (see previous comment)
 
-```r
-install.packages("BsplineQuantReg")
-```
 
 ### Windows Users
 
@@ -119,12 +110,25 @@ Then open http://localhost:3838 in your browser.
 
 ### Installation
 
-```r
-# Install from GitHub
-remotes::install_github("alexandreabbes/bsplinequantreggui")
+```{r}
+# Install from "CRAN"
+remotes::install("alexandreabbes/bsplinequantreggui")
 ```
 
+```{r}
+# Install from GitHub
+install.packages("alexandreabbes/bsplinequantreggui")
+```
 
+## Online documentation
+
+`BsplineQuantReg` is fully documented with demos and vignettes. All vignettes are available in HTML at:
+
+**https://bsplinequantreg-doc.statichost.page/**
+
+The site also hosts the HTML builds of the vignettes for the graphical interface `BsplineQuantRegGui`, 
+in English, French, German, Arabic, Russian, and Chinese.
+Each language has its own section on the landing page, with direct links to the core, application, and interface vignettes.
 
 ## Related Packages
 

@@ -1,4 +1,4 @@
-#' Unified Quantile Regression with B-Splines of Any Degree (1 to 4)
+#' Unified Quantile Regression with B-Splines of Any Degree (0 to 4 and more)
 #'
 #' This function provides a unified interface for quantile regression with
 #' B-splines of degrees 1 to 4, with shape constraints (monotonicity,
@@ -75,7 +75,7 @@ quantile_spline <- function(xtab,
   if (is.null(knot)){knot=c(min(xtab),max(xtab))}
 
     # Validate degree
-  if (degree < 0 || degree < 0) {
+  if (degree < 0) {
     stop("degree must be between 1 and 4. Received: ", degree)
   }
   if (degree == 0) {

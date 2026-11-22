@@ -8,6 +8,8 @@ Version=0.2.7
 - in spline_eval(Bspline,xx), if Bspline is a basis, not re-compute the basis.
 - Transfer the basis attributes to callable and non-callable splines, get_parameter() is adapted, and all output are now aligned.
 -modify the ylim in basis_view()
+- update the readme and add the link to the html documentation of the core+gui+app
+
 
 ## fixed
 - some vignettes (mostly cosmetic, details)
@@ -17,6 +19,9 @@ Version=0.2.7
 - remove waste bspline_base2 useseless function (old debug purpose, forgotten)
 - some mistake in Bspline_base() function help
 - view_basis() adapt ylim to the yvalues
+- export and description for "bspline_to_deriv_coeffs_general()""
+- fix some details in "SplinePolynQuant()"
+
 
 Version=0.2.6 (10/2026)
 =============
